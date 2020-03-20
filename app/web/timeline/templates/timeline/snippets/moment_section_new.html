@@ -30,6 +30,14 @@
         <summary class="details__header" data-handler="open-moment">
             <h3 data-static-mode data-moment-name class="details__title"></h3>
             <p data-edit-mode>{{ moment.name }}</p>
+
+
+            <div class="form-field" class="data-edit-mode">
+                <label for="id_description" class="sr-only">{{ moment.name.label }}</label>
+                {{ moment.name }}
+                <p class="error-text">Het veld hierboven is verplicht</p>
+            </div>
+
             <span class="details__toggle-icon">
                 <svg class="details__header-opened" width="14" height="9">
                     <use href="#chevron-up" xlink:href="#chevron-up" width="14" height="9"></use>
@@ -68,25 +76,31 @@
                 <h4>Betrokken organisaties</h4>
                 <p>Er zijn (nog) geen organisaties toegewezen aan deze processtap.</p>
             </div>
-            <p class="data-edit-mode">{{ moment.description }}</p> 
-            <div class="data-edit-mode">
-                <div class="form-field">
-                    <label for="id_document_type">{{ moment.organizations.label }}</label>
-                    <ul class="form-field__checkboxgroup">
-                        {% for checkbox in moment.organizations %}
-                            <li>
-                                {{ checkbox.tag }}
-                                <label for="{{ checkbox.id_for_label }}" class="form-field__checkboxlabel">
-                                    {{ checkbox.choice_label }}
-                                </label>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+
             <div data-static-mode class="form-field form-field--buttons">
                 <button href="#" data-handler="enter-edit-moment" class="button button--primary" disabled="disabled">Wijzigen</button>
             </div>
+
+            <div class="form-field" class="data-edit-mode">
+                <label for="id_description">{{ moment.description.label }}</label>
+                {{ moment.description }}
+                <p class="error-text">Het veld hierboven is verplicht</p>
+            </div>
+
+            <div class="form-field" class="data-edit-mode">
+                <label for="id_document_type">{{ moment.organizations.label }}</label>
+                <ul class="form-field__checkboxgroup">
+                    {% for checkbox in moment.organizations %}
+                        <li>
+                            {{ checkbox.tag }}
+                            <label for="{{ checkbox.id_for_label }}" class="form-field__checkboxlabel">
+                                {{ checkbox.choice_label }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
             <div data-edit-mode class="form-field form-field--buttons">
                 <button class="button button--primary" data-handler="save-moment" disabled="disabled">Opslaan</button>
                 <button class="button button--secondary" data-handler="exit-edit-moment" disabled="disabled">Annuleer</button>
