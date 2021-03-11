@@ -49,7 +49,7 @@ class UserManager(BaseUserManager):
         )
         return queryset
 
-    def federation_beheerders_by_federation_type(self, federation_type):
+    def federation_beheerders_by_federation(self, federation, federation_type):
         queryset = self.get_queryset()
         queryset = queryset.filter(
             user_type__in=[
@@ -57,6 +57,7 @@ class UserManager(BaseUserManager):
                 FEDERATIE_BEHEERDER,
                 WONEN,
             ],
+            federation=federation,
             federation__organization__federation_type=federation_type,
         )
         return queryset
