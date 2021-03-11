@@ -28,7 +28,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "vue": "^2.6.11",
     "@vue/cli": "^4.5.4",
     "vue-moment": "^4.1.0"
