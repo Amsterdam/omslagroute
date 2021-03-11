@@ -64,7 +64,7 @@ FIELDS = (
         required=False,
     ), {'step_required': True}),
     ('jonger_dan_26', forms.IntegerField(
-        label=_('Plaatsing jonger dan 27 jaar'),
+        label=_('Plaatsing jonger dan 26 jaar'),
         widget=RadioSelect(
             choices=JONGER_DAN_26,
         ),
@@ -981,7 +981,7 @@ URGENTIE_AANVRAAG = [
                 ],
             },
             {
-                'title': 'Jonger dan 27 jaar?',
+                'title': 'Jonger dan 26 jaar?',
                 'description': '',
                 'fields': [
                     'jonger_dan_26',
@@ -1129,7 +1129,7 @@ OMKLAP_AANVRAAG = [
         ]
     },
     {
-        'title': 'Jonger dan 27 jaar?',
+        'title': 'Jonger dan 26 jaar?',
         'description': '',
         'section_list': [
             {
