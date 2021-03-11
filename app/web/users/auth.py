@@ -86,7 +86,8 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
         beheerder_recipient_list = list(self.UserModel.objects.beheerders().values_list('username', flat=True))
         federation = Federation.objects.filter(federation_id=claims.get(settings.OIDC_FEDERATION_KEY)).first()
         if federation and federation.organization and federation.organization.federation_type:
-            federatie_beheerder_recipient_list = list(self.UserModel.objects.federation_beheerders_by_federation_type(
+            federatie_beheerder_recipient_list = list(self.UserModel.objects.federation_beheerders_by_federation(
+                federation,
                 federation.organization.federation_type
             ).values_list('username', flat=True))
             if federatie_beheerder_recipient_list:
