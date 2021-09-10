@@ -71,14 +71,14 @@ class UserList(UserPassesTestMixin, TemplateView):
         filter_params = '&filter='.join(filter_list)
         filter_params = '&filter=%s' % filter_params if filter_params else ''
 
-        search = self.request.GET.get('search', None)
+        search = self.request.GET.get('search', '')
 
-        if search is None:
+        if search == '':
             object_list = User.objects.all().filter(user_type__in=filter)
         else:
-            object_list = User.objects.all().filter(user_type__in=filter).filter(Q(first_name__icontains=search) |
-                                                                                 Q(last_name__icontains=search) |
-                                                                                 Q(email__icontains=search) )
+            object_list = User.objects.filter(user_type__in=filter).filter(Q(first_name__icontains=search) |
+                                                                           Q(last_name__icontains=search) |
+                                                                           Q(email__icontains=search) )
 
         # default sort on user_type by custom list
         object_list = [[o, USER_TYPES_ACTIVE.index(o.user_type)] for o in object_list]
