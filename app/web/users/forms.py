@@ -23,6 +23,11 @@ class FilterListForm(forms.Form):
         ),
         required=False,
     )
+    search = forms.CharField(
+        label=_('Zoeken'),
+        required=False
+    )
+
 
 class FilterListFederationForm(forms.Form):
     filter = forms.MultipleChoiceField(

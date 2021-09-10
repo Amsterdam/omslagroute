@@ -18,7 +18,7 @@ from mozilla_django_oidc.utils import (
     absolutify
 )
 from web.cases.models import Case
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 import sendgrid
@@ -70,7 +70,15 @@ class UserList(UserPassesTestMixin, TemplateView):
         filter = filter_list if filter_list else USER_TYPES_ACTIVE
         filter_params = '&filter='.join(filter_list)
         filter_params = '&filter=%s' % filter_params if filter_params else ''
-        object_list = User.objects.all().filter(user_type__in=filter)
+
+        search = self.request.GET.get('search', '')
+
+        if search == '':
+            object_list = User.objects.all().filter(user_type__in=filter)
+        else:
+            object_list = User.objects.filter(user_type__in=filter).filter(Q(first_name__icontains=search) |
+                                                                           Q(last_name__icontains=search) |
+                                                                           Q(email__icontains=search) )
 
         # default sort on user_type by custom list
         object_list = [[o, USER_TYPES_ACTIVE.index(o.user_type)] for o in object_list]
