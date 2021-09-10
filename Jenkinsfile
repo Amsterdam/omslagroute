@@ -1,7 +1,7 @@
 #!groovy
 
 String PROJECTNAME = "omslagroute"
-String CONTAINERDIR = "."
+String CONTAINERDIR = "app"
 String PRODUCTION_BRANCH = "main"
 String INFRASTRUCTURE = 'secure'
 String PLAYBOOK = 'deploy.yml'
