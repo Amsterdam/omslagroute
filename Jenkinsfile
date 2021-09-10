@@ -42,7 +42,7 @@ node {
             sh 'cat version_file'
 
             docker.withRegistry("${DOCKER_REGISTRY_HOST}",'docker_registry_auth') {
-                image = docker.build("${CONTAINERNAME}:${env.BUILD_NUMBER}","-f ${DOCKERFILE} ${CONTAINERDIR}")
+                image = docker.build("${CONTAINERNAME}:${env.BUILD_NUMBER}","-f app/${DOCKERFILE} ${CONTAINERDIR}")
                 image.push()
             }
         }
