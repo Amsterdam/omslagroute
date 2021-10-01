@@ -148,11 +148,13 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
             case__delete_request_date__isnull=True
         )
 
-        paginator = Paginator(tabs[int(self.request.GET.get('f', 0))].get('queryset'), 20)
+        tab_index = self.request.GET.get('f', 0)
+        paginator = Paginator(tabs[int(tab_index)].get('queryset'), 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
         kwargs.update({
+            'filter_params': f'&f={tab_index}',
             'object_list': paginator.get_page(page),
             'tabs': tabs,
             'case_archive_list': Case.objects.filter(delete_request_date__isnull=False)
