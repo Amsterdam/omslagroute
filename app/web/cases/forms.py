@@ -11,12 +11,25 @@ from web.profiles.models import Profile
 from web.users.statics import BEGELEIDER, PB_FEDERATIE_BEHEERDER
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE
 
+class UserCaseForm(forms.ModelForm):
+    search = forms.CharField(
+        label=_('Zoeken'),
+        required=False
+    )
+    class Meta:
+        model = Case
+        exclude = []
+
 class CaseForm(forms.ModelForm):
     geslacht = forms.ChoiceField(
         label=_('Geslacht'),
         required=True,
         widget=RadioSelect(),
         choices=GESLACHT
+    )
+    search = forms.CharField(
+        label=_('Zoeken'),
+        required=False
     )
 
     class Meta:

@@ -27,7 +27,7 @@ from web.users.auth import user_passes_test
 from django.core.paginator import Paginator
 from web.timeline.models import Moment
 from formtools.wizard.views import SessionWizardView
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Concat
 from django.db.models import TextField, DateTimeField, IntegerField
 from django.core.exceptions import PermissionDenied
@@ -49,13 +49,24 @@ class UserCaseList(UserPassesTestMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs = super().get_context_data(object_list=object_list, **kwargs)
+
+        search = self.request.GET.get('search', '')
+
+        if search == '':
+            object_list = kwargs.pop('object_list')
+        else:
+            object_list = kwargs.pop('object_list').filter(Q(client_first_name__icontains=search) |
+                                                           Q(client_last_name__icontains=search) |
+                                                           Q(emailadres__icontains=search) )
+
         # pagination
-        object_list = kwargs.pop('object_list')
         paginator = Paginator(object_list, 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
+        form = UserCaseForm(self.request.GET)
         kwargs.update({
             'object_list': object_list,
+            'form': form,
         })
         return kwargs
 
@@ -74,12 +85,23 @@ class CaseListArchive(UserPassesTestMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs = super().get_context_data(object_list=None, **kwargs)
 
-        paginator = Paginator(kwargs.get('object_list', []), 20)
+        search = self.request.GET.get('search', '')
+
+        if search == '':
+            object_list = kwargs.pop('object_list')
+        else:
+            object_list = kwargs.pop('object_list').filter(Q(client_first_name__icontains=search) |
+                                                           Q(client_last_name__icontains=search) |
+                                                           Q(emailadres__icontains=search) )
+
+        paginator = Paginator(object_list, 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
+        form = UserCaseForm(self.request.GET)
         kwargs.update({
             'object_list': paginator.get_page(page),
+            'form': form,
         })
         return kwargs
 
@@ -92,12 +114,21 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+
         casestatus_list = CaseStatus.objects.all()
+
         casestatus_list = casestatus_list.filter(
             case__in=Case.objects.by_user(self.request.user).values_list('id', flat=True),
         ).exclude(
             status=CASE_STATUS_AFGESLOTEN
         )
+
+        search = self.request.GET.get('search', '')
+
+        if search != '':
+            casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=search) |
+                                                                                   Q(client_last_name__icontains=search) |
+                                                                                   Q(emailadres__icontains=search) ))
 
         qs = casestatus_list.exclude(
             status=CASE_STATUS_INGEDIEND,
@@ -153,10 +184,12 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
+        form = UserCaseForm(self.request.GET)
         kwargs.update({
             'filter_params': f'&f={tab_index}',
             'object_list': paginator.get_page(page),
             'tabs': tabs,
+            'form': form,
             'case_archive_list': Case.objects.filter(delete_request_date__isnull=False)
         })
         return kwargs
