@@ -36,6 +36,10 @@ class FilterListFederationForm(forms.Form):
         widget=CheckboxSelectMultiple(),
         required=False,
     )
+    search = forms.CharField(
+        label=_('Zoeken'),
+        required=False
+    )
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
         super().__init__(*args, **kwargs)

@@ -28,6 +28,11 @@
             <label>Filter op gebruiker rol</label>
             {{ form.filter }}
         </div>
+        <div class="form-field">
+            <div class="help-text">Zoek in de velden Voornaam, Achternaam en E-mailadres.</div>
+            {{ form.search }}
+        </div>
+        <button type="submit" >Filter</button>
         <button type="submit" >Filter</button>
     </form>
     <p>{{ object_list.paginator.count }}{% if object_list.paginator.count == 1 %} resultaat{% else %} resultaten{% endif %}</p>

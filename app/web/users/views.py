@@ -120,7 +120,16 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         filter = filter_list if filter_list else user_types_federatie
         filter_params = '&filter='.join(filter_list)
         filter_params = '&filter=%s' % filter_params if filter_params else ''
-        object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
+
+        search = self.request.GET.get('search', '')
+
+        if search == '':
+            object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
+        else:
+            object_list = User.objects.filter(user_type__in=filter,
+                                              federation=self.request.user.federation).filter(Q(first_name__icontains=search) |
+                                                                                              Q(last_name__icontains=search) |
+                                                                                              Q(email__icontains=search) )
 
         # default sort on user_type by custom list
         object_list = [[o, user_types_federatie.index(o.user_type)] for o in object_list]
