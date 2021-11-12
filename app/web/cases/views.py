@@ -180,15 +180,24 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         )
 
         tab_index = self.request.GET.get('f', 0)
+        try:
+            int(tab_index)
+        except ValueError:
+            tab_index = '0'
         paginator = Paginator(tabs[int(tab_index)].get('queryset'), 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
-        form = UserCaseForm(self.request.GET)
+        initial_form_data = {
+            'f' : str(tab_index)
+        }
+
+        form = UserCaseForm(self.request.GET, initial=initial_form_data)
         kwargs.update({
             'filter_params': f'&f={tab_index}',
             'object_list': paginator.get_page(page),
             'tabs': tabs,
+            'search': search,
             'form': form,
             'case_archive_list': Case.objects.filter(delete_request_date__isnull=False)
         })

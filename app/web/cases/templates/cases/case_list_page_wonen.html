@@ -31,6 +31,7 @@
     <form method="get" class="u-margin-bottom-2x">
         <div class="form-field">
             <div class="help-text">Zoek in de velden Voornaam, Achternaam en E-mailadres.</div>
+            {{ form.f }}
             {{ form.search }}
         </div>
         <button type="submit">Filter</button>
@@ -43,7 +44,7 @@
             </li>
             {% for tab in tabs %}
             <li class="tab{% if request.GET.f|stringformat:"s" == forloop.counter0|stringformat:"s" %} selected{% elif request.GET.f == None and forloop.counter0|stringformat:"s" == "0" %} selected{% endif %}">
-                <a href="./?f={{ forloop.counter0 }}" role="button" class="button button--tertiary">{{ tab.title }} ({{ tab.queryset|length }})</a>
+                <a href="./?f={{ forloop.counter0 }}{% if search != "" %}&search={{ search }}{% endif %}" role="button" class="button button--tertiary">{{ tab.title }} ({{ tab.queryset|length }})</a>
             </li>
             {% endfor%}
         </ul>

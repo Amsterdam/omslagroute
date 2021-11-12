@@ -12,6 +12,11 @@ from web.users.statics import BEGELEIDER, PB_FEDERATIE_BEHEERDER
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE
 
 class UserCaseForm(forms.ModelForm):
+    f = forms.CharField(
+        label = ('f'),
+        required=False,
+        widget=forms.HiddenInput()
+    )
     search = forms.CharField(
         label=_('Zoeken'),
         required=False
