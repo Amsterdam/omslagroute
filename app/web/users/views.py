@@ -76,9 +76,11 @@ class UserList(UserPassesTestMixin, TemplateView):
         if search == '':
             object_list = User.objects.all().filter(user_type__in=filter)
         else:
-            object_list = User.objects.filter(user_type__in=filter).filter(Q(first_name__icontains=search) |
-                                                                           Q(last_name__icontains=search) |
-                                                                           Q(email__icontains=search) )
+            object_list = User.objects.all().filter(user_type__in=filter)
+            for s in search.split():
+                object_list = object_list.filter(Q(first_name__icontains=s) |
+                                                 Q(last_name__icontains=s) |
+                                                 Q(email__icontains=s) )
 
         # default sort on user_type by custom list
         object_list = [[o, USER_TYPES_ACTIVE.index(o.user_type)] for o in object_list]
@@ -126,10 +128,11 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         if search == '':
             object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
         else:
-            object_list = User.objects.filter(user_type__in=filter,
-                                              federation=self.request.user.federation).filter(Q(first_name__icontains=search) |
-                                                                                              Q(last_name__icontains=search) |
-                                                                                              Q(email__icontains=search) )
+            object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
+            for s in search.split():
+                object_list = object_list.filter(Q(first_name__icontains=s) |
+                                                 Q(last_name__icontains=s) |
+                                                 Q(email__icontains=s) )
 
         # default sort on user_type by custom list
         object_list = [[o, user_types_federatie.index(o.user_type)] for o in object_list]

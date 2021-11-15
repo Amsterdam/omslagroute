@@ -55,9 +55,11 @@ class UserCaseList(UserPassesTestMixin, ListView):
         if search == '':
             object_list = kwargs.pop('object_list')
         else:
-            object_list = kwargs.pop('object_list').filter(Q(client_first_name__icontains=search) |
-                                                           Q(client_last_name__icontains=search) |
-                                                           Q(emailadres__icontains=search) )
+            object_list = kwargs.pop('object_list')
+            for s in search.split():
+                object_list = object_list.filter(Q(client_first_name__icontains=s) |
+                                                 Q(client_last_name__icontains=s) |
+                                                 Q(emailadres__icontains=s) )
 
         # pagination
         paginator = Paginator(object_list, 20)
@@ -90,9 +92,11 @@ class CaseListArchive(UserPassesTestMixin, ListView):
         if search == '':
             object_list = kwargs.pop('object_list')
         else:
-            object_list = kwargs.pop('object_list').filter(Q(client_first_name__icontains=search) |
-                                                           Q(client_last_name__icontains=search) |
-                                                           Q(emailadres__icontains=search) )
+            object_list = kwargs.pop('object_list')
+            for s in search.split():
+                object_list = object_list.filter(Q(client_first_name__icontains=s) |
+                                                 Q(client_last_name__icontains=s) |
+                                                 Q(emailadres__icontains=s) )
 
         paginator = Paginator(object_list, 20)
         page = self.request.GET.get('page', 1)
@@ -126,9 +130,10 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         search = self.request.GET.get('search', '')
 
         if search != '':
-            casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=search) |
-                                                                                   Q(client_last_name__icontains=search) |
-                                                                                   Q(emailadres__icontains=search) ))
+            for s in search.split():
+                casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=s) |
+                                                                                       Q(client_last_name__icontains=s) |
+                                                                                       Q(emailadres__icontains=s) ))
 
         qs = casestatus_list.exclude(
             status=CASE_STATUS_INGEDIEND,
