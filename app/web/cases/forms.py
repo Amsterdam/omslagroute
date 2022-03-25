@@ -134,6 +134,10 @@ class CaseBaseForm(forms.ModelForm):
         self.fields['client_first_name'].required = True
         self.fields['client_last_name'].required = True
         self.fields['geboortedatum'].required = True
+        self.fields['partner_check'].widget.attrs.update({'onChange': "updateCaseForm(this)"})
+        self.fields['partner_naam'].widget.attrs.update({'class': 'partner_form_elem'})
+        self.fields['partner_geboortedatum'].widget.attrs.update({'class': 'partner_form_elem'})
+        self.fields['partner_emailadres'].widget.attrs.update({'class': 'partner_form_elem'})
 
 
 class CaseCleanForm(forms.ModelForm):
