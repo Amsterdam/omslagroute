@@ -111,6 +111,11 @@ class CaseBase(PrintableModel):
         blank=True,
         null=True,
     )
+    partner_emailadres = models.EmailField(
+        verbose_name=_('partner E-mailadres'),
+        blank=True,
+        null=True,
+    )
     partner_naam = models.CharField(
         verbose_name=_('Partner naam'),
         max_length=100,

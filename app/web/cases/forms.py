@@ -123,6 +123,10 @@ class CaseBaseForm(forms.ModelForm):
             'client_last_name',
             'geboortedatum',
             'emailadres',
+            'partner_check',
+            'partner_naam',
+            'partner_geboortedatum',
+            'partner_emailadres',
         ]
         
     def __init__(self, *args, **kwargs):

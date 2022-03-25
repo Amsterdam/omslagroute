@@ -1,19 +1,45 @@
 {% extends 'base.html' %}
 
-{% block title %} - Cli&euml;nt aanmaken{% endblock %}
+{% block skiplinks %}
+{% if not request.GET.iframe_content %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block header %}
+{% if not request.GET.iframe_content %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block messages %}
+{% if not request.GET.iframe_content %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block feedback %}
+{% if not request.GET.iframe_content %}
+{{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
 
 {% block breadcrumb %}
-    <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
-        <ol class="breadcrumb-list">
-            <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
-            <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
-            <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt aanmaken</li>
-        </ol>
-    </nav>
+    {% if mode == 'page' %}
+        <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+                <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
+                <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt aanmaken</li>
+            </ol>
+        </nav>
+    {% endif %}
 {% endblock %}
 
 {% block main %}
-    <h2>Cli&euml;nt aanmaken</h2>
+<h2>{{ title }}</h2>
 
     <form method="post">
         {% csrf_token %}
@@ -22,7 +48,11 @@
 
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
             <input type="submit" value="Opslaan" class="button button--primary">
+            {% if mode == 'page' %}
             <a href="{% url 'cases_by_profile' %}" class="button button--secondary">Annuleer</a>
+            {% else %}
+            <a href="#" data-handler='modal-close' class="button button--secondary">Annuleer</a>
+            {% endif %}
         </div>
     </form>
 {% endblock %}
