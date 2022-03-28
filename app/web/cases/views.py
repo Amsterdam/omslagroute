@@ -924,7 +924,6 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
 class CaseCreateView(UserPassesTestMixin, CreateView):
     model = Case
     form_class = CaseBaseForm
-    # template_name_suffix = '_update_base_form'
     template_name_suffix = '_create_form'
     success_url = reverse_lazy('cases_by_profile')
 
@@ -958,7 +957,6 @@ class CaseCreateView(UserPassesTestMixin, CreateView):
 class CaseBaseUpdateView(UserPassesTestMixin, UpdateView):
     model = Case
     form_class = CaseBaseForm
-    # template_name_suffix = '_update_base_form'
     template_name_suffix = '_create_form'
     success_url = reverse_lazy('cases_by_profile')
 
