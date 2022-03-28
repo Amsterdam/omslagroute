@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load staticfiles auth_tags %}
+{% load static auth_tags %}
 
 {% block main %}
         {% if not request.user.is_authenticated and not KC_ENABLED %}

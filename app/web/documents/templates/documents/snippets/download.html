@@ -1,4 +1,4 @@
-{% load staticfiles auth_tags tz i18n  %}
+{% load static auth_tags tz i18n  %}
 
 {% if request.user|is_redactie or object.document_to_document_version.all|length %}
     {% with document_version=object.document_to_document_version.all.0 %}

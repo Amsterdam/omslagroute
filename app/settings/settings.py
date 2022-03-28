@@ -190,8 +190,10 @@ REST_FRAMEWORK = {
 
 # CORS and allowed hosts
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://17.0.0.1').split(',')
 CORS_ORIGIN_ALLOW_ALL = False
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 AUTH_GROUPNAME_PROCESS = 'proces'
 
