@@ -971,7 +971,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
 class CaseCreateView(UserPassesTestMixin, CreateView):
     model = Case
     form_class = CaseBaseForm
-    template_name_suffix = '_update_base_form'
+    template_name_suffix = '_create_form'
     success_url = reverse_lazy('cases_by_profile')
 
     def get_success_url(self):
@@ -979,6 +979,11 @@ class CaseCreateView(UserPassesTestMixin, CreateView):
             'case', 
             args=[self.object.id]
         )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"title": "Cliënt aanmaken", "mode": "page"})
+        return context
 
     def get_queryset(self):
         return self.model._default_manager.by_user(user=self.request.user)
@@ -999,7 +1004,7 @@ class CaseCreateView(UserPassesTestMixin, CreateView):
 class CaseBaseUpdateView(UserPassesTestMixin, UpdateView):
     model = Case
     form_class = CaseBaseForm
-    template_name_suffix = '_update_base_form'
+    template_name_suffix = '_create_form'
     success_url = reverse_lazy('cases_by_profile')
 
     def get_success_url(self):
@@ -1007,6 +1012,11 @@ class CaseBaseUpdateView(UserPassesTestMixin, UpdateView):
             'case', 
             args=[self.object.id]
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"title": "Cliënt aanpassen", "mode": "iframe"})
+        return context
 
     def get_queryset(self):
         return self.model._default_manager.by_user(user=self.request.user)
