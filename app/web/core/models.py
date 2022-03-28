@@ -35,7 +35,7 @@ class PrintableModel(models.Model):
                     data[f.name] = datetime.datetime.strftime(data[f.name], '%d-%m-%Y')
                 if isinstance(data[f.name], datetime.datetime):
                     data[f.name] = data[f.name].isoformat()
-                if data[f.name] is None or data[f.name] is '':
+                if data[f.name] is None or data[f.name] == '':
                     data[f.name] = self.EMPTY_VALUE if hasattr(self, 'EMPTY_VALUE') else '\u2014'
                 if f.name in textile_fields:
                     data[f.name] = textile(data[f.name])
