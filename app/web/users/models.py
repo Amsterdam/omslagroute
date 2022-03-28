@@ -6,7 +6,7 @@ from .statics import USER_TYPES, USER_TYPES_DICT, USER_TYPES_ACTIVE, USER_TYPES_
 from django.db import models
 from django import forms
 from django.forms import widgets
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 
 
