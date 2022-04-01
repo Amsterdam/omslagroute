@@ -71,7 +71,7 @@ class SessionRefresh(DatapuntSessionRefresh):
             })
             request.session['oidc_nonce'] = nonce
 
-        request.session['oidc_state'] = state
+        request.session['oidc_states'] = {state:{'nonce':None}}
         request.session['oidc_login_next'] = request.get_full_path()
 
         query = urlencode(params)
