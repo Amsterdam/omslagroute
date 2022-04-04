@@ -194,6 +194,8 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+SECURE_REFERRER_POLICY = "strict-origin"
+
 AUTH_GROUPNAME_PROCESS = 'proces'
 
 SESSION_COOKIE_SECURE = True

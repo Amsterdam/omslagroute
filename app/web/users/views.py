@@ -377,7 +377,7 @@ class OIDCAuthenticationRequestView(DatapuntOIDCAuthenticationRequestView):
             })
             request.session['oidc_nonce'] = nonce
 
-        request.session['oidc_state'] = state
+        request.session['oidc_states'] = {state:{'nonce':None}}
         request.session['oidc_login_next'] = get_next_url(request, redirect_field_name)
 
         query = urlencode(params)
