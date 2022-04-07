@@ -50,5 +50,5 @@ def get_rules_reversed(form_cnfig, *args, **kwargs):
 @register.simple_tag()
 def get_document_by_id(id, *args, **kwargs):
     from web.cases.models import Document
-    document = get_object_or_404(Document, id=id)
+    document = get_object_or_404(Document, id=id.value)
     return document
