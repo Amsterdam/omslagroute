@@ -282,16 +282,14 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG'
         },
     },
-    'loggers': {
-        'mozilla_django_oidc': {
-            'handlers': ['console'],
-            'level': 'DEBUG'
-        },
-    }
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
 }
+
 
 WEBPACK_LOADER = {
     'DEFAULT': {
