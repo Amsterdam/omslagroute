@@ -1258,19 +1258,6 @@ OMKLAP_AANVRAAG = [
             },
         ]
     },
-    {
-        'title': 'Bijlagen',
-        'description': "<strong>Nodige bijlagen bij aanvraag Voordracht omklap</strong><ul><li>meest recente IB60/ IBRI (jaaropgave van de belastingdienst)</li><li>meest recente loonstrook</li><li>meest recente plaatsingsbesluit veldtafel, WMO beschikking of SPIC</li></ul>",
-        'section_list': [
-            {
-                'title': '',
-                'description': '',
-                'fields': [
-                    'document_list',
-                ],
-            },
-        ]
-    },
 ]
 
 EVALUATIE_WONEN = [
