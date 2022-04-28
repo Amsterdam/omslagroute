@@ -1258,6 +1258,19 @@ OMKLAP_AANVRAAG = [
             },
         ]
     },
+    {
+        'title': 'Bijlagen',
+        'description': "",
+        'section_list': [
+            {
+                'title': '',
+                'description': '',
+                'fields': [
+                    'document_list',
+                ],
+            },
+        ]
+    },
 ]
 
 EVALUATIE_WONEN = [
