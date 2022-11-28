@@ -62,17 +62,6 @@ pipeline {
 
         stage("Push and deploy") {
             stages {
-                stage("Confirm Release ACC") {
-                    steps {
-                        script {
-
-                            slackSend channel: "#salmagundi_ci", color: "warning", message: "${PROJECTNAME} is waiting for ACC Release - please confirm. URL: ${env.JOB_URL}"
-                            input "Deploy to ACC?"
-
-                        }
-                    }
-                }
-
                 stage("Release ACC") {
                     steps {
                         script {
