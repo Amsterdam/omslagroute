@@ -109,3 +109,4 @@ wcwidth==0.2.5
 webencodings==0.5.1
 wrapt==1.14.0
 zipp==3.7.0
+django-simple-captcha==0.5.17
