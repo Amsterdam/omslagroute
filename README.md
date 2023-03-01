@@ -11,6 +11,16 @@ Start the dev server for local development:
 docker-compose up
 ```
 
+Go to http://localhost:8088/
+
+Initial user and password in docker-compose.
+
+For the admin interface:
+http://localhost:8088/admin/
+
+
+## Build
+
 To rebuild (for example, when dependencies are added requirements.txt):
 ```bash
 docker-compose build
@@ -32,7 +42,7 @@ Migrate database without restarting containers:
 
 ```bash
 docker-compose exec web python manage.py migrate
-``` 
+```
 
 # Styling resources
 

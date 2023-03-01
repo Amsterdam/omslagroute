@@ -29,6 +29,7 @@ INSTALLED_APPS = (
     'multiselectfield',
     'keycloak_oidc',
     'corsheaders',
+    'captcha',                  # captcha for feedback form
 
     'web.core',
     'web.documents',
