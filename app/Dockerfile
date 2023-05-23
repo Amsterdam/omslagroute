@@ -25,10 +25,8 @@ RUN apt-get install -y curl
 # get install script and pass it to execute:
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
 # and install node
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs npm nginx
 
-# install nginx
-RUN apt-get install -y nginx
 # RUN apt-get install -y --no-install-recommends apt-utils
 
 RUN mkdir -p /static
