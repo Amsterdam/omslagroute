@@ -22,10 +22,14 @@ RUN apt-get -y install locales
 
 # install curl
 RUN apt-get install -y curl
-# get install script and pass it to execute:
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
+# get install script and version and pass it to execute:
+ENV NODE_VERSION 12
+RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash
 # and install node
-RUN apt-get install -y nodejs npm nginx
+RUN apt-get install -y nodejs
+
+# install nginx
+RUN apt-get install -y nginx
 
 # RUN apt-get install -y --no-install-recommends apt-utils
 
