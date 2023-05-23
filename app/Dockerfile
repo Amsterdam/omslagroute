@@ -1,5 +1,4 @@
-FROM amsterdam/python
-LABEL maintainer="datapunt@amsterdam.nl"
+FROM python:3.8-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 
@@ -15,6 +14,7 @@ RUN adduser datapunt sudo
 
 # update
 RUN apt-get update
+RUN apt-get install libpq-dev build-essential -y
 
 RUN pip install --upgrade pip
 
