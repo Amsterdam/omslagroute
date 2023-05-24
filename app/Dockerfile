@@ -27,8 +27,7 @@ ENV NODE_VERSION 12
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash
 # and install node
 RUN apt-get install -y nodejs
-# and install npm
-RUN apt-get install -y npm
+RUN npm install -g npm@^6
 
 # install nginx
 RUN apt-get install -y nginx
