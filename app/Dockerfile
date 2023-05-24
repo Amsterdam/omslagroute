@@ -28,7 +28,9 @@ ENV NPM_VERSION 6
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash
 # and install node
 RUN apt-get install -y nodejs
-RUN npm install -g npm@^${NPM_VERSION}
+
+RUN echo "Node: " && node -v
+RUN echo "NPM: " && npm -v
 
 # install nginx
 RUN apt-get install -y nginx
@@ -55,7 +57,7 @@ ENV LC_ALL nl_NL.UTF-8
 
 WORKDIR /app
 
-RUN npm install
+RUN npm install -g npm@^${NPM_VERSION}
 RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
