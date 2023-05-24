@@ -28,10 +28,6 @@ ENV NPM_VERSION 6
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash
 # and install node
 RUN apt-get install -y nodejs
-
-RUN echo "Node: " && node -v
-RUN echo "NPM: " && npm -v
-
 # install nginx
 RUN apt-get install -y nginx
 
@@ -54,7 +50,6 @@ RUN sed -i -e 's/# nl_NL.UTF-8 UTF-8/nl_NL.UTF-8 UTF-8/' /etc/locale.gen && \
 ENV LANG nl_NL.UTF-8
 ENV LANGUAGE nl_NL:nl
 ENV LC_ALL nl_NL.UTF-8
-
 WORKDIR /app
 
 RUN npm install -g npm@^${NPM_VERSION}
