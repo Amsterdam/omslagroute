@@ -24,11 +24,11 @@ RUN apt-get -y install locales
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
 ENV NODE_VERSION 12
+ENV NPM_VERSION 6
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash
 # and install node
 RUN apt-get install -y nodejs
-# and install npm
-RUN apt-get install -y npm
+RUN npm install -g npm@^${NPM_VERSION}
 
 # install nginx
 RUN apt-get install -y nginx
