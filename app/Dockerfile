@@ -1,5 +1,8 @@
 FROM python:3.8-slim-buster
 
+RUN adduser --system datapunt
+RUN adduser datapunt sudo
+
 ENV PYTHONUNBUFFERED 1
 
 ARG COMMIT_HASH
@@ -8,9 +11,8 @@ ARG INVENTORY
 ENV COMMIT_HASH=${COMMIT_HASH}
 ENV BRANCH_NAME=${BRANCH_NAME}
 ENV INVENTORY=${INVENTORY}
-
-RUN adduser --system datapunt
-RUN adduser datapunt sudo
+ENV NODE_VERSION 12
+ENV NPM_VERSION 6
 
 # update
 RUN apt-get update
@@ -24,13 +26,13 @@ RUN apt-get -y install locales
 # install curl
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
-ENV NODE_VERSION 12
-ENV NPM_VERSION 6
+
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
 # and install node
 RUN apt-get install -y nodejs
 # install nginx
 RUN apt-get install -y nginx
+
 RUN node -v
 RUN npm -v
 
@@ -55,7 +57,6 @@ ENV LANGUAGE nl_NL:nl
 ENV LC_ALL nl_NL.UTF-8
 WORKDIR /app
 
-RUN npm install -g npm@^${NPM_VERSION}
 RUN npm install
 RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
