@@ -27,7 +27,7 @@ RUN apt-get -y install locales
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
 
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | tee /tmp/setup_${NODE_VERSION}.x
+RUN curl https://deb.nodesource.com/setup_${NODE_VERSION}.x | tee /tmp/setup_${NODE_VERSION}.x
 
 RUN chmod +x /tmp/setup_${NODE_VERSION}.x \
     && /tmp/setup_${NODE_VERSION}.x \
