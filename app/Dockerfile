@@ -30,11 +30,10 @@ RUN apt-get install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
 # and install node
 RUN apt-get install -y nodejs
-# install nginx
-RUN apt-get install -y nginx
-
 RUN node -v
 RUN npm -v
+# install nginx
+RUN apt-get install -y nginx
 
 # RUN apt-get install -y --no-install-recommends apt-utils
 
