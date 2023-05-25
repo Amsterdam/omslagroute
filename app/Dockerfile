@@ -17,6 +17,7 @@ RUN apt-get update
 RUN apt-get install libpq-dev build-essential -y
 
 RUN pip install --upgrade pip
+RUN pip install uwsgi
 
 RUN apt-get -y install locales
 
@@ -53,6 +54,7 @@ ENV LC_ALL nl_NL.UTF-8
 WORKDIR /app
 
 RUN npm install -g npm@^${NPM_VERSION}
+RUN npm install
 RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
