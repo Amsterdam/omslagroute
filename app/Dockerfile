@@ -29,10 +29,10 @@ RUN apt-get -y install locales
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
 
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+#RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
 
 # and install node
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs npm
 RUN node -v
 RUN npm -v
 # install nginx
