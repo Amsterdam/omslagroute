@@ -18,7 +18,7 @@ ENV NPM_VERSION 6
 RUN apt-get update
 RUN apt-get install libpq-dev build-essential ca-certificates -y
 
-RUN update-ca-certificates
+RUN update-ca-certificates --fresh
 
 RUN pip install --upgrade pip
 RUN pip install uwsgi
