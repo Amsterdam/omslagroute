@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.8-bullseye
 
 RUN adduser --system datapunt
 RUN adduser datapunt sudo
@@ -29,12 +29,7 @@ RUN apt-get -y install locales
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
 
-RUN curl -k https://deb.nodesource.com/setup_${NODE_VERSION}.x | tee /tmp/setup_${NODE_VERSION}.x
-
-RUN chmod +x /tmp/setup_${NODE_VERSION}.x \
-    && /tmp/setup_${NODE_VERSION}.x \
-    && rm /tmp/setup_${NODE_VERSION}.x
-
+RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
 
 # and install node
 RUN apt-get install -y nodejs
