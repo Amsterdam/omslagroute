@@ -26,7 +26,7 @@
     </div>
     <form method="get" class="u-margin-bottom-2x">
         <div class="form-field">
-            <div class="help-text">Zoek cliënten op Voornaam, Achternaam en/of E-mailadres.</div>
+            <div class="help-text">Zoek cliënten op Voornaam, Achternaam, E-mailadres en/of Geboortedatum (dd-mm-jjjj).</div>
             {{ form.search }}
         </div>
         <button type="submit">Filter</button>
@@ -50,11 +50,11 @@
             {% for object in object_list %}
                 {% case_status_list_latest object as case_status_list %}
                 <tr class="u-border-top {% if object.delete_request_date %}client-inactive{% endif %}">
-        
+
                     <td>
                         <span class="show-on-mobile">Naam:</span>
                         <a href="{% url 'case' object.id %}" class="show-active">{{ object.client_name }}</a>
-                        
+
                     </td>
                     <td class="help-text">
                         <span class="show-on-mobile">Laatste opgeslagen:</span>
@@ -93,9 +93,9 @@
                     </td>
                 </tr>
                 {% if object.delete_request_date %}
-                
+
                 <tr>
-                    
+
                     <td colspan="6" class="u-font-size-small">
                         <span class="u-margin-right-half">
                             <svg class="icon icon-bell" width="16" height="16" style="vertical-align: middle;">
@@ -111,7 +111,7 @@
         </tbody>
     </table>
 
-    
+
     {% include 'core/pagination.html' with object_list=object_list filter_params='' %}
 </section>
 {% endblock %}
