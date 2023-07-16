@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.8-bullseye
 
 RUN adduser --system datapunt
 RUN adduser datapunt sudo
@@ -11,12 +11,14 @@ ARG INVENTORY
 ENV COMMIT_HASH=${COMMIT_HASH}
 ENV BRANCH_NAME=${BRANCH_NAME}
 ENV INVENTORY=${INVENTORY}
-ENV NODE_VERSION 12
+ENV NODE_VERSION 14
 ENV NPM_VERSION 6
 
 # update
 RUN apt-get update
-RUN apt-get install libpq-dev build-essential -y
+RUN apt-get install libpq-dev build-essential ca-certificates -y
+
+RUN update-ca-certificates --fresh
 
 RUN pip install --upgrade pip
 RUN pip install uwsgi
@@ -27,14 +29,14 @@ RUN apt-get -y install locales
 RUN apt-get install -y curl
 # get install script and version and pass it to execute:
 
-RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
-# and install node
-RUN apt-get install -y nodejs
-# install nginx
-RUN apt-get install -y nginx
+#RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
 
+# and install node
+RUN apt-get install -y nodejs npm
 RUN node -v
 RUN npm -v
+# install nginx
+RUN apt-get install -y nginx
 
 # RUN apt-get install -y --no-install-recommends apt-utils
 
@@ -58,10 +60,10 @@ ENV LC_ALL nl_NL.UTF-8
 WORKDIR /app
 
 RUN npm install
+COPY requirements.txt /app/
 RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
-COPY requirements.txt /app/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
