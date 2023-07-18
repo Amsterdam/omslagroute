@@ -31,7 +31,7 @@ class CaseManager(models.Manager):
                 delete_request_date__lte=datetime_treshold
             ).order_by('-saved')
             return queryset
-            
+
         if user.user_type in [WONINGCORPORATIE_MEDEWERKER]:
             queryset = queryset.filter(
                 id__in=CaseVersion.objects.filter(
@@ -41,12 +41,13 @@ class CaseManager(models.Manager):
                 woningcorporatie=user.federation,
             )
             return queryset
-        return queryset.filter(
+
+        queryset = queryset.filter(
             id__in=CaseVersion.objects.filter(
                 version_verbose__in=FORMS_SLUG_BY_FEDERATION_TYPE.get(FEDERATION_TYPE_ADW)
             ).order_by('case').distinct().values_list('case'),
-            delete_request_date__isnull=True,
         )
+        return queryset
 
 
 class CaseVersionManager(models.Manager):
