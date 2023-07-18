@@ -23,6 +23,11 @@
         color: $primary-white;
       }
 
+      span.pagination-ellipsis {
+        background-color: transparent;
+        color: $default-text-color;
+      }
+
       a {
         text-decoration: none;
         &:hover {
