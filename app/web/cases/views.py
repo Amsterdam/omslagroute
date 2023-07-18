@@ -35,6 +35,7 @@ from datetime import datetime
 from constance import config
 from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list
+from operator import or_
 
 
 class UserCaseList(UserPassesTestMixin, ListView):
@@ -49,13 +50,10 @@ class UserCaseList(UserPassesTestMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs = super().get_context_data(object_list=object_list, **kwargs)
+        object_list = kwargs.pop('object_list')
 
-        search = self.request.GET.get('search', '')
-
-        if search == '':
-            object_list = kwargs.pop('object_list')
-        else:
-            object_list = kwargs.pop('object_list')
+        search = self.request.GET.get('search')
+        if search:
             search_terms = search.split()
 
             # Initialize an empty queryset to store the filtered results
@@ -68,16 +66,14 @@ class UserCaseList(UserPassesTestMixin, ListView):
                 except ValueError:
                     search_date = None
 
+                # Create a base filter
+                base_filter = Q(client_first_name__icontains=term) | Q(client_last_name__icontains=term) | Q(emailadres__icontains=term)
+
                 # Apply filters based on the search term
                 if search_date:
-                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
-                                                            Q(client_last_name__icontains=term) |
-                                                            Q(emailadres__icontains=term) |
-                                                            Q(geboortedatum=search_date))
+                    filtered_queryset |= object_list.filter(or_(base_filter, Q(geboortedatum=search_date)))
                 else:
-                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
-                                                            Q(client_last_name__icontains=term) |
-                                                            Q(emailadres__icontains=term))
+                    filtered_queryset |= object_list.filter(base_filter)
 
             # Remove double items
             object_list = filtered_queryset.distinct()
@@ -108,13 +104,10 @@ class CaseListArchive(UserPassesTestMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs = super().get_context_data(object_list=None, **kwargs)
+        object_list = kwargs.pop('object_list')
 
-        search = self.request.GET.get('search', '')
-
-        if search == '':
-            object_list = kwargs.pop('object_list')
-        else:
-            object_list = kwargs.pop('object_list')
+        search = self.request.GET.get('search')
+        if search:
             search_terms = search.split()
 
             # Initialize an empty queryset to store the filtered results
@@ -127,16 +120,14 @@ class CaseListArchive(UserPassesTestMixin, ListView):
                 except ValueError:
                     search_date = None
 
+                # Create a base filter
+                base_filter = Q(client_first_name__icontains=term) | Q(client_last_name__icontains=term) | Q(emailadres__icontains=term)
+
                 # Apply filters based on the search term
                 if search_date:
-                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
-                                                            Q(client_last_name__icontains=term) |
-                                                            Q(emailadres__icontains=term) |
-                                                            Q(geboortedatum=search_date))
+                    filtered_queryset |= object_list.filter(or_(base_filter, Q(geboortedatum=search_date)))
                 else:
-                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
-                                                            Q(client_last_name__icontains=term) |
-                                                            Q(emailadres__icontains=term))
+                    filtered_queryset |= object_list.filter(base_filter)
 
             # Remove double items
             object_list = filtered_queryset.distinct()
@@ -169,9 +160,9 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
             status=CASE_STATUS_AFGESLOTEN
         )
 
-        search = self.request.GET.get('search', '')
+        search = self.request.GET.get('search')
 
-        if search != '':
+        if search:
             # Initialize an empty queryset to store the filtered results
             filtered_queryset = casestatus_list.none()
             search_terms = search.split()
@@ -182,38 +173,21 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
                 except ValueError:
                     search_date = None
 
+                # Create a base filter
+                base_filter = Q(client_first_name__icontains=term) | Q(client_last_name__icontains=term) | Q(emailadres__icontains=term)
+
                 # Apply filters based on the search term
                 if search_date:
                     filtered_queryset |= casestatus_list.filter(
-                        case__in=Case.objects.filter(
-                            Q(client_first_name__icontains=term) |
-                            Q(client_last_name__icontains=term) |
-                            Q(emailadres__icontains=term) |
-                            Q(geboortedatum=search_date)
-                        )
+                        case__in=Case.objects.filter(or_(base_filter, Q(geboortedatum=search_date)))
                     )
                 else:
                     filtered_queryset |= casestatus_list.filter(
-                        case__in=Case.objects.filter(
-                            Q(client_first_name__icontains=term) |
-                            Q(client_last_name__icontains=term) |
-                            Q(emailadres__icontains=term)
-                        )
+                        case__in=Case.objects.filter(base_filter)
                     )
 
             # Remove double items
             casestatus_list = filtered_queryset.distinct()
-
-
-
-
-
-
-
-            # for s in search.split():
-            #     casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=s) |
-            #                                                                            Q(client_last_name__icontains=s) |
-            #                                                                            Q(emailadres__icontains=s) ))
 
         qs = casestatus_list.exclude(
             status=CASE_STATUS_INGEDIEND,
