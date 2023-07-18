@@ -30,13 +30,13 @@
     </div>
     <form method="get" class="u-margin-bottom-2x">
         <div class="form-field">
-            <div class="help-text">Zoek cliënten op Voornaam, Achternaam en/of E-mailadres.</div>
+            <div class="help-text">Zoek cliënten op Voornaam, Achternaam, E-mailadres en/of Geboortedatum (dd-mm-jjjj).</div>
             {{ form.f }}
             {{ form.search }}
         </div>
         <button type="submit">Filter</button>
     </form>
-    
+
     <div class="tab-list-container">
         <ul class="u-list-style-none tab-list">
             <li class="list-label">
@@ -84,12 +84,12 @@
                         <span class="label {% if object.status == 2 or object.status == 6 %}label--status-disapproved{% elif object.status == 3 or object.status == 7 %}label--status-approved{% elif object.status == 4 or object.status == 8 %}label--status-pending{% endif %}">
                             {% if object.status == 1 and not object.is_first_of_statustype %}Opnieuw {% endif %}{{ object.status|status_verbose }}
                         </span>
-                        {% if object.status != 1 and object.case_form_is_opnieuw_ingediend %} 
+                        {% if object.status != 1 and object.case_form_is_opnieuw_ingediend %}
                         <span class="label u-font-size-small u-margin-top-half">
                             Opnieuw ingediend
                         </span>
                         {% endif %}
-                        
+
                     </td>
                     <td class="u-no-wrap">{{ object.created|timezone:FRONTEND_TIMEZONE|date:"j b Y H:i" }}</td>
                 </tr>

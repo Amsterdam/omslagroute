@@ -31,7 +31,7 @@ from django.db.models import Count, Q
 from django.db.models.functions import Concat
 from django.db.models import TextField, DateTimeField, IntegerField
 from django.core.exceptions import PermissionDenied
-import datetime
+from datetime import datetime
 from constance import config
 from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list
@@ -56,10 +56,31 @@ class UserCaseList(UserPassesTestMixin, ListView):
             object_list = kwargs.pop('object_list')
         else:
             object_list = kwargs.pop('object_list')
-            for s in search.split():
-                object_list = object_list.filter(Q(client_first_name__icontains=s) |
-                                                 Q(client_last_name__icontains=s) |
-                                                 Q(emailadres__icontains=s) )
+            search_terms = search.split()
+
+            # Initialize an empty queryset to store the filtered results
+            filtered_queryset = object_list.none()
+
+            for term in search_terms:
+                # Check if the search term is a valid date format
+                try:
+                    search_date = datetime.strptime(term, '%d-%m-%Y').date()
+                except ValueError:
+                    search_date = None
+
+                # Apply filters based on the search term
+                if search_date:
+                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
+                                                            Q(client_last_name__icontains=term) |
+                                                            Q(emailadres__icontains=term) |
+                                                            Q(geboortedatum=search_date))
+                else:
+                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
+                                                            Q(client_last_name__icontains=term) |
+                                                            Q(emailadres__icontains=term))
+
+            # Remove double items
+            object_list = filtered_queryset.distinct()
 
         # pagination
         paginator = Paginator(object_list, 20)
@@ -71,6 +92,7 @@ class UserCaseList(UserPassesTestMixin, ListView):
             'form': form,
         })
         return kwargs
+
 
 
 class CaseListArchive(UserPassesTestMixin, ListView):
@@ -93,15 +115,35 @@ class CaseListArchive(UserPassesTestMixin, ListView):
             object_list = kwargs.pop('object_list')
         else:
             object_list = kwargs.pop('object_list')
-            for s in search.split():
-                object_list = object_list.filter(Q(client_first_name__icontains=s) |
-                                                 Q(client_last_name__icontains=s) |
-                                                 Q(emailadres__icontains=s) )
+            search_terms = search.split()
+
+            # Initialize an empty queryset to store the filtered results
+            filtered_queryset = object_list.none()
+
+            for term in search_terms:
+                # Check if the search term is a valid date format
+                try:
+                    search_date = datetime.strptime(term, '%d-%m-%Y').date()
+                except ValueError:
+                    search_date = None
+
+                # Apply filters based on the search term
+                if search_date:
+                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
+                                                            Q(client_last_name__icontains=term) |
+                                                            Q(emailadres__icontains=term) |
+                                                            Q(geboortedatum=search_date))
+                else:
+                    filtered_queryset |= object_list.filter(Q(client_first_name__icontains=term) |
+                                                            Q(client_last_name__icontains=term) |
+                                                            Q(emailadres__icontains=term))
+
+            # Remove double items
+            object_list = filtered_queryset.distinct()
 
         paginator = Paginator(object_list, 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
-
         form = UserCaseForm(self.request.GET)
         kwargs.update({
             'object_list': paginator.get_page(page),
@@ -130,10 +172,48 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         search = self.request.GET.get('search', '')
 
         if search != '':
-            for s in search.split():
-                casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=s) |
-                                                                                       Q(client_last_name__icontains=s) |
-                                                                                       Q(emailadres__icontains=s) ))
+            # Initialize an empty queryset to store the filtered results
+            filtered_queryset = casestatus_list.none()
+            search_terms = search.split()
+            for term in search_terms:
+                # Check if the search term is a valid date format
+                try:
+                    search_date = datetime.strptime(term, '%d-%m-%Y').date()
+                except ValueError:
+                    search_date = None
+
+                # Apply filters based on the search term
+                if search_date:
+                    filtered_queryset |= casestatus_list.filter(
+                        case__in=Case.objects.filter(
+                            Q(client_first_name__icontains=term) |
+                            Q(client_last_name__icontains=term) |
+                            Q(emailadres__icontains=term) |
+                            Q(geboortedatum=search_date)
+                        )
+                    )
+                else:
+                    filtered_queryset |= casestatus_list.filter(
+                        case__in=Case.objects.filter(
+                            Q(client_first_name__icontains=term) |
+                            Q(client_last_name__icontains=term) |
+                            Q(emailadres__icontains=term)
+                        )
+                    )
+
+            # Remove double items
+            casestatus_list = filtered_queryset.distinct()
+
+
+
+
+
+
+
+            # for s in search.split():
+            #     casestatus_list = casestatus_list.filter( case__in=Case.objects.filter(Q(client_first_name__icontains=s) |
+            #                                                                            Q(client_last_name__icontains=s) |
+            #                                                                            Q(emailadres__icontains=s) ))
 
         qs = casestatus_list.exclude(
             status=CASE_STATUS_INGEDIEND,
@@ -166,12 +246,12 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         tabs = [[cs, CASE_STATUS_DICT.get(cs).get('current')] for cs in CASE_STATUS_CHOICES_BY_FEDEATION_TYPE.get(self.request.user.federation.organization.federation_type)]
         tabs.append([0, 'Alle'])
         tabs = [{
-            'filter':t[0],  
-            'title':t[1],  
+            'filter':t[0],
+            'title':t[1],
             'queryset':final_set.filter(
                 status=t[0],
                 form__in=form_slug_list,
-            ) if t[0] else final_set,  
+            ) if t[0] else final_set,
         } for t in tabs]
 
         tabs[0]['queryset'] = ingediend_final_set
@@ -331,7 +411,7 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
         response = super().delete(request, *args, **kwargs)
 
         recipient_list = list(set(
-            get_zorginstelling_medewerkers_email_list(self.object) + 
+            get_zorginstelling_medewerkers_email_list(self.object) +
             get_woningcorporatie_medewerkers_email_list(self.object)
         ))
 
@@ -379,16 +459,17 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         case = form.save(commit=False)
-        case.delete_request_date = datetime.datetime.now()
+        case.delete_request_date = datetime.now()
         case.delete_request_by = self.request.user.profile
         case.save()
 
         recipient_list = list(set(
-            get_wonen_medewerkers_email_list() + 
-            get_zorginstelling_medewerkers_email_list(self.object) + 
+            get_wonen_medewerkers_email_list() +
+            get_zorginstelling_medewerkers_email_list(self.object) +
             get_woningcorporatie_medewerkers_email_list(self.object)
         ))
-        recipient_list.remove(self.request.user.username)
+        if self.request.user.username in recipient_list:
+            recipient_list.remove(self.request.user.username)
 
         current_site = get_current_site(self.request)
         body = render_to_string('cases/mail/case_delete_request.txt', {
@@ -440,11 +521,12 @@ class CaseDeleteRequestRevokeView(UserPassesTestMixin, UpdateView):
         case.save()
 
         recipient_list = list(set(
-            get_wonen_medewerkers_email_list() + 
-            get_zorginstelling_medewerkers_email_list(self.object) + 
+            get_wonen_medewerkers_email_list() +
+            get_zorginstelling_medewerkers_email_list(self.object) +
             get_woningcorporatie_medewerkers_email_list(self.object)
         ))
-        recipient_list.remove(self.request.user.username)
+        if self.request.user.username in recipient_list:
+            recipient_list.remove(self.request.user.username)
 
         current_site = get_current_site(self.request)
         body = render_to_string('cases/mail/case_delete_request_revoke.txt', {
@@ -819,7 +901,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
         return self.get_all_users().filter(
             federation=self.request.user.federation,
         ).exclude(
-            profile__in=instance.profile_set.all(), 
+            profile__in=instance.profile_set.all(),
         )
 
     def get_linked_users(self):
@@ -852,7 +934,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
     def get_context_data(self, **kwargs):
         self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
         linked_users = User.objects.filter(
-            profile__in=self.instance.profile_set.all(), 
+            profile__in=self.instance.profile_set.all(),
             user_type__in=[BEGELEIDER, PB_FEDERATIE_BEHEERDER]
         ).exclude(id=self.request.user.id)
 
@@ -885,7 +967,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                     'user': self.request.user,
                     'invited': invited,
                     'case_url': 'https://%s%s' % (
-                        current_site.domain, 
+                        current_site.domain,
                         reverse('case', kwargs={'pk':self.instance.id})
                     ),
                 })
@@ -918,7 +1000,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
         instance = self.model.objects.get(id=self.kwargs.get('pk'))
         return self.get_all_users().filter(
             federation=self.request.user.federation,
-            profile__in=instance.profile_set.all(), 
+            profile__in=instance.profile_set.all(),
         )
 
     def get_success_url(self):
@@ -951,7 +1033,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
                     'user': self.request.user,
                     'removed_user': user,
                     'case_url': 'https://%s%s' % (
-                        current_site.domain, 
+                        current_site.domain,
                         reverse('case', kwargs={'pk':self.instance.id})
                     ),
                 })
@@ -976,10 +1058,10 @@ class CaseCreateView(UserPassesTestMixin, CreateView):
 
     def get_success_url(self):
         return reverse(
-            'case', 
+            'case',
             args=[self.object.id]
         )
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({"title": "Cliënt aanmaken", "mode": "page"})
@@ -1009,7 +1091,7 @@ class CaseBaseUpdateView(UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return '%s?iframe=true' % reverse(
-            'case', 
+            'case',
             args=[self.object.id]
         )
 
@@ -1042,7 +1124,7 @@ class CaseAddressCreate(UserPassesTestMixin, UpdateView):
         if self.request.GET.get('next'):
             return self.request.GET.get('next')
         return '%s?iframe=true' % reverse(
-            'case', 
+            'case',
             args=[self.object.id]
         )
 
@@ -1073,7 +1155,7 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return '%s?iframe=true' % reverse(
-            'case', 
+            'case',
             args=[self.object.id]
         )
 
@@ -1094,18 +1176,19 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
             'case': case,
             'user': self.request.user,
             'case_url': 'https://%s%s' % (
-                current_site.domain, 
+                current_site.domain,
                 reverse('case', kwargs={'pk':case.id})
             ),
         }
         body = render_to_string('cases/mail/case_address_changed.txt', context)
 
         recipient_list = list(set(
-            get_wonen_medewerkers_email_list() + 
-            get_zorginstelling_medewerkers_email_list(self.object) + 
+            get_wonen_medewerkers_email_list() +
+            get_zorginstelling_medewerkers_email_list(self.object) +
             get_woningcorporatie_medewerkers_email_list(self.object)
         ))
-        recipient_list.remove(self.request.user.username)
+        if self.request.user.username in recipient_list:
+            recipient_list.remove(self.request.user.username)
 
         if settings.SENDGRID_KEY:
             sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
@@ -1202,7 +1285,7 @@ class DocumentDelete(UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return '%s?iframe=true' % reverse(
-            'case', 
+            'case',
             kwargs={'pk': self.kwargs.get('case_pk')}
         )
 
@@ -1248,7 +1331,7 @@ def download_document(request, case_pk, document_pk):
 
     if not default_storage.exists(default_storage.generate_filename(document.uploaded_file.name)):
         raise Http404()
-    
+
     return HttpResponseRedirect(document.uploaded_file.url)
 
 

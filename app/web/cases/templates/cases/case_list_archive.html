@@ -19,7 +19,7 @@
 
     <form method="get" class="u-margin-bottom-2x">
         <div class="form-field">
-            <div class="help-text">Zoek cliënten op Voornaam, Achternaam en/of E-mailadres.</div>
+            <div class="help-text">Zoek cliënten op Voornaam, Achternaam, E-mailadres en/of Geboortedatum (dd-mm-jjjj).</div>
             {{ form.search }}
         </div>
         <button type="submit">Filter</button>
@@ -61,7 +61,7 @@
                         <a  href="#" data-handler="modal" data-contentid="modalCaseDelete" class="button button--secondary" title="ga naar definitief verwijderen">
                             Definitief verwijderen
                         </a>
-                        <div role="dialog" class="modal" id="modalCaseDelete"> 
+                        <div role="dialog" class="modal" id="modalCaseDelete">
                             <iframe class="modal--uploads" id="iframeCaseDelete" data-src="{% url 'delete_case' object.id %}" src="about:blank" title="Cliënt defintief verwijderen"></iframe>
                         </div>
                         {% else %}
@@ -73,7 +73,7 @@
         </tbody>
     </table>
 
-    
+
     {% include 'core/pagination.html' with object_list=object_list filter_params='' %}
 </section>
 {% endblock %}
