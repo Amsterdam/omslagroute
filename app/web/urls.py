@@ -12,8 +12,11 @@ from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
 from django.views.generic import RedirectView
 
+def trigger_error(request):
+    division_by_zero = 1 / 0
 
 urlpatterns = [
+    path('sentry-debug/', trigger_error),
     path('', HomePageView.as_view(), name='home'),
     path('data/', DataView.as_view(), name='data'),
     path('admin/settings', VariablesView.as_view(), name='variables'),
