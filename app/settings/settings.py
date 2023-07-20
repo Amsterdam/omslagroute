@@ -73,6 +73,15 @@ WSGI_APPLICATION = 'wsgi.application'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SENDGRID_KEY = os.environ.get("SENDGRID_KEY")
 
+# Error logging through Sentry
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN", ""),
+    integrations=[DjangoIntegration(), ],
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
+
 ADMINS = (
     ('admin', 'name@email.com'),
 )
@@ -281,13 +290,18 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
+        'sentry': {
+            'level': 'ERROR',  # Log errors and above to Sentry
+            'class': 'sentry_sdk.integrations.logging.EventHandler',
+        },
         'console': {
             'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
         },
     },
     'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
+        'handlers': ['sentry', 'console'],
+        'level': 'INFO',
     },
 }
 

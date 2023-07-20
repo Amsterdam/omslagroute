@@ -13,6 +13,7 @@ from web.forms.statics import URGENTIE_AANVRAAG, FORMS_BY_SLUG, FORMS_SLUG_BY_FE
 from web.forms.views import GenericUpdateFormView, GenericCreateFormView
 from web.forms.utils import get_sections_fields
 import sendgrid
+import logging
 from sendgrid.helpers.mail import Mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
@@ -37,6 +38,7 @@ from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list
 from operator import or_
 
+logger = logging.getLogger(__name__)
 
 class UserCaseList(UserPassesTestMixin, ListView):
     model = Case
