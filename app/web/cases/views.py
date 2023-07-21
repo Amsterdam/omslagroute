@@ -40,6 +40,8 @@ from operator import or_
 
 logger = logging.getLogger(__name__)
 
+PAGE_SIZE = 20
+
 class UserCaseList(UserPassesTestMixin, ListView):
     model = Case
     template_name_suffix = '_list_page'
@@ -81,7 +83,7 @@ class UserCaseList(UserPassesTestMixin, ListView):
             object_list = filtered_queryset.distinct()
 
         # pagination
-        paginator = Paginator(object_list, 20)
+        paginator = Paginator(object_list, PAGE_SIZE)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
         form = UserCaseForm(self.request.GET)
@@ -134,7 +136,7 @@ class CaseListArchive(UserPassesTestMixin, ListView):
             # Remove double items
             object_list = filtered_queryset.distinct()
 
-        paginator = Paginator(object_list, 20)
+        paginator = Paginator(object_list, PAGE_SIZE)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
         form = UserCaseForm(self.request.GET)
@@ -245,7 +247,7 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
             int(tab_index)
         except ValueError:
             tab_index = '0'
-        paginator = Paginator(tabs[int(tab_index)].get('queryset'), 20)
+        paginator = Paginator(tabs[int(tab_index)].get('queryset'), PAGE_SIZE)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
