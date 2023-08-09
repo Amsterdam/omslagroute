@@ -46,6 +46,7 @@ class CaseManager(models.Manager):
             id__in=CaseVersion.objects.filter(
                 version_verbose__in=FORMS_SLUG_BY_FEDERATION_TYPE.get(FEDERATION_TYPE_ADW)
             ).order_by('case').distinct().values_list('case'),
+            delete_request_date__isnull=True,
         )
         return queryset
 
