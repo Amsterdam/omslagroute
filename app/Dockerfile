@@ -67,4 +67,6 @@ RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN EXPORT REQUEST_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+
 CMD ["/deploy/docker-run.sh"]
