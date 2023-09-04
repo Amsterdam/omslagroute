@@ -102,7 +102,7 @@
                                 <use href="#bell" xlink:href="#bell" width="16" height="16"></use>
                             </svg>
                         </span>
-                        <a href="{% url 'case' object.id %}" >Verzoek om verwijderen</a> verstuurd (ongedaan maken nog <strong>{{ object.delete_request_seconds_left|duration }}</strong> dagen)
+                        <a href="{% url 'case' object.id %}" >Verzoek om verwijderen</a> verstuurd (<strong>{{ object.delete_request_seconds_left|duration }}</strong> tot definitieve verwijdering)
                         </p>
                     </td>
                 </tr>

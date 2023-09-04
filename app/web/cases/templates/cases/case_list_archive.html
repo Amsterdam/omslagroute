@@ -50,7 +50,7 @@
                     </td>
                     <td>
                         <span class="show-on-mobile">Datum verzoek:</span>
-                        {{ object.delete_request_date|timezone:FRONTEND_TIMEZONE|date:'d-m-y H:i' }}
+                        {{ object.delete_request_date|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                     </td>
                     <td>
                         <span class="show-on-mobile">Bericht:</span>
@@ -58,10 +58,10 @@
                     </td>
                     <td>
                         {% if object.delete_enabled %}
-                        <a  href="#" data-handler="modal" data-contentid="modalCaseDelete" class="button button--secondary" title="ga naar definitief verwijderen">
+                        <a  href="#" data-handler="modal" data-contentid="modalCaseDelete-{{ object.id }}" class="button button--secondary" title="ga naar definitief verwijderen">
                             Definitief verwijderen
                         </a>
-                        <div role="dialog" class="modal" id="modalCaseDelete">
+                        <div role="dialog" class="modal" id="modalCaseDelete-{{ object.id }}">
                             <iframe class="modal--uploads" id="iframeCaseDelete" data-src="{% url 'delete_case' object.id %}" src="about:blank" title="Cliënt defintief verwijderen"></iframe>
                         </div>
                         {% else %}
