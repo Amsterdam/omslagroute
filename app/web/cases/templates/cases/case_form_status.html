@@ -36,16 +36,16 @@
             <div class="flex-item u-clearfix">
                 {% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder %}
 
-                {% else %} 
+                {% else %}
                 <!-- wonen && !dossiernr-->
                 <div data-case-id="{{ object.id }}" {% if request.user|is_woningcorporatie_medewerker %}data-deny-dossier_nr="true"{% endif %} id="dossier_nr">
                 </div>
-                
-                {% endif %}    
-        
+
+                {% endif %}
+
             </div>
         </div>
- 
+
 
 
     <div class="form-title-wrapper">
@@ -75,21 +75,21 @@
             {% include 'cases/snippets/case_address.html'  with class='u-margin-top-none u-margin-bottom-half' %}
             {% endif %}
 
-            
+
         </div>
 
 
         <div class="details-client details-client--status details-client--approve u-width-50"
-            data-case-id="{{ object.id }}" 
-            data-form="{{ form_config.form_config_slug }}" 
-            data-case-status-options="{{ status_options }}" 
-            data-title="{{ form_config.title }}" 
-            data-email-list="{{ user_list }}" 
+            data-case-id="{{ object.id }}"
+            data-form="{{ form_config.form_config_slug }}"
+            data-case-status-options="{{ status_options }}"
+            data-title="{{ form_config.title }}"
+            data-email-list="{{ user_list }}"
             >
             {% csrf_token %}
             <div id="app"></div>
         </div>
-        
+
 
     </section>
 
@@ -104,8 +104,8 @@
             {% for document in document_list %}
                 <li>
                     <div><a href="{% url 'download_case_document' object.id document.id %}
-                    " target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }} </span></div>
-                    
+                    " target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span></div>
+
                 </li>
             {% endfor %}
             {% else %}
@@ -120,7 +120,7 @@
     <section class="section section--forms">
         <!-- START Client basis gegevens -->
         <div class="details-client">
-            
+
             {% case_form_data object request.user.federation.organization form_config.form_config_slug as data %}
             {% include 'forms/snippets/readonly_form_data.html' with form_config=form_config data=data %}
         </div>

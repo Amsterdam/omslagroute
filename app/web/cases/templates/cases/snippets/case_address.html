@@ -2,7 +2,7 @@
     <header>
         <h2 class="h3 {{class}}">Woning omslagroute</h2>
     </header>
-    
+
     <dl>
         <div>
             <dt>Adres: </dt>
@@ -37,11 +37,11 @@
                         <p class="u-margin-bottom-none">{{ h.adres_straatnaam }} {{ h.adres_huisnummer }}, {{ h.adres_postcode }} {{ h.adres_plaatsnaam }}</p>
                         <p class="u-margin-bottom-none">{{ object.woningcorporatie }}</p>
                         {% if h.adres_wijziging_reden %}<p class="u-margin-bottom-none"><i>'{{ h.adres_wijziging_reden }}'</i></p>{% endif %}
-                        <small>{{ h.saved|date:"d-m-y H:i" }} - {{ h.saved_by.user }}</small>
+                        <small>{{ h.saved|date:DATE_FORMAT }} - {{ h.saved_by.user }}</small>
                     </li>
                     {% endfor %}
                 </ul>
-            </div>    
+            </div>
         </div>
     </details>
     {% endif %}

@@ -33,11 +33,11 @@
             <div class="flex-item">
                 <h1>{{ object.client_name }}</h1>
             </div>
-            <div class="flex-item u-clearfix">   
+            <div class="flex-item u-clearfix">
                 {% include 'cases/status/current.html' with object=object.casestatus_set.all.first %}
             </div>
         </div>
- 
+
 
 
     <div class="form-title-wrapper">
@@ -68,8 +68,8 @@
             {% for document in document_list %}
                 <li>
                     <div><a href="{% url 'download_case_document' object.id document.id %}
-                    " target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }} </span></div>
-                    
+                    " target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span></div>
+
                 </li>
             {% endfor %}
             {% else %}
@@ -80,13 +80,13 @@
             </ul>
         </div>
         <!-- END BIJLAGE -->
-        
+
 
     </section>
     <section class="section section--forms">
         <!-- START Client basis gegevens -->
         <div class="details-client">
-            
+
             {% case_form_data object request.user.federation.organization object.version_verbose as data %}
             {% include 'forms/snippets/readonly_form_data.html' with form_config=form_config data=data %}
         </div>

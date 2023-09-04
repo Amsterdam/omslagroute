@@ -371,26 +371,21 @@ class CaseCreateView(UserPassesTestMixin, CreateView):
 class CaseDeleteView(UserPassesTestMixin, DeleteView):
     model = Case
     template_name_suffix = '_delete'
-    success_url = reverse_lazy('case_list')
+    success_url = reverse_lazy('case_archive')
 
     def get_success_url(self):
-        return './?iframe=%s' % (
-            self.success_url,
-        )
+        return reverse('case_list') + '?iframe=%s' % self.success_url
 
     def test_func(self):
         return auth_test(self.request.user, [WONEN])
-
-    def get_queryset(self):
-        return self.model._default_manager.by_user(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         case = self.get_object()
         response = super().delete(request, *args, **kwargs)
 
         recipient_list = list(set(
-            get_zorginstelling_medewerkers_email_list(self.object) +
-            get_woningcorporatie_medewerkers_email_list(self.object)
+            get_zorginstelling_medewerkers_email_list(case) +
+            get_woningcorporatie_medewerkers_email_list(case)
         ))
 
         current_site = get_current_site(self.request)
@@ -414,7 +409,8 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
             )
             sg.send(email)
 
-        messages.add_message(self.request, messages.INFO, "De cliënt '%s' is verwijderd." % obj.client_name)
+        messages.add_message(self.request, messages.INFO, "De cliënt '%s' is verwijderd." % case.client_name)
+
         return response
 
 
