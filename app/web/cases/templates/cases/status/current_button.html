@@ -4,7 +4,7 @@
     {% if object.case_form_is_opnieuw_ingediend %}
     Opnieuw ingediend
     {% else %}
-    {{ object.status|status_verbose }} {{ object.created|timezone:FRONTEND_TIMEZONE|date:"d-m-Y H:i" }}
+    {{ object.status|status_verbose }} {{ object.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
     {% endif %}
 </span>
 {% else %}

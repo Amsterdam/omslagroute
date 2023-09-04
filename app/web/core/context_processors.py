@@ -35,5 +35,6 @@ def app_settings(request=None):
         'NEW_USER_INTRO': config.NEW_USER_INTRO,
         'login_form': AuthenticationForm(),
         'FRONTEND_TIMEZONE': settings.FRONTEND_TIMEZONE,
+        'DATE_FORMAT': settings.DATE_FORMAT,
         'BASIS_GEGEVENS_FIELDS': BASIS_GEGEVENS_FIELDS,
     }

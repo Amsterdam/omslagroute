@@ -7,7 +7,7 @@
 {% else %}
     {{ object.status|status_verbose }}
 {% endif %}
- <small>({{ object.created|timezone:FRONTEND_TIMEZONE|date:"d-m-Y H:i" }})</small>
+ <small>({{ object.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }})</small>
  </span>
 {% else %}
 <span class="u-font-size-small">

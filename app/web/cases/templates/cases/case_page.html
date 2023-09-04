@@ -29,16 +29,16 @@
 {% csrf_token %}
 <section class="section section--client">
     <div>
-        {% if object.delete_request_date %}  
+        {% if object.delete_request_date %}
         {% include 'cases/snippets/case_delete_request_header.html' %}
-        {% endif %}    
+        {% endif %}
         <div class="client-header flex-container">
             <div class="flex-item">
                 <h1>{{ object.client_name }}</h1>
             </div>
             <div class="flex-item u-clearfix">
                 {% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder %}
-                
+
                 {% if not object.delete_request_date %}
                 <div class="screen-only">
                     <a href="{% url 'case_invite_users' object.id %}" class="button button--secondary" data-handler="modal" data-contentid="modalInvite">
@@ -74,7 +74,7 @@
                                 <a href="#" data-handler="modal" data-contentid="modalChangeAddress">Wijzig woning</a>
                                 <div role="dialog" class="modal" id="modalChangeAddress">
                                     <iframe class="modal--address" id="iframeChangeAddress" data-src="{% url 'update_case_address' object.id %}?iframe_content=true" src="about:blank" title="Wijzig woning">
-                                        
+
                                     </iframe>
                                 </div>
                             </li>
@@ -89,35 +89,35 @@
                         </ul>
                     </div>
                 </details>
-                
+
                 </div>
                 {% endif %}
 
-                {% else %} 
+                {% else %}
                 <!-- wonen && !dossiernr-->
                 <div data-case-id="{{ object.id }}" id="dossier_nr">
                 </div>
-                
-                {% endif %}    
-        
+
+                {% endif %}
+
             </div>
         </div>
-        
-    
+
+
             <div role="dialog" class="modal" id="modalInvite">
                 <iframe class="modal--invite" id="iframeInvite" data-src="{% url 'case_invite_users' object.id  %}" src="about:blank" title="Uitnodiging tot samenwerking">
                 </iframe>
-              </div>    
-        <small class="u-color-neutralgrey4">Laatste activiteit: {{ object.saved|timezone:FRONTEND_TIMEZONE|date:"d-m-Y H:i" }}{% if object.saved_by %} | {{ object.saved_by.user.username }}{% endif %}{% if object.saved_form %} | '{{ object.saved_form|form_verbose }}'{% endif %}</small>
+              </div>
+        <small class="u-color-neutralgrey4">Laatste activiteit: {{ object.saved|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}{% if object.saved_by %} | {{ object.saved_by.user.username }}{% endif %}{% if object.saved_form %} | '{{ object.saved_form|form_verbose }}'{% endif %}</small>
         <small class="print-only">
             {% language 'nl' %}
                 Printdatum: {% now "j F Y H:i" %}
             {% endlanguage %}
         </small>
-        
-        
+
+
     </div>
-    
+
     <section class="section-details-client">
         <!-- START Client basis gegevens -->
         <div class="details-client details-client--basic">
@@ -151,15 +151,15 @@
                 <iframe class="modal--uploads" id="iframeModal" data-src="{% url 'add_case_document' object.id %}" src="about:blank" title="ga naar bestand toevoegen">
                 </iframe>
             </div>
-              
+
             <ul class="downloads">
             {% for document in object.document_set.all %}
                 {% if forloop.counter0 < 4 %}
                     <li>
-                        <div><a href="{% url 'download_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }} </span></div>
+                        <div><a href="{% url 'download_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span></div>
                         {% if not object.delete_request_date %}
                         <div>
-                            
+
                             <button type="button" title="Bijlage aanpassen" class="text-link u-margin-top-none" data-handler="modal" data-contentid="modalDocumentUpdate-{{ document.id }}">
                                 <span><svg class="button__icon"  width="20" height="20" >
                                     <use href="#edit-document" xlink:href="#edit-document"  width="20" height="20"></use>
@@ -172,7 +172,7 @@
                                 <svg class="button__icon"  width="20" height="20" >
                                     <use href="#trash" xlink:href="#trash"  width="20" height="20"></use>
                                 </svg>
-                            </button>  
+                            </button>
                             <div role="dialog" class="modal" id="modalDocumentDelete-{{ document.id }}">
                                 <iframe class="modal--delete-document" id="iFrameDocumentDelete-{{ document.id }}" data-src="{% url 'delete_case_document' object.id document.id %}" src="about:blank" title="Verwijder bijlage {{ document.name }}"></iframe>
                             </div>
@@ -186,7 +186,7 @@
             {% if object.document_set.all|length > 4 %}
             <a href="{% url 'case_document_list' object.id %}" class="u-underline--none"><span class="u-underline">Overzicht alle bijlagen</span> ></a>
             {% endif %}
-            
+
         </div>
         <!-- END BIJLAGE -->
         {% endif %}
@@ -201,7 +201,7 @@
     {% block processtappen %}
     <!-- START PROCESSTAPPEN -->
     <section class="section section--forms section--mijn-clienten">
-        
+
         <table class="moment-list">
             <thead>
                 <tr>
@@ -274,7 +274,7 @@
                                     </svg>
                                 </summary>
                                 <div class="content">
-                                    
+
                                     <ul class="u-list-style-none list--status-icons">
                                         {% for cv in versions %}
                                         <li>
@@ -293,7 +293,7 @@
                             {% if moment.form %}
                             {% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder %}
                             <span class="show-on-mobile">Status:</span>
-                            
+
 
                                 {% include 'cases/status/current.html' with object=case_status %}
 
@@ -305,13 +305,13 @@
                                     {% for cs in case_status_list %}
                                     <li>
                                     <span class="label label--status-{{ cs.status|status_class }}">
-                                        {{ cs.status|status_verbose }} {{ cs.created|timezone:FRONTEND_TIMEZONE|date:"d-m-Y H:i" }}
+                                        {{ cs.status|status_verbose }} {{ cs.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                                     </span>
                                     </li>
                                     {% endfor %}
                                 </ul>
-                                
-                                
+
+
                                 {% endif %}
                                 {% endif %}
                             {% else %}
@@ -326,7 +326,7 @@
                         <td>
                             {% if case_status and request.user.federation.organization.federation_type == moment.form|form_federation_type %}
                                 <span class="show-on-mobile">Status datum:</span>
-                                <span class="u-font-size-small">{{ case_status.created|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }}</span>
+                                <span class="u-font-size-small">{{ case_status.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}</span>
                             {% endif %}
                             </td>
                             <td>

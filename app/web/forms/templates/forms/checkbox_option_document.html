@@ -12,7 +12,7 @@
         {{ document.extension }}
     </small>
     <small>
-        {{ document.uploaded|timezone:'Europe/Amsterdam'|date:"d-m-Y H:i" }}
+        {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
     </small>
 </div>
 

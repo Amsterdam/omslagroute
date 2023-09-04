@@ -58,7 +58,7 @@
                     </td>
                     <td class="help-text">
                         <span class="show-on-mobile">Laatste opgeslagen:</span>
-                        {{ object.saved|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }}
+                        {{ object.saved|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                     </td>
                     <td>
                         <span class="show-on-mobile">Stap in omslagroute:</span>
@@ -80,7 +80,7 @@
                     <td class="help-text">
                         <span class="show-on-mobile">Status datum:</span>
                         {% if case_status_list and case_status_list.0.form %}
-                        {{ case_status_list.0.created|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }}
+                        {{ case_status_list.0.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                         {% else %}
                         {% endif %}
                     </td>

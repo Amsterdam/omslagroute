@@ -44,7 +44,7 @@
                     </td>
                     <td>
                         <span class="show-on-mobile">Datum:</span>
-                        <span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:"d-m-y H:i" }} </span>
+                        <span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span>
                     </td>
                     {% if not object.delete_request_date %}
                     <td>
@@ -62,7 +62,7 @@
                             </svg></a>
                         <div role="dialog" class="modal" id="modalDocumentDelete-{{ document.id }}">
                             <iframe class="modal--delete-document" id="iFrameDocumentDelete-{{ document.id }}" data-src="{% url 'delete_case_document' object.id document.id %}" src="about:blank" title="Verwijder bijlage {{ document.name }}"></iframe>
-                        </div>  
+                        </div>
                     </td>
                     {% endif %}
                 </tr>
