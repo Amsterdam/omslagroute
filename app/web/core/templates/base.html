@@ -34,11 +34,11 @@
         .no-js .modal-inner,
         .no-js .js-spinner {
             opacity: 0;
-            display: none;  
+            display: none;
         }
     </style>
     <link type="text/css" rel="stylesheet" href="https://fast.fonts.net/t/1.css?apiType=css&amp;projectid=3680cf49-2b05-4b8a-af28-fa9e27d2bed0">
-    
+
 </head>
 <body>
 
@@ -145,8 +145,17 @@
     <footer id="pageFooter" class="page-footer">
         <div class="section-wrapper section-wrapper--top">
             <section>
-                <h3>Vragen? Neem contact op met de <a href="mailto:woonzaken.omslag@amsterdam.nl" class="u-text-inherit">Afdeling Wonen (gemeente Amsterdam)</a>.</h3>
-            </section>    
+                <h3><a href="mailto:woonzaken.omslag@amsterdam.nl" target="_blank" rel="noopener noreferrer" class="u-text-inherit">Klik hier als u vragen heeft over de werkwijze binnen de Omslagroute.</a></h3>
+                <h3>
+                    <button
+                        class="button-as-link"
+                        data-handler="modal"
+                        data-contentid="modalFeedback"
+                    >
+                        Klik hier als u problemen met de site heeft of suggesties wilt doorgeven.
+                    </button>
+                </h3>
+            </section>
         </div>
 
         <div class="section-wrapper section-wrapper--bottom">
@@ -158,7 +167,7 @@
                         Privacy
                     </a>
                 </li>
-                
+
                 {% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder or request.user|is_wonen_medewerker %}
                 <li class="u-margin-right-2x">
                     <a href="{% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder %}{% static "documents/quickguide-zorginstellingen.pdf" %}{% elif request.user|is_wonen_medewerker %}{% static "documents/quickguide-wonen.pdf" %}{% endif %}" target="_blank" rel="noopener noreferrer" class="u-underline--none">
