@@ -47,15 +47,14 @@ class FeedbackFormView(FormView):
                         'name': user.get_full_name()
                     })
             body = render_to_string('feedback/mail/feedback.txt', data)
-            if settings.SENDGRID_KEY:
-                sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-                email = Mail(
-                    from_email='no-reply@%s' % current_site.domain,
-                    to_emails=addresses,
-                    subject='Omslagroute - feedback',
-                    plain_text_content=body
-                )
-                sg.send(email)
+            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
+            email = Mail(
+                from_email='no-reply@%s' % current_site.domain,
+                to_emails=addresses,
+                subject='Omslagroute - feedback',
+                plain_text_content=body
+            )
+            sg.send(email)
         else:
             return HttpResponseRedirect('./?error=1')
         return super().form_valid(form)
