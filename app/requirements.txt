@@ -106,6 +106,7 @@ textile==4.0.1
 tornado==6.1
 traitlets==5.1.1
 uritemplate==4.1.1
+urllib3==1.25.11
 wcwidth==0.2.5
 webencodings==0.5.1
 wrapt==1.14.0
