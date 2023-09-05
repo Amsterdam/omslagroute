@@ -73,7 +73,6 @@ parso==0.8.3
 pbr==5.8.1
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==10.0.0
 prompt-toolkit==2.0.10
 psycopg2==2.9.3
 ptyprocess==0.7.0
@@ -107,8 +106,6 @@ textile==4.0.1
 tornado==6.1
 traitlets==5.1.1
 uritemplate==4.1.1
-urllib3==2.0.3
-uWSGI==2.0.21
 wcwidth==0.2.5
 webencodings==0.5.1
 wrapt==1.14.0
