@@ -404,7 +404,7 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
             ),
             'user': self.request.user,
         })
-        if settings.SENDGRID_KEY:
+        if settings.SENDGRID_KEY and recipient_list:
             sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
             email = Mail(
                 from_email='noreply@%s' % current_site.domain,

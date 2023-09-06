@@ -23,6 +23,7 @@ class CustomUserAdmin(UserAdmin):
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
+    list_filter = ('user_type', 'federation', 'is_staff', 'is_superuser', 'is_active')
 
     def profile_link(self, obj):
         url = reverse('admin:%s_%s_change' % ('profiles',  'profile'),  args=[obj.profile.id])
