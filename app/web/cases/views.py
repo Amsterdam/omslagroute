@@ -298,7 +298,12 @@ class CaseDetailView(UserPassesTestMixin, DetailView):
         return auth_test(self.request.user, [WONEN, BEGELEIDER, PB_FEDERATIE_BEHEERDER, WONINGCORPORATIE_MEDEWERKER])
 
     def get_queryset(self):
-        return self.model._default_manager.by_user(user=self.request.user)
+        # Check if the user has the WONEN permission
+        if auth_test(self.request.user, WONEN):
+            # return all cases because Wonen can see the case details through the "Archief".
+            return super().get_queryset()
+        else:
+            return self.model._default_manager.by_user(user=self.request.user)
 
 
 class CaseVersionDetailView(UserPassesTestMixin, DetailView):
