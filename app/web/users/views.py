@@ -51,7 +51,7 @@ def generic_login(request):
 
             if user:
                 login(request, user)
-                if user.user_type in [BEGELEIDER, PB_FEDERATIE_BEHEERDER]:
+                if any(int(user_type) in [BEGELEIDER, PB_FEDERATIE_BEHEERDER] for user_type in user.user_type):
                     return HttpResponseRedirect(reverse('cases_by_profile'))
                 return HttpResponseRedirect(request.POST.get('next', '/'))
     messages.add_message(request, messages.ERROR, 'Er is iets mis gegaan met het inloggen')
@@ -74,9 +74,9 @@ class UserList(UserPassesTestMixin, TemplateView):
         search = self.request.GET.get('search', '')
 
         if search == '':
-            object_list = User.objects.all().filter(user_type__in=filter)
+            object_list = User.objects.all().filter(user_type__contains=filter)
         else:
-            object_list = User.objects.all().filter(user_type__in=filter)
+            object_list = User.objects.all().filter(user_type__contains=filter)
             for s in search.split():
                 object_list = object_list.filter(Q(first_name__icontains=s) |
                                                  Q(last_name__icontains=s) |
@@ -115,10 +115,10 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         if self.request.user.federation.organization:
             user_type_choices = [[ut, USER_TYPES_DICT[int(ut)]] for ut in self.request.user.federation.organization.rol_restrictions]
 
-        user_types_federatie = [int(ut[0]) for ut in user_type_choices]
-
+        user_types_federatie = [ut[0] for ut in user_type_choices]
         # filter
         filter_list = [f for f in self.request.GET.getlist('filter', []) if f]
+
         filter = filter_list if filter_list else user_types_federatie
         filter_params = '&filter='.join(filter_list)
         filter_params = '&filter=%s' % filter_params if filter_params else ''
@@ -135,7 +135,7 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
                                                  Q(email__icontains=s) )
 
         # default sort on user_type by custom list
-        object_list = [[o, user_types_federatie.index(o.user_type)] for o in object_list]
+        object_list = [[o, [user_types_federatie.index(user_type) for user_type in o.user_type]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
 

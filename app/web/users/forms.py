@@ -40,6 +40,7 @@ class FilterListFederationForm(forms.Form):
         label=_('Zoeken'),
         required=False
     )
+
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
         super().__init__(*args, **kwargs)
@@ -62,21 +63,26 @@ class AuthenticationForm(DefaultAuthenticationForm):
 
 
 class UserUpdateForm(forms.ModelForm):
-
     class Meta:
         model = User
         fields = (
             'user_type',
             'federation',
         )
+        widgets = {
+            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
+        }
 
 class FederationUserUpdateForm(forms.ModelForm):
-    
     class Meta:
         model = User
         fields = (
             'user_type',
         )
+        widgets = {
+            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
+        }
+
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
         super().__init__(*args, **kwargs)
@@ -89,10 +95,6 @@ class UserCreationForm(forms.ModelForm):
         required=True
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['federation'].label = 'Organisatie'
-
     class Meta:
         model = User
         fields = (
@@ -100,6 +102,14 @@ class UserCreationForm(forms.ModelForm):
             'federation',
             'user_type',
         )
+        widgets = {
+            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['federation'].label = 'Organisatie'
+
 
 class UserCreationFederationForm(forms.ModelForm):
     username = forms.EmailField(
@@ -112,6 +122,9 @@ class UserCreationFederationForm(forms.ModelForm):
             'username',
             'user_type',
         )
+        widgets = {
+            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
+        }
 
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
@@ -120,11 +133,6 @@ class UserCreationFederationForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_suffix = ''
-
     class Meta:
         model = Profile
         exclude = [
@@ -132,6 +140,10 @@ class ProfileForm(forms.ModelForm):
             'user',
             'organization',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ''
 
 
 ProfileFormSet = inlineformset_factory(

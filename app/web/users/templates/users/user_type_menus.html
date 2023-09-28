@@ -41,54 +41,53 @@
                             <a href="{% url 'case_list' %}">Onze cli&euml;nten</a>
                         </li>
                     {% endif %}
-                    {% if request.user|is_beheerder %}
+                    {% if request.user|is_federatie_beheerder or request.user|is_wonen_medewerker or request.user|is_pb_federatie_beheerder or request.user|is_beheerder %}
                         <li class="admin-settings">
                             <button class="navigation__open"><span>Beheer</span></button>
                             <ul>
-                                <li>
-                                    <a href="{% url 'user_list' %}">
-                                        <svg width="8" height="12">
-                                            <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
-                                        </svg>
-                                        Gebruikers beheer
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'federation_list' %}">
-                                        <svg width="8" height="12">
-                                            <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
-                                        </svg>
-                                        Organisaties beheer</a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'data' %}">
-                                        <svg width="8" height="12">
-                                            <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
-                                        </svg>
-                                        Analytics</a>
-                                </li>
-                            </ul>
-                        </li>
-                    {% endif %}
-                    {% if request.user|is_federatie_beheerder or request.user|is_wonen_medewerker or request.user|is_pb_federatie_beheerder %}
-                        <li class="admin-settings">
-                            <button class="navigation__open"><span>Beheer</span></button>
-                            <ul>
-                                <li>
-                                    <a href="{% url 'federation_user_list' %}">
-                                        <svg width="8" height="12">
-                                            <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
-                                        </svg>
-                                        Gebruikers beheer
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'federation_update' request.user.federation.id %}">
-                                        <svg width="8" height="12">
-                                            <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
-                                        </svg>
-                                        Organisatie beheer</a>
-                                </li>
+                                {% if request.user|is_federatie_beheerder or request.user|is_wonen_medewerker or request.user|is_pb_federatie_beheerder %}
+                                    <li>
+                                        <a href="{% url 'federation_user_list' %}">
+                                            <svg width="8" height="12">
+                                                <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
+                                            </svg>
+                                            Gebruiker beheer
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'federation_update' request.user.federation.id %}">
+                                            <svg width="8" height="12">
+                                                <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
+                                            </svg>
+                                            Organisatie beheer</a>
+                                    </li>
+                                {% endif %}
+                                {% if request.user|is_beheerder %}
+                                    <li>
+                                        <a href="{% url 'user_list' %}">
+                                            <svg width="8" height="12">
+                                                <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
+                                            </svg>
+                                            Gebruikers beheer
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'federation_list' %}">
+                                            <svg width="8" height="12">
+                                                <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
+                                            </svg>
+                                            Organisaties beheer</a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'data' %}">
+                                            <svg width="8" height="12">
+                                                <use href="#chevron-right" xlink:href="#chevron-right" width="8" height="12"></use>
+                                            </svg>
+                                            Analytics</a>
+                                    </li>
+                                {% endif %}
+
+
                             </ul>
                         </li>
                     {% endif %}

@@ -68,13 +68,13 @@ class FederationUpdateView(UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy('federation_list')
 
     def get_success_url(self):
-        if self.request.user.user_type in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER]:
+        if any(int(user_type) in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER] for user_type in self.request.user.user_type):
             return reverse('home')
         return super().get_success_url()
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.request.user.user_type in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER]:
+        if any(int(user_type) in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER] for user_type in self.request.user.user_type):
             queryset = queryset.filter(
                 id=self.request.user.federation.id,
             )

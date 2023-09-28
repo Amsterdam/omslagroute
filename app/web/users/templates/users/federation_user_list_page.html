@@ -22,7 +22,7 @@
             </div>
         </div>
     </div>
-    
+
     <form method="get" class="u-margin-bottom-2x">
         <div class="form-field form-field--checkboxselectmultiple">
             <label>Filter op gebruiker rol</label>
@@ -64,7 +64,7 @@
             </td>
             <td>
                 <a href="{% url 'update_federation_user' object.id %}">
-                    {{ object.user_type_value }}
+                    {{ object.user_type_names }}
                 </a>
             </td>
         </tr>

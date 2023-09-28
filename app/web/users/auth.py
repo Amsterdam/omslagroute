@@ -58,8 +58,8 @@ def auth_test(user, user_type):
     if not hasattr(user, 'profile'):
         return False
     if isinstance(user_type, list):
-        return hasattr(user, 'user_type') and user.user_type in user_type
-    return hasattr(user, 'user_type') and user.user_type == user_type
+        return hasattr(user, 'user_type') and any(str(role) in user.user_type for role in user_type)
+    return hasattr(user, 'user_type') and str(user_type) in user.user_type
 
 
 class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):

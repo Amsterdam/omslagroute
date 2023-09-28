@@ -35,7 +35,7 @@ class FeedbackFormView(FormView):
             user = self.request.user
             if user.is_authenticated:
                 data.update({
-                    'rol': user.user_type_value,
+                    'rol': user.user_type_names,
                     'email': '%s%s%s' % (
                         data.get('email', ''),
                         ', ' if data.get('email') else '',
