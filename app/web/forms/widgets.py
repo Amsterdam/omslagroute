@@ -2,6 +2,7 @@ from django.forms import RadioSelect as DefaultRadioSelect
 from django.forms.widgets import \
     ClearableFileInput as DefaultClearableFileInput, \
     CheckboxSelectMultiple as DefaultCheckboxSelectMultiple
+from django.conf import settings
 
 
 class RadioSelect(DefaultRadioSelect):
@@ -29,4 +30,10 @@ class CheckboxSelectMultipleDocument(DefaultCheckboxSelectMultiple):
 
     def get_context(self, name, value, attrs):
         attrs.update(self.attrs)
-        return super().get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
+        # Context variables are not inherited by checkbox_option_document.html
+        # Add context variables specific to the widget
+        context['FRONTEND_TIMEZONE'] = settings.FRONTEND_TIMEZONE
+        context['DATE_FORMAT'] = settings.DATE_FORMAT
+
+        return context
