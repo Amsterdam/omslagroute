@@ -77,7 +77,9 @@
                         <li>
                             <a
                                 href="javascript:void(0);"
-                                {% if object.delete_request_date %}disabled{% else %}
+                                {% if object.delete_request_date %}
+                                    disabled
+                                {% else %}
                                     data-handler="ajax-forms-submit modal"
                                     data-contentid="modalConfirmInternalCheck"
                                 {% endif %}
