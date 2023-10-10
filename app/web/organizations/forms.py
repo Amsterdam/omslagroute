@@ -39,8 +39,7 @@ class FederationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-
-        if any(int(user_type) in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER, WONEN] for user_type in user.user_type):
+        if any(user_type in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER, WONEN] for user_type in user.user_type_values):
             del self.fields['federation_id']
             del self.fields['organization']
             del self.fields['name']

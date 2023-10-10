@@ -51,7 +51,7 @@ def generic_login(request):
 
             if user:
                 login(request, user)
-                if any(int(user_type) in [BEGELEIDER, PB_FEDERATIE_BEHEERDER] for user_type in user.user_type):
+                if any(user_type in [BEGELEIDER, PB_FEDERATIE_BEHEERDER] for user_type in user.user_type_values):
                     return HttpResponseRedirect(reverse('cases_by_profile'))
                 return HttpResponseRedirect(request.POST.get('next', '/'))
     messages.add_message(request, messages.ERROR, 'Er is iets mis gegaan met het inloggen')
@@ -228,7 +228,7 @@ class UserCreationView(UserPassesTestMixin, CreateView):
             data = {
                 'creator': self.request.user,
                 'user': user,
-                'user_type': USER_TYPES_DICT.get(user.user_type, ''),
+                'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
             body = render_to_string('users/mail/to_new_user.txt', data)
@@ -277,7 +277,7 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
             data = {
                 'creator': self.request.user,
                 'user': user,
-                'user_type': USER_TYPES_DICT.get(user.user_type, ''),
+                'user_type': user.user_type_namnes,
                 'url': 'https://%s' % current_site.domain,
             }
             body = render_to_string('users/mail/to_new_user.txt', data)

@@ -59,16 +59,16 @@
                 {% for user in form.instance.user_list.all %}
                 <tr>
                     <td>
-                        {{user.username}}
+                        {{ user.username }}
                     </td>
                     <td>
-                        {{user.first_name}}
+                        {{ user.first_name }}
                     </td>
                     <td>
-                        {{user.last_name}}
+                        {{ user.last_name }}
                     </td>
                     <td>
-                        {{user.user_type|user_type_verbose}}
+                        {{ user.user_type_names }}
                     </td>
                     <td>
                         <a href="{% url 'update_user' user.id %}?next={% url 'federation_update' object.id %}">Wijzig</a>

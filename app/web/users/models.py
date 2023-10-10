@@ -43,8 +43,14 @@ class User(AbstractUser):
         return self.username
 
     @property
+    def user_type_values(self):
+        # The MultiSelectField user_type is returning a list of strings instead of integers.
+        # With this property it's easier to filter.
+        return [int(value) for value in self.user_type]
+
+    @property
     def user_type_names(self):
-        names = [USER_TYPES_DICT.get(int(value), 'Unknown') for value in self.user_type]
+        names = [USER_TYPES_DICT.get(value, 'Unknown') for value in self.user_type_values]
         return ", ".join(names)
 
     class Meta:

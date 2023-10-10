@@ -1298,8 +1298,7 @@ def download_document(request, case_pk, document_pk):
     if not case:
         raise PermissionDenied
     document = get_object_or_404(Document, id=document_pk)
-
-    if any(int(user_type) in [WONEN, WONINGCORPORATIE_MEDEWERKER] for user_type in request.user.user_type):
+    if any(user_type in [WONEN, WONINGCORPORATIE_MEDEWERKER] for user_type in request.user.user_type_values):
         form_status_list = [f[0] for f in case.casestatus_set.all().order_by('form').distinct().values_list('form')]
         shared_in_forms = [f for f in document.forms if f in form_status_list]
         if not shared_in_forms:

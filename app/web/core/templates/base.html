@@ -63,7 +63,7 @@
                         {% if request.user.is_superuser %}
                             <p><a href="{% url 'admin:users_user_change' request.user.id %}" class="site-userinfo__username">
                                 {{ request.user.username }}
-                                <small>({{ request.user.user_type|user_type_verbose }})</small>
+                                <small>({{ request.user.user_type_names }})</small>
                             </a></p>
                         {% elif request.user.first_name %}
                             <p class="site-userinfo__username">{{ request.user.first_name }}</p>

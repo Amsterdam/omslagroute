@@ -5,12 +5,6 @@ register = template.Library()
 from web.users.statics import *
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE, FEDERATION_TYPE_ADW
 
-# Returning a string with the names of user_type_values seperated by a comma.
-@register.filter()
-def user_type_verbose(user_type_values):
-    user_type_names = [USER_TYPES_DICT.get(int(value), 'Unknown') for value in user_type_values]
-    return ', '.join(user_type_names)
-
 
 @register.filter()
 def is_redactie(user):
