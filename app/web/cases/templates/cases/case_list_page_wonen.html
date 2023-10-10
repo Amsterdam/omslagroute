@@ -85,7 +85,7 @@
                             {% if object.status == 1 and not object.is_first_of_statustype %}Opnieuw {% endif %}{{ object.status|status_verbose }}
                         </span>
                         {% if object.status != 1 and object.case_form_is_opnieuw_ingediend %}
-                        <span class="label u-font-size-small u-margin-top-half">
+                        <span class="label u-font-size-small u-margin-top-half" style="padding-left: 0;">
                             Opnieuw ingediend
                         </span>
                         {% endif %}

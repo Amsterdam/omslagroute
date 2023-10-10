@@ -146,7 +146,7 @@ class CaseBaseForm(forms.ModelForm):
             'partner_geboortedatum',
             'partner_emailadres',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['client_first_name'].required = True
@@ -199,7 +199,7 @@ class CaseAddressForm(forms.ModelForm):
             'woningcorporatie',
             'woningcorporatie_medewerker',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['adres_straatnaam'].required = True
@@ -233,7 +233,7 @@ class CaseAddressUpdateForm(forms.ModelForm):
             'woningcorporatie',
             'woningcorporatie_medewerker',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['adres_straatnaam'].required = True
@@ -303,4 +303,18 @@ class CaseDeleteRequestRevokeForm(forms.ModelForm):
         model = Case
         fields = []
 
+class CaseStatusForm(forms.ModelForm):
+    status_comment = forms.CharField(
+        label=_('Opmerking'),
+        help_text=_('Voeg eventueel een opmerking toe voor de interne controleur.'),
+        widget=forms.Textarea(
+            attrs={
+                'rows': 4,
+            }
+        ),
+        required=False
+    )
 
+    class Meta:
+        model = CaseStatus
+        fields = []

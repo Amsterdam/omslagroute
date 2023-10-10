@@ -42,7 +42,7 @@
     <div role="dialog" class="modal" id="modalInvite">
         <iframe class="modal--invite" id="iframeInvite" data-src="{% url 'case_invite_users' object.id  %}" src="about:blank" title="Uitnodiging tot samenwerking">
         </iframe>
-      </div>  
+      </div>
 </section>
 
 <section class="section section--form section--form-{{ title|slugify }}{% if request.GET.control %} section--form--control{% endif %} u-margin-bottom-sticky">
@@ -62,10 +62,9 @@
                                 </svg>
                             </a>
                         </li>
-                    {% endif %}
-                    {% if object.get_linked_users|length > 1 %}
+                        {% endif %}
+                        {% if object.get_linked_users|length > 1 %}
                         <li>
-                            
                             <a href="mailto:{% for user in object.get_linked_users %}{% if request.user.id != user.id %}{{user.username}},{% endif %}{% endfor %}?SUBJECT={{ title }}&BODY=%0D%0D%0A{{request.build_absolute_uri}}%0D%0D%0ALog in op omslagroute.amsterdam.nl om bovenstaande link te openen.">
                                 <span>Mail samenwerker(s)</span><svg width="20" height="20">
                                     <use href="#email" xlink:href="#email" width="20" height="20"></use>
@@ -73,26 +72,57 @@
                             </a>
                         </li>
                         {% endif %}
+
+                        {% if form.instance.id and federation and case_status_list|length == 0 %}
                         <li>
-                            {% if form.instance.id and federation %}
-                        <button {% if object.delete_request_date %}disabled{% endif %} type="submit" name="next" id="form-submit" value="{% url 'send_case' form.instance.id form_config_slug %}" class="button text-link" >
-                            <span>Indienen bij {% if federation %}{{federation.name}}{% endif %}</span><svg class="" width="20" height="20">
-                                <use href="#share" xlink:href="#share" width="20" height="16"></use>
-                            </svg></button>{% endif %}
+                            <a
+                                href="javascript:void(0);"
+                                {% if object.delete_request_date %}disabled{% else %}
+                                    data-handler="ajax-forms-submit modal"
+                                    data-contentid="modalConfirmInternalCheck"
+                                {% endif %}
+                            >
+                                <span>Laat intern controleren</span>
+                                <svg class="" width="20" height="20">
+                                    <use href="#recycle" xlink:href="#recycle" width="20" height="16"></use>
+                                </svg>
+                            </a>
                         </li>
+                        <div role="dialog" class="modal" id="modalConfirmInternalCheck">
+                            <iframe
+                                class="modal--check"
+                                id="iframeModal"
+                                data-src="{% url 'internal_check_case' form.instance.id form_config_slug %}"
+                                src="about:blank"
+                                title="Intern laten controleren"
+                            >
+                            </iframe>
+                        </div>
+                        {% endif %}
+
+                        {% if form.instance.id and federation %}
+                        <li>
+                            <button {% if object.delete_request_date %}disabled{% endif %} type="submit" name="next" id="form-submit" value="{% url 'send_case' form.instance.id form_config_slug %}" class="button text-link" >
+                                <span>Indienen bij {% if federation %}{{federation.name}}{% endif %}</span>
+                                <svg class="" width="20" height="20">
+                                    <use href="#share" xlink:href="#share" width="20" height="16"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        {% endif %}
                     </ul>
-                    
+
                 </div>
 
                 <div class="section--client section--lightgrey u-margin-bottom-4x">
                     <section class="section-details-client u-margin-none">
                         <!-- START Client persoonsgegevens -->
-                        
+
                         <div class="details-client details-client--basic">
                             <header>
                                 <h2 class="h3 u-margin-top-none">Basisgegevens</h2>
                             </header>
-                
+
                             {% include 'cases/snippets/case_basis_gegevens.html' with data=object.to_dict %}
 
                             {% if object.address_complete %}
@@ -101,7 +131,7 @@
 
                         </div>
                         <!-- END Client persoonsgegevens -->
-                                
+
                         <!-- START STATUS -->
                         <div class="details-client details-client--status">
                             <h2 class="h3 u-margin-top-none">Status aanvraag</h2>
@@ -123,7 +153,7 @@
                                 </div>
                                 {% if case_status_list|length > 1 %}
                                     <div class="status-history-container form-field-history screen-only">
-                                        
+
                                         <details>
                                             <summary>Historie<svg class="icon-details--closed" width="12" height="9">
                                                     <use href="#chevron-down" xlink:href="#chevron-down" width="12" height="9"></use>
@@ -153,7 +183,7 @@
                                                         {% endif %}
                                                         {% endfor %}
                                                     </ul>
-                                                </div>    
+                                                </div>
                                             </div>
                                         </details>
                                     </div>
@@ -165,7 +195,7 @@
                         </div>
                     </section>
                 </div>
-            
+
                 {% csrf_token %}
                 {{ form.as_sections.errors }}
                 {% if form.errors %}
@@ -247,13 +277,15 @@
                                     {% if history %}
                                     <div class="form-field form-field-history screen-only">
                                         <details>
-                                            <summary><strong class="u-margin-none">Eerder verstuurd in</strong>
+                                            <summary>
+                                                <strong class="u-margin-none">Eerder verstuurd in</strong>
                                                 <svg class="icon-details--closed" width="14" height="9">
                                                     <use href="#chevron-down" xlink:href="#chevron-down" width="14" height="9"></use>
                                                 </svg>
                                                 <svg class="icon-details--open" width="14" height="9">
                                                     <use href="#chevron-up" xlink:href="#chevron-up" width="14" height="9"></use>
-                                                </svg></summary> 
+                                                </svg>
+                                            </summary>
                                             <div class="content">
                                                 {% for h in history %}
                                                 <details>
@@ -272,14 +304,14 @@
                                                             <svg class="icon-recycle" width="18" height="18">
                                                                 <use href="#recycle" xlink:href="#recycle" width="18" height="18"></use>
                                                             </svg>
-                                                        </button>    
+                                                        </button>
                                                         {% endif %}
                                                     </div>
                                                 </details>
-                                                {% endfor %}        
-                                            </div>   
+                                                {% endfor %}
+                                            </div>
                                         </details>
-                                        
+
                                     </div>
                                     {% endif %}
                                 </div>
@@ -301,8 +333,8 @@
                         <input {% if object.delete_request_date %}disabled{% endif %} type="submit" value="Opslaan" class="button button--primary">
                         {% endif %}
                         <a href="{{ discard_url }}" class="button button--secondary">Annuleren</a>
-                        
-                    </div>        
+
+                    </div>
                 </div>
 
             </div>

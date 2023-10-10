@@ -38,11 +38,7 @@ JONGER_DAN_26_DICT = dict((s[0], s[1]) for s in JONGER_DAN_26)
 DEFAULT_YES_OR_NO_DICT = dict((s[0], s[1]) for s in DEFAULT_YES_OR_NO)
 DEFAULT_NO_OR_YES_DICT = dict((s[0], s[1]) for s in DEFAULT_NO_OR_YES)
 
-
-
-
-
-# case status 
+# case status
 CASE_STATUS_INGEDIEND = 1
 CASE_STATUS_AFGEKEURD = 2
 CASE_STATUS_GOEDGEKEURD = 3
@@ -52,71 +48,80 @@ CASE_STATUS_WONINGCORPORATIE_AFGEKEURD = 6
 CASE_STATUS_WONINGCORPORATIE_GOEDGEKEURD = 7
 CASE_STATUS_WONINGCORPORATIE_IN_BEHANDELING = 8
 CASE_STATUS_AFGESLOTEN = 9
+CASE_STATUS_INTERNE_CONTROLE = 10
 
 CASE_STATUS = (
     (
-        CASE_STATUS_INGEDIEND, 
-        'Ingediend', 
-        'Indienen', 
+        CASE_STATUS_INGEDIEND,
+        'Ingediend',
+        'Indienen',
         'icon-circle',
         '',
         'ingediend.html',
     ),
     (
-        CASE_STATUS_AFGEKEURD, 
-        'Afgekeurd', 
-        'Afkeuren', 
+        CASE_STATUS_AFGEKEURD,
+        'Afgekeurd',
+        'Afkeuren',
         'disapproved',
         'close',
         'afgekeurd.html',
     ),
     (
-        CASE_STATUS_GOEDGEKEURD, 
-        'Goedgekeurd', 
-        'Goedkeuren', 
+        CASE_STATUS_GOEDGEKEURD,
+        'Goedgekeurd',
+        'Goedkeuren',
         'approved',
         'check',
         'goedgekeurd.html',
     ),
     (
-        CASE_STATUS_IN_BEHANDELING, 
-        'In behandeling', 
-        'In behandeling nemen', 
+        CASE_STATUS_IN_BEHANDELING,
+        'In behandeling',
+        'In behandeling nemen',
         'pending',
         'pause',
         'in_behandeling.html',
     ),
     (
-        CASE_STATUS_WONINGCORPORATIE_AFGEKEURD, 
-        'Afgekeurd', 
-        'Afkeuren', 
+        CASE_STATUS_WONINGCORPORATIE_AFGEKEURD,
+        'Afgekeurd',
+        'Afkeuren',
         'disapproved',
         'close',
         'afgekeurd.html',
     ),
     (
-        CASE_STATUS_WONINGCORPORATIE_GOEDGEKEURD, 
-        'Goedgekeurd', 
-        'Goedkeuren', 
+        CASE_STATUS_WONINGCORPORATIE_GOEDGEKEURD,
+        'Goedgekeurd',
+        'Goedkeuren',
         'approved',
         'check',
         'goedgekeurd.html',
     ),
     (
-        CASE_STATUS_WONINGCORPORATIE_IN_BEHANDELING, 
-        'In behandeling', 
-        'In behandeling nemen', 
+        CASE_STATUS_WONINGCORPORATIE_IN_BEHANDELING,
+        'In behandeling',
+        'In behandeling nemen',
         'pending',
         'pause',
         'in_behandeling.html',
     ),
     (
-        CASE_STATUS_AFGESLOTEN, 
-        'In concept', 
-        'In concept zetten', 
+        CASE_STATUS_AFGESLOTEN,
+        'In concept',
+        'In concept zetten',
         'pending',
         'pause',
         'afgesloten.html',
+    ),
+    (
+        CASE_STATUS_INTERNE_CONTROLE,
+        'Interne controle',
+        'Intern controleren',
+        'icon-circle',
+        '',
+        'empty.html',
     ),
 )
 
@@ -153,11 +158,6 @@ IN_CONCEPT = [
     CASE_STATUS_AFGESLOTEN,
 ]
 
-
-
-
-
-
 # case version
 CASE_VERSION_BASE = 'basis-gegevens'
 CASE_VERSION_ADDRESS = 'adres-aanpassen'
@@ -182,7 +182,6 @@ def map_case_version_keys(f):
     }
 
 CASE_VERSION_BY_SLUG = dict((s[0], map_case_version_keys(s)) for s in CASE_VERSION)
-
 
 BASIS_GEGEVENS_FIELDS = [
     'client_first_name',

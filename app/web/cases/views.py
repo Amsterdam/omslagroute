@@ -161,7 +161,7 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         casestatus_list = casestatus_list.filter(
             case__in=Case.objects.by_user(self.request.user).values_list('id', flat=True),
         ).exclude(
-            status=CASE_STATUS_AFGESLOTEN
+            status__in=[CASE_STATUS_AFGESLOTEN, CASE_STATUS_INTERNE_CONTROLE]
         )
 
         search = self.request.GET.get('search')
@@ -1314,12 +1314,42 @@ def download_document(request, case_pk, document_pk):
     return HttpResponseRedirect(document.uploaded_file.url)
 
 
+class InternalCheckView(UserPassesTestMixin, UpdateView):
+    model = Case
+    template_name = 'cases/internal_check.html'
+    form_class = CaseStatusForm
+    success_url = '.?iframe=true'
 
+    def test_func(self):
+        return auth_test(self.request.user, [BEGELEIDER, PB_FEDERATIE_BEHEERDER])
 
+    def get_context_data(self, **kwargs):
+        form_config_slug = self.kwargs.get('form_config_slug')
+        form_config = FORMS_BY_SLUG.get(form_config_slug)
 
+        if not form_config:
+            raise Http404
 
+        kwargs.update(self.kwargs, **form_config)
+        return super().get_context_data(**kwargs)
 
+    def form_valid(self, form):
+        version = self.object.create_version(self.kwargs.get('form_config_slug'))
+        case_status_dict = {
+            'form': self.kwargs.get('form_config_slug'),
+            'case': self.object,
+            'case_version': version,
+            'profile': self.request.user.profile,
+            'status': CASE_STATUS_INTERNE_CONTROLE,
+            'status_comment': form.cleaned_data.get('status_comment'),
+        }
+        case_status = CaseStatus(**case_status_dict)
+        case_status.save()
 
+        messages.add_message(
+            self.request, messages.INFO, 'Het formulier heeft de status "Interne controle" gekregen.'
+        )
+        return super().form_valid(form)
 
-
-
+    def form_invalid(self, form):
+        return super().form_invalid(form)

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block skiplinks %}{% endblock %}
+{% block header %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block messages %}{% endblock %}
+{% block feedback %}{% endblock %}
+
+{% block main %}
+<div class="content-container">
+    <button data-handler="modal-close" class="button button--close">
+        <svg width="20" height="20" title="Sluit venster">
+            <use href="#close" xlink:href="#close" width="20" height="20"></use>
+        </svg>
+        <span class="sr-only">Sluit venster</span>
+    </button>
+    <h2>Intern laten controleren</h2>
+    <hr />
+
+    <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+
+        <div class="form-field">
+            {% if form.errors %}
+                <div class="errors" aria-live="polite">
+                    <ul class="errorlist list-vertical" aria-live="polite">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>
+                                    <a href="#{{field.id_for_label }}">{{field.label}}</a>:
+                                    {{ error|escape }}
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error|escape }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="help-text">Afhankelijk van de zorgaanbieder kan het dossier eerst naar een derde gaan ter controle. De status "Interne controle" kan alleen worden toegekend als het dossier "{{ form_config_slug }}"" nog geen andere status heeft. </div>
+
+            <div class="form-field form-field--textinput">
+                <label for="{{ form.status_comment.id_for_label }}">{{ form.status_comment.label }}</label>
+                {% if form.status_comment.help_text %}
+                    <div class="help-text">{{ form.status_comment.help_text|safe }}</div>
+                {% endif %}
+                {{ form.status_comment }}
+            </div>
+
+        </div>
+
+        <div class="form-field form-field--buttons screen-only u-margin-top-2x">
+            <a href="#" class="button button--secondary" data-handler="modal-close">Annuleren</a>
+            <input type="submit" value="Intern controleren" class="button button--primary" data-handler="show-loading">
+        </div>
+
+    </form>
+</div>
+{% endblock %}

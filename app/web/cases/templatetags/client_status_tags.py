@@ -3,7 +3,7 @@ from web.forms.statics import FORMS_BY_SLUG
 from ..models import CaseVersion, CaseStatus
 from web.organizations.models import Organization, Federation
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE, FEDERATION_TYPE_ADW
-from ..statics import * 
+from ..statics import *
 register = template.Library()
 
 
@@ -27,6 +27,7 @@ def case_status_list_latest(case, *args, **kwargs):
     case_status_list = CaseStatus.objects.filter(
         case=case,
         status__in=[
+            CASE_STATUS_INTERNE_CONTROLE,
             CASE_STATUS_INGEDIEND,
             CASE_STATUS_AFGEKEURD,
             CASE_STATUS_IN_BEHANDELING,
