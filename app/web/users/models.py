@@ -12,7 +12,7 @@ from django.db.models import JSONField
 
 class User(AbstractUser):
     user_types = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_ACTIVE]
-    user_type = MultiSelectField(
+    user_type = MultiSelectField( # MultiSelectField stores vales as a comma separated string in a CharField
         verbose_name=_('Gebruiker rol'),
         choices=user_types,
         default=[6],

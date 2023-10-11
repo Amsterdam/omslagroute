@@ -872,7 +872,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
-            user_type__contains=[BEGELEIDER]
+            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):
@@ -912,10 +912,6 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
 
     def get_context_data(self, **kwargs):
         self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
-        linked_users = User.objects.filter(
-            Q(profile__in=self.instance.profile_set.all()) &
-            (Q(user_type__contains=[BEGELEIDER]) | Q(user_type__contains=[PB_FEDERATIE_BEHEERDER]))
-        ).exclude(id=self.request.user.id)
 
         kwargs.update({
             'linked_users': self.get_linked_users(),
@@ -972,7 +968,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
-            user_type__contains=[BEGELEIDER]
+            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):

@@ -46,7 +46,7 @@ class CaseInviteUsersForm(forms.Form):
     user_list = forms.ModelMultipleChoiceField(
         label=_('Met wie van je organisatie wil je samenwerken aan deze cliënt?'),
         help_text=_('Selecteer één of meerdere collega’s. Wanneer je kiest voor samenwerken met een collega kan deze:<ul><li>basisgegevens en aanvraagformulieren bekijken en bewerken</li><li>bijlagen downloaden en  toevoegen</li><li>formulieren verzenden naar afdeling Wonen Gemeente Amsterdam</li></ul>'),
-        queryset=User.objects.filter(Q(user_type__contains=[BEGELEIDER]) | Q(user_type__contains=[PB_FEDERATIE_BEHEERDER])),
+        queryset=User.objects.filter(Q(user_type__contains=BEGELEIDER) | Q(user_type__contains=PB_FEDERATIE_BEHEERDER)),
         widget=CheckboxSelectMultiple(attrs={'class': 'u-list-style-none scroll-list-container'}),
         required=True,
     )
@@ -85,7 +85,7 @@ class CaseRemoveInvitedUsersForm(forms.Form):
     user_list = forms.ModelMultipleChoiceField(
         label=_('Met wie van je organisatie wil je níet meer samenwerken aan deze cliënt?'),
         help_text=_('Wanneer je de samenwerking beëindigt kunnen deze collega’s géén:<ul><li>basisgegevens en aanvraagformulieren bekijken en bewerken</li><li>bijlagen downloaden en  toevoegen</li><li>formulieren verzenden naar afdeling Wonen Gemeente Amsterdam</li>'),
-        queryset=User.objects.filter(Q(user_type__contains=[BEGELEIDER]) | Q(user_type__contains=[PB_FEDERATIE_BEHEERDER])),
+        queryset=User.objects.filter(Q(user_type__contains=BEGELEIDER) | Q(user_type__contains=PB_FEDERATIE_BEHEERDER)),
         widget=CheckboxSelectMultipleUser(attrs={'class': 'u-list-style-none scroll-list-container'}),
         required=True,
     )

@@ -74,7 +74,7 @@ class UserManager(BaseUserManager):
     def zorginstelling_medewerkers(self, case):
         queryset = self.get_queryset()
         queryset = queryset.filter(
-            user_type__contains=[BEGELEIDER],
+            user_type__contains=BEGELEIDER,
             federation__organization__federation_type=FEDERATION_TYPE_ZORGINSTELLING,
             profile__cases__in=[case],
         )
@@ -83,7 +83,7 @@ class UserManager(BaseUserManager):
     def wonen_medewerkers(self):
         queryset = self.get_queryset()
         queryset = queryset.filter(
-            user_type__contains=[WONEN],
+            user_type__contains=WONEN,
             federation__organization__federation_type=FEDERATION_TYPE_ADW,
         )
         return queryset
