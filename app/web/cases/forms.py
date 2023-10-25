@@ -1,11 +1,12 @@
 from django import forms
 from .models import *
+from django.db.models import Q
 from web.forms.forms import GenericModelForm
 from web.forms.widgets import RadioSelect, CheckboxSelectMultipleDocument, CheckboxSelectMultiple, CheckboxSelectMultipleUser
 from .statics import GESLACHT
 from web.forms.statics import FORMS_CHOICES
 from django.utils.translation import ugettext_lazy as _
-from web.forms.fields import MultiSelectFormField, GroupedModelChoiceField
+from web.forms.fields import MultiSelectFormField
 from web.users.models import User
 from web.profiles.models import Profile
 from web.users.statics import BEGELEIDER, PB_FEDERATIE_BEHEERDER
@@ -45,7 +46,7 @@ class CaseInviteUsersForm(forms.Form):
     user_list = forms.ModelMultipleChoiceField(
         label=_('Met wie van je organisatie wil je samenwerken aan deze cliënt?'),
         help_text=_('Selecteer één of meerdere collega’s. Wanneer je kiest voor samenwerken met een collega kan deze:<ul><li>basisgegevens en aanvraagformulieren bekijken en bewerken</li><li>bijlagen downloaden en  toevoegen</li><li>formulieren verzenden naar afdeling Wonen Gemeente Amsterdam</li></ul>'),
-        queryset=User.objects.filter(user_type__in=[BEGELEIDER, PB_FEDERATIE_BEHEERDER]),
+        queryset=User.objects.filter(Q(user_type__contains=BEGELEIDER) | Q(user_type__contains=PB_FEDERATIE_BEHEERDER)),
         widget=CheckboxSelectMultiple(attrs={'class': 'u-list-style-none scroll-list-container'}),
         required=True,
     )
@@ -84,7 +85,7 @@ class CaseRemoveInvitedUsersForm(forms.Form):
     user_list = forms.ModelMultipleChoiceField(
         label=_('Met wie van je organisatie wil je níet meer samenwerken aan deze cliënt?'),
         help_text=_('Wanneer je de samenwerking beëindigt kunnen deze collega’s géén:<ul><li>basisgegevens en aanvraagformulieren bekijken en bewerken</li><li>bijlagen downloaden en  toevoegen</li><li>formulieren verzenden naar afdeling Wonen Gemeente Amsterdam</li>'),
-        queryset=User.objects.filter(user_type__in=[BEGELEIDER, PB_FEDERATIE_BEHEERDER]),
+        queryset=User.objects.filter(Q(user_type__contains=BEGELEIDER) | Q(user_type__contains=PB_FEDERATIE_BEHEERDER)),
         widget=CheckboxSelectMultipleUser(attrs={'class': 'u-list-style-none scroll-list-container'}),
         required=True,
     )
@@ -146,7 +147,7 @@ class CaseBaseForm(forms.ModelForm):
             'partner_geboortedatum',
             'partner_emailadres',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['client_first_name'].required = True
@@ -199,7 +200,7 @@ class CaseAddressForm(forms.ModelForm):
             'woningcorporatie',
             'woningcorporatie_medewerker',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['adres_straatnaam'].required = True
@@ -233,7 +234,7 @@ class CaseAddressUpdateForm(forms.ModelForm):
             'woningcorporatie',
             'woningcorporatie_medewerker',
         ]
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['adres_straatnaam'].required = True

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
+from multiselectfield import MultiSelectField
 from .managers import UserManager
 from .statics import USER_TYPES, USER_TYPES_DICT, USER_TYPES_ACTIVE, USER_TYPES_FEDERATIE
 from django.db import models
@@ -9,15 +10,12 @@ from django.forms import widgets
 from django.db.models import JSONField
 
 
-
 class User(AbstractUser):
     user_types = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_ACTIVE]
-    federation_user_types = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_FEDERATIE]
-
-    user_type = models.PositiveSmallIntegerField(
+    user_type = MultiSelectField( # MultiSelectField stores vales as a comma separated string in a CharField
         verbose_name=_('Gebruiker rol'),
         choices=user_types,
-        default=6,
+        default=[6],
     )
     federation = models.ForeignKey(
         to='organizations.Federation',
@@ -45,8 +43,15 @@ class User(AbstractUser):
         return self.username
 
     @property
-    def user_type_value(self):
-        return USER_TYPES_DICT[self.user_type]
+    def user_type_values(self):
+        # The MultiSelectField user_type is returning a list of strings instead of integers.
+        # With this property it's easier to filter.
+        return [int(value) for value in self.user_type]
+
+    @property
+    def user_type_names(self):
+        names = [USER_TYPES_DICT.get(value, 'Unknown') for value in self.user_type_values]
+        return ", ".join(names)
 
     class Meta:
         verbose_name = _('Gebruiker')

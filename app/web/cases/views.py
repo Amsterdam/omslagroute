@@ -872,7 +872,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
-            user_type__in=[BEGELEIDER]
+            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):
@@ -912,10 +912,6 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
 
     def get_context_data(self, **kwargs):
         self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
-        linked_users = User.objects.filter(
-            profile__in=self.instance.profile_set.all(),
-            user_type__in=[BEGELEIDER, PB_FEDERATIE_BEHEERDER]
-        ).exclude(id=self.request.user.id)
 
         kwargs.update({
             'linked_users': self.get_linked_users(),
@@ -972,7 +968,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
-            user_type__in=[BEGELEIDER]
+            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):
@@ -1298,8 +1294,7 @@ def download_document(request, case_pk, document_pk):
     if not case:
         raise PermissionDenied
     document = get_object_or_404(Document, id=document_pk)
-
-    if request.user.user_type in [WONEN, WONINGCORPORATIE_MEDEWERKER]:
+    if any(user_type in [WONEN, WONINGCORPORATIE_MEDEWERKER] for user_type in request.user.user_type_values):
         form_status_list = [f[0] for f in case.casestatus_set.all().order_by('form').distinct().values_list('form')]
         shared_in_forms = [f for f in document.forms if f in form_status_list]
         if not shared_in_forms:

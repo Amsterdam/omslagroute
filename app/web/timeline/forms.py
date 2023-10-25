@@ -3,9 +3,6 @@ from .models import *
 from django.utils.translation import ugettext_lazy as _
 from web.documents.widgets import *
 from django.forms.widgets import *
-from web.documents.models import Document
-from web.documents.forms import DocumentForm
-from django.forms.models import inlineformset_factory
 
 
 class MomentForm(forms.ModelForm):

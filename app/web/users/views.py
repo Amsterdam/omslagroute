@@ -51,7 +51,7 @@ def generic_login(request):
 
             if user:
                 login(request, user)
-                if user.user_type in [BEGELEIDER, PB_FEDERATIE_BEHEERDER]:
+                if any(user_type in [BEGELEIDER, PB_FEDERATIE_BEHEERDER] for user_type in user.user_type_values):
                     return HttpResponseRedirect(reverse('cases_by_profile'))
                 return HttpResponseRedirect(request.POST.get('next', '/'))
     messages.add_message(request, messages.ERROR, 'Er is iets mis gegaan met het inloggen')
@@ -65,39 +65,54 @@ class UserList(UserPassesTestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
 
-        # filter
-        filter_list = [f for f in self.request.GET.getlist('filter', []) if f]
-        filter = filter_list if filter_list else USER_TYPES_ACTIVE
-        filter_params = '&filter='.join(filter_list)
-        filter_params = '&filter=%s' % filter_params if filter_params else ''
+        # Convert the "USER_TYPES_ACTIVE" list to a list of strings
+        user_types_active_str_list = [str(item) for item in USER_TYPES_ACTIVE]
+
+        # Initialize filter_list with USER_TYPES_ACTIVE if no filter is provided
+        filter_list = self.request.GET.getlist('filter', default=user_types_active_str_list)
+
+        # Remove empty strings from filter_list
+        filter_list = [f for f in filter_list if f]
 
         search = self.request.GET.get('search', '')
 
-        if search == '':
-            object_list = User.objects.all().filter(user_type__in=filter)
-        else:
-            object_list = User.objects.all().filter(user_type__in=filter)
-            for s in search.split():
-                object_list = object_list.filter(Q(first_name__icontains=s) |
-                                                 Q(last_name__icontains=s) |
-                                                 Q(email__icontains=s) )
+        # Create a Q object for user_type__contains filter
+        filter_q = Q()
+        for item in filter_list:
+            filter_q |= Q(user_type__contains=item)
 
-        # default sort on user_type by custom list
-        object_list = [[o, USER_TYPES_ACTIVE.index(o.user_type)] for o in object_list]
+        # Apply search filtering
+        if search:
+            search_q = Q()
+            for s in search.split():
+                search_q |= (Q(first_name__icontains=s) |
+                            Q(last_name__icontains=s) |
+                            Q(email__icontains=s))
+            object_list = User.objects.filter(filter_q & search_q)
+        else:
+            object_list = User.objects.filter(filter_q)
+
+        # Sort by user_type using a custom list
+        object_list = [[o, [USER_TYPES_ACTIVE.index(value) for value in o.user_type_values]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
 
-        # pagination
+        # Pagination
         paginator = Paginator(object_list, 20)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
+        # Create the filter parameters string
+        filter_params = '&filter='.join(filter_list) if filter_list else ''
+
+        # Update the context data
         form = FilterListForm(self.request.GET)
         kwargs.update({
             'object_list': object_list,
             'form': form,
             'filter_params': filter_params,
         })
+
         return kwargs
 
     def test_func(self):
@@ -108,49 +123,67 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
     template_name = 'users/federation_user_list_page.html'
     form_class = FilterListFederationForm
     http_method_names = ['get']
+    per_page = 20
+
+    def get_user_type_choices(self, federation):
+        if federation.organization:
+            return [[str(ut), USER_TYPES_DICT[int(ut)]] for ut in federation.organization.rol_restrictions]
+        return [[str(ut[0]), ut[1]] for ut in User.user_types if ut[0] in [ONBEKEND, FEDERATIE_BEHEERDER]]
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        user_type_choices = [ut for ut in User.user_types if ut[0] in [ONBEKEND, FEDERATIE_BEHEERDER]]
-        if self.request.user.federation.organization:
-            user_type_choices = [[ut, USER_TYPES_DICT[int(ut)]] for ut in self.request.user.federation.organization.rol_restrictions]
 
-        user_types_federatie = [int(ut[0]) for ut in user_type_choices]
+        # Get user's federation and its role restrictions
+        federation = self.request.user.federation
+        user_type_choices = self.get_user_type_choices(federation)
 
-        # filter
-        filter_list = [f for f in self.request.GET.getlist('filter', []) if f]
-        filter = filter_list if filter_list else user_types_federatie
-        filter_params = '&filter='.join(filter_list)
-        filter_params = '&filter=%s' % filter_params if filter_params else ''
+        user_types_federatie = [ut[0] for ut in user_type_choices]
+
+        filter_list = self.request.GET.getlist('filter', default=user_types_federatie)
+
+        # Remove empty strings from filter_list
+        filter_list = [f for f in filter_list if f]
 
         search = self.request.GET.get('search', '')
 
-        if search == '':
-            object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
-        else:
-            object_list = User.objects.filter(user_type__in=filter, federation=self.request.user.federation)
-            for s in search.split():
-                object_list = object_list.filter(Q(first_name__icontains=s) |
-                                                 Q(last_name__icontains=s) |
-                                                 Q(email__icontains=s) )
+        federation_q = Q(federation=federation)
 
-        # default sort on user_type by custom list
-        object_list = [[o, user_types_federatie.index(o.user_type)] for o in object_list]
+        # Create a Q object for user_type__contains filter
+        filter_q = Q()
+        for item in filter_list:
+            filter_q |= Q(user_type__contains=item)
+
+        # Apply search filtering
+        if search:
+            search_q = Q()
+            for s in search.split():
+                search_q |= (Q(first_name__icontains=s) |
+                            Q(last_name__icontains=s) |
+                            Q(email__icontains=s))
+            object_list = User.objects.filter(filter_q & search_q & federation_q)
+        else:
+            object_list = User.objects.filter(filter_q & federation_q)
+
+        object_list = [[o, [USER_TYPES_ACTIVE.index(value) for value in o.user_type_values]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
 
-        # pagination
-        paginator = Paginator(object_list, 20)
+        # Pagination
+        paginator = Paginator(object_list, self.per_page)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
-        # form context
+        # Create the filter parameters string
+        filter_params = '&filter='.join(filter_list) if filter_list else ''
+
+        # Update the context data
         form = FilterListFederationForm(self.request.GET, user_type_choices=user_type_choices)
         kwargs.update({
             'object_list': object_list,
             'form': form,
             'filter_params': filter_params,
         })
+
         return kwargs
 
     def test_func(self):
@@ -228,7 +261,7 @@ class UserCreationView(UserPassesTestMixin, CreateView):
             data = {
                 'creator': self.request.user,
                 'user': user,
-                'user_type': USER_TYPES_DICT.get(user.user_type, ''),
+                'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
             body = render_to_string('users/mail/to_new_user.txt', data)
@@ -277,7 +310,7 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
             data = {
                 'creator': self.request.user,
                 'user': user,
-                'user_type': USER_TYPES_DICT.get(user.user_type, ''),
+                'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
             body = render_to_string('users/mail/to_new_user.txt', data)

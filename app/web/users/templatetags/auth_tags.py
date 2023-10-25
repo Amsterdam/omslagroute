@@ -5,19 +5,6 @@ register = template.Library()
 from web.users.statics import *
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE, FEDERATION_TYPE_ADW
 
-@register.filter()
-def user_type_verbose(user_type):
-    return USER_TYPES_DICT.get(user_type)
-
-@register.filter()
-def has_group(user, group_name):
-    return auth_test(user, group_name)
-
-
-@register.filter()
-def is_user_type(user, user_type):
-    return auth_test(user, user_type)
-
 
 @register.filter()
 def is_redactie(user):
@@ -65,7 +52,5 @@ def user_federation_type_is_adw(user):
 
 
 @register.filter()
-def is_onbekent(user):
+def is_onbekend(user):
     return auth_test(user, ONBEKEND)
-
-

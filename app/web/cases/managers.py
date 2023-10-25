@@ -14,7 +14,7 @@ class CaseManager(models.Manager):
         datetime_treshold = datetime.datetime.now() - datetime.timedelta(seconds=config.CASE_DELETE_SECONDS)
         queryset = self.get_queryset()
 
-        if user.user_type in [PB_FEDERATIE_BEHEERDER]:
+        if PB_FEDERATIE_BEHEERDER in user.user_type_values:
             queryset = queryset.filter(
                 profile__in=Profile.objects.filter(
                     user__federation=user.federation,
@@ -24,7 +24,7 @@ class CaseManager(models.Manager):
             ).order_by('-saved').distinct('id', 'saved')
             return queryset
 
-        if user.user_type in [BEGELEIDER]:
+        if BEGELEIDER in user.user_type_values:
             queryset = queryset.filter(
                 id__in=user.profile.cases.all().values_list('id', flat=True)
             ).exclude(
@@ -32,7 +32,7 @@ class CaseManager(models.Manager):
             ).order_by('-saved')
             return queryset
 
-        if user.user_type in [WONINGCORPORATIE_MEDEWERKER]:
+        if WONINGCORPORATIE_MEDEWERKER in user.user_type_values:
             queryset = queryset.filter(
                 id__in=CaseVersion.objects.filter(
                         version_verbose__in=FORMS_SLUG_BY_FEDERATION_TYPE.get(FEDERATION_TYPE_WONINGCORPORATIE,
