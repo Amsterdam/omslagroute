@@ -21,7 +21,7 @@ fieldset {
 
 summary {
     cursor: pointer;
-    
+
 }
 
 .summary {
@@ -49,8 +49,8 @@ body:not(:-moz-handler-blocked) fieldset {
     z-index: 20;
     background-color: $primary-white;
 
-   
-    
+
+
     h1 + .text-link {
         margin: 2rem 0 0;
     }
@@ -103,7 +103,7 @@ body:not(:-moz-handler-blocked) fieldset {
     margin-top: 0;
 
     @media print {
-    
+
         padding-left: .938rem;
 }
 }
@@ -315,7 +315,7 @@ body:not(:-moz-handler-blocked) fieldset {
         background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
         background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%);
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 );
-        
+
     }
 
     .button-wrapper {
@@ -359,7 +359,7 @@ input,
 textarea {
     + .helptext {
         display: block;
-    } 
+    }
 }
 
 .error-text,
@@ -569,6 +569,7 @@ ul.form-field__radiogroup,
     margin-top: .625rem;
 
     li {
+        padding-top: 4px;
         margin-top: 0;
         margin-bottom: .625rem;
     }
@@ -623,7 +624,7 @@ ul.form-field__radiogroup,
 .form-field__checkboxlabel {
     position: relative;
     padding: 2px 0 1px 34px;
-    
+
         &::before {
             position: absolute;
             top: -4px;
@@ -642,8 +643,8 @@ ul.form-field__radiogroup,
                 content: '';
             }
         }
-        
-    
+
+
 
     &.form-field__checkboxlabel::before {
         border-radius: 0;
@@ -723,7 +724,7 @@ ul.form-field__radiogroup,
             min-height: 1.25em;
             background-color: $primary-white;
             border: .063rem solid $neutral-grey4;
-            
+
             content: '';
             transform: translateY(.25rem);
         }
@@ -844,7 +845,7 @@ select {
         color: $neutral-grey4;
         min-width: 4.375rem;
         max-width: 38.75rem;
-    
+
         details {
             >.content {
                 border: 0;
@@ -863,7 +864,7 @@ select {
                     .content {
                         border: 1px solid $neutral-grey4;
                     }
-                }        
+                }
             }
         }
     }

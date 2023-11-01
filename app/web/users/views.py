@@ -1,16 +1,13 @@
 from django.contrib.auth import logout, login
 from django.http.response import HttpResponseRedirect
-from django.contrib.auth.forms import (
-    AuthenticationForm, authenticate
-)
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.views.generic import CreateView, ListView, UpdateView, FormView, TemplateView, DeleteView
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 from .models import *
 from .forms import *
 from django.urls import reverse_lazy, reverse
 from web.users.auth import auth_test
-from django.db import transaction
 from .statics import *
 from mozilla_django_oidc.views import OIDCAuthenticationRequestView as DatapuntOIDCAuthenticationRequestView
 from django.core.paginator import Paginator
@@ -61,6 +58,7 @@ def generic_login(request):
 class UserList(UserPassesTestMixin, TemplateView):
     template_name = 'users/user_list_page.html'
     http_method_names = ['get']
+    per_page = 20
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -85,9 +83,7 @@ class UserList(UserPassesTestMixin, TemplateView):
         if search:
             search_q = Q()
             for s in search.split():
-                search_q |= (Q(first_name__icontains=s) |
-                            Q(last_name__icontains=s) |
-                            Q(email__icontains=s))
+                search_q |= (Q(first_name__icontains=s) | Q(last_name__icontains=s) | Q(email__icontains=s))
             object_list = User.objects.filter(filter_q & search_q)
         else:
             object_list = User.objects.filter(filter_q)
@@ -98,12 +94,18 @@ class UserList(UserPassesTestMixin, TemplateView):
         object_list = [o[0] for o in object_list]
 
         # Pagination
-        paginator = Paginator(object_list, 20)
+        paginator = Paginator(object_list, self.per_page)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
         # Create the filter parameters string
-        filter_params = '&filter='.join(filter_list) if filter_list else ''
+        filter_param_list = self.request.GET.getlist('filter')
+        filter_params = '&filter=' + '&filter='.join(filter_param_list) if filter_param_list else ''
+
+        # Create the search parameters string
+        search_params = f'&search={search}' if search else ''
+
+        object_list.paginator.page_range
 
         # Update the context data
         form = FilterListForm(self.request.GET)
@@ -111,6 +113,7 @@ class UserList(UserPassesTestMixin, TemplateView):
             'object_list': object_list,
             'form': form,
             'filter_params': filter_params,
+            'search_params': search_params,
         })
 
         return kwargs
@@ -157,9 +160,7 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         if search:
             search_q = Q()
             for s in search.split():
-                search_q |= (Q(first_name__icontains=s) |
-                            Q(last_name__icontains=s) |
-                            Q(email__icontains=s))
+                search_q |= (Q(first_name__icontains=s) | Q(last_name__icontains=s) | Q(email__icontains=s))
             object_list = User.objects.filter(filter_q & search_q & federation_q)
         else:
             object_list = User.objects.filter(filter_q & federation_q)
@@ -174,7 +175,11 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         object_list = paginator.get_page(page)
 
         # Create the filter parameters string
-        filter_params = '&filter='.join(filter_list) if filter_list else ''
+        filter_param_list = self.request.GET.getlist('filter')
+        filter_params = '&filter=' + '&filter='.join(filter_param_list) if filter_param_list else ''
+
+        # Create the search parameters string
+        search_params = f'&search={search}' if search else ''
 
         # Update the context data
         form = FilterListFederationForm(self.request.GET, user_type_choices=user_type_choices)
@@ -182,6 +187,7 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
             'object_list': object_list,
             'form': form,
             'filter_params': filter_params,
+            'search_params': search_params,
         })
 
         return kwargs
@@ -273,7 +279,7 @@ class UserCreationView(UserPassesTestMixin, CreateView):
             )
             sg.send(email)
 
-        messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username )
+        messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)
 
 
@@ -410,7 +416,7 @@ class OIDCAuthenticationRequestView(DatapuntOIDCAuthenticationRequestView):
             })
             request.session['oidc_nonce'] = nonce
 
-        request.session['oidc_states'] = {state:{'nonce':None}}
+        request.session['oidc_states'] = {state: {'nonce': None}}
         request.session['oidc_login_next'] = get_next_url(request, redirect_field_name)
 
         query = urlencode(params)

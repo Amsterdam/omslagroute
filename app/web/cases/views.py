@@ -1,15 +1,14 @@
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView, DetailView, FormView, TemplateView
 from django.views.generic.base import RedirectView
 from .models import *
-from .statics import CASE_STATUS_AFGEKEURD, CASE_STATUS_GOEDGEKEURD, CASE_STATUS_IN_BEHANDELING, CASE_STATUS_INGEDIEND
+from .statics import CASE_STATUS_INGEDIEND
 from django.urls import reverse_lazy, reverse
 from .forms import *
 from web.users.auth import auth_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
 from web.users.statics import BEGELEIDER, WONEN, PB_FEDERATIE_BEHEERDER, WONINGCORPORATIE_MEDEWERKER
-from web.profiles.models import Profile
-from web.forms.statics import URGENTIE_AANVRAAG, FORMS_BY_SLUG, FORMS_SLUG_BY_FEDERATION_TYPE
+from web.forms.statics import FORMS_BY_SLUG, FORMS_SLUG_BY_FEDERATION_TYPE
 from web.forms.views import GenericUpdateFormView, GenericCreateFormView
 from web.forms.utils import get_sections_fields
 import sendgrid
@@ -18,9 +17,9 @@ from sendgrid.helpers.mail import Mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.template.loader import render_to_string
-from web.organizations.models import Organization, Federation
-from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from web.organizations.models import Federation
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -28,12 +27,11 @@ from web.users.auth import user_passes_test
 from django.core.paginator import Paginator
 from web.timeline.models import Moment
 from formtools.wizard.views import SessionWizardView
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.db.models.functions import Concat
-from django.db.models import TextField, DateTimeField, IntegerField
+from django.db.models import TextField
 from django.core.exceptions import PermissionDenied
 from datetime import datetime
-from constance import config
 from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list
 from operator import or_
@@ -41,6 +39,7 @@ from operator import or_
 logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 20
+
 
 class UserCaseList(UserPassesTestMixin, ListView):
     model = Case
@@ -82,6 +81,9 @@ class UserCaseList(UserPassesTestMixin, ListView):
             # Remove double items
             object_list = filtered_queryset.distinct()
 
+        # Create the search parameters string
+        search_params = f'&search={search}' if search else ''
+
         # pagination
         paginator = Paginator(object_list, PAGE_SIZE)
         page = self.request.GET.get('page', 1)
@@ -90,14 +92,15 @@ class UserCaseList(UserPassesTestMixin, ListView):
         kwargs.update({
             'object_list': object_list,
             'form': form,
+            'search_params': search_params,
         })
         return kwargs
-
 
 
 class CaseListArchive(UserPassesTestMixin, ListView):
     model = Case
     template_name_suffix = '_list_archive'
+
     def test_func(self):
         return auth_test(self.request.user, WONEN)
 
@@ -136,6 +139,9 @@ class CaseListArchive(UserPassesTestMixin, ListView):
             # Remove double items
             object_list = filtered_queryset.distinct()
 
+        # Create the search parameters string
+        search_params = f'&search={search}' if search else ''
+
         paginator = Paginator(object_list, PAGE_SIZE)
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
@@ -143,6 +149,7 @@ class CaseListArchive(UserPassesTestMixin, ListView):
         kwargs.update({
             'object_list': paginator.get_page(page),
             'form': form,
+            'search_params': search_params,
         })
         return kwargs
 
@@ -224,9 +231,9 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         tabs = [[cs, CASE_STATUS_DICT.get(cs).get('current')] for cs in CASE_STATUS_CHOICES_BY_FEDEATION_TYPE.get(self.request.user.federation.organization.federation_type)]
         tabs.append([0, 'Alle'])
         tabs = [{
-            'filter':t[0],
-            'title':t[1],
-            'queryset':final_set.filter(
+            'filter': t[0],
+            'title': t[1],
+            'queryset': final_set.filter(
                 status=t[0],
                 form__in=form_slug_list,
             ) if t[0] else final_set,
@@ -251,16 +258,20 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         page = self.request.GET.get('page', 1)
         object_list = paginator.get_page(page)
 
+        # Create the search parameters string
+        search_params = f'&search={search}' if search else ''
+
         initial_form_data = {
-            'f' : str(tab_index)
+            'f': str(tab_index)
         }
 
         form = UserCaseForm(self.request.GET, initial=initial_form_data)
         kwargs.update({
             'filter_params': f'&f={tab_index}',
-            'object_list': paginator.get_page(page),
+            'object_list': object_list,
             'tabs': tabs,
             'search': search,
+            'search_params': search_params,
             'form': form,
             'case_archive_list': Case.objects.filter(delete_request_date__isnull=False)
         })
@@ -356,21 +367,34 @@ class CaseDetailAllDataView(CaseDetailView):
 
 class CaseCreateView(UserPassesTestMixin, CreateView):
     model = Case
-    form_class = CaseForm
+    form_class = CaseBaseForm
     template_name_suffix = '_create_form'
-    success_url = reverse_lazy('cases_by_profile')
 
-    def test_func(self):
-        return auth_test(self.request.user, [BEGELEIDER, PB_FEDERATIE_BEHEERDER])
+    def get_success_url(self):
+        return reverse(
+            'case',
+            args=[self.object.id]
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"title": "Cliënt aanmaken", "mode": "page"})
+        return context
 
     def get_queryset(self):
         return self.model._default_manager.by_user(user=self.request.user)
 
+    def test_func(self):
+        return auth_test(self.request.user, [BEGELEIDER, PB_FEDERATIE_BEHEERDER])
+
     def form_valid(self, form):
-        case = form.save(commit=True)
+        response = super().form_valid(form)
+        case = form.save(commit=False)
+        case.saved_by = self.request.user.profile
+        case.save()
         self.request.user.profile.cases.add(case)
         messages.add_message(self.request, messages.INFO, "De cliënt '%s' is aangemaakt." % case.client_name)
-        return super().form_valid(form)
+        return response
 
 
 class CaseDeleteView(UserPassesTestMixin, DeleteView):
@@ -617,8 +641,7 @@ class GenericCaseUpdateFormView(UserPassesTestMixin, GenericUpdateFormView):
             return redirect('%s%s' % (
                 reverse('create_case_address', args=[self.object.id]),
                 '?next=%s' % reverse('update_case', args=[self.object.id, self.kwargs.get('form_config_slug')]),
-                )
-            )
+            ))
         return response
 
     def get_initial(self):
@@ -707,6 +730,7 @@ class GenericCaseCreateFormView(UserPassesTestMixin, GenericCreateFormView):
         messages.add_message(self.request, messages.INFO, "De cliënt '%s' is aangemaakt." % case.client_name)
         return response
 
+
 class ValidateCaseView(UserPassesTestMixin, RedirectView):
     model = Case
     permanent = False
@@ -786,7 +810,6 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
             recipient_list += get_woningcorporatie_medewerkers_email_list(self.object)
         recipient_list = list(set(recipient_list))
         return recipient_list
-
 
     def get_context_data(self, **kwargs):
         kwargs.update(self.kwargs)
@@ -943,7 +966,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                     'invited': invited,
                     'case_url': 'https://%s%s' % (
                         current_site.domain,
-                        reverse('case', kwargs={'pk':self.instance.id})
+                        reverse('case', kwargs={'pk': self.instance.id})
                     ),
                 })
                 body = render_to_string('cases/mail/invite.txt', context)
@@ -1009,7 +1032,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
                     'removed_user': user,
                     'case_url': 'https://%s%s' % (
                         current_site.domain,
-                        reverse('case', kwargs={'pk':self.instance.id})
+                        reverse('case', kwargs={'pk': self.instance.id})
                     ),
                 })
                 body = render_to_string('cases/mail/invated_removed.txt', context)
@@ -1023,39 +1046,6 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
 
         messages.add_message(self.request, messages.INFO, "De gebruikers hebben een mail ontvangen van het verbreken van de samenwerking.")
         return super().form_valid(form)
-
-
-class CaseCreateView(UserPassesTestMixin, CreateView):
-    model = Case
-    form_class = CaseBaseForm
-    template_name_suffix = '_create_form'
-    success_url = reverse_lazy('cases_by_profile')
-
-    def get_success_url(self):
-        return reverse(
-            'case',
-            args=[self.object.id]
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({"title": "Cliënt aanmaken", "mode": "page"})
-        return context
-
-    def get_queryset(self):
-        return self.model._default_manager.by_user(user=self.request.user)
-
-    def test_func(self):
-        return auth_test(self.request.user, [BEGELEIDER, PB_FEDERATIE_BEHEERDER])
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        case = form.save(commit=False)
-        case.saved_by = self.request.user.profile
-        case.save()
-        self.request.user.profile.cases.add(case)
-        messages.add_message(self.request, messages.INFO, "De cliënt '%s' is aangemaakt." % case.client_name)
-        return response
 
 
 class CaseBaseUpdateView(UserPassesTestMixin, UpdateView):
@@ -1152,7 +1142,7 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
             'user': self.request.user,
             'case_url': 'https://%s%s' % (
                 current_site.domain,
-                reverse('case', kwargs={'pk':case.id})
+                reverse('case', kwargs={'pk': case.id})
             ),
         }
         body = render_to_string('cases/mail/case_address_changed.txt', context)
