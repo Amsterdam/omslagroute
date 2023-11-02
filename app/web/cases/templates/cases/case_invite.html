@@ -17,7 +17,7 @@
         <span class="sr-only">Sluit venster</span>
     </button>
     <h2>Nodig collega's uit om samen te werken aan {{instance.client_name}}</h2>
-    
+
 
     <hr class="" />
     {% if unlinked_users %}
@@ -33,7 +33,7 @@
             {% if linked_users %}
             <h3 class="u-margin-bottom-none u-width-60">Je werkt samen aan deze client met:</h3>
             <ul class="u-margin-bottom-2x scroll-list-container">
-            
+
                 {% for u in linked_users %}
                 <li>{{ u.username }}{% if request.user.federation != u.federation %}({% if u.federation %}{{u.federation}}{% else %}Geen organisatie{% endif %}){% endif %}</li>
                 {% endfor %}
@@ -61,14 +61,19 @@
             {{ wizard.form }}
         {% endif %}
 
-        
+
         <div class="form-field form-field--buttons screen-only u-margin-top-2x">
             {% if wizard.steps.prev %}
-        <button name="wizard_goto_step" role="link" value="{{ wizard.steps.prev }}" class="button button--secondary button--previous"><svg class="button__icon" width="12" height="18"><use href="#chevron-left" xlink:href="#chevron-left" width="12" height="18"></use></svg>Terug</button>
-        {% endif %}
+            <button name="wizard_goto_step" role="link" value="{{ wizard.steps.prev }}" class="button button--secondary button--previous">
+                <svg class="button__icon" width="12" height="18">
+                    <use href="#chevron-left" xlink:href="#chevron-left" width="12" height="18"></use>
+                </svg>
+                Terug
+            </button>
+            {% endif %}
 
-            <input type="submit" value="Samenwerken" class="button button--primary">
             <a data-handler="modal-close" href="#" class="button button--secondary">Annuleren</a>
+            <input type="submit" value="Samenwerken" class="button button--primary">
         </div>
     </form>
     {% elif not unlinked_users and linked_users %}

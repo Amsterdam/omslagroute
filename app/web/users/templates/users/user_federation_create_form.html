@@ -22,7 +22,7 @@
                     {% for field in form %}
                         {% for error in field.errors %}
                             <li>
-                                <a href="#{{field.id_for_label }}">{{field.label}}</a>: 
+                                <a href="#{{field.id_for_label }}">{{field.label}}</a>:
                                 {{ error|escape }}
                             </li>
                         {% endfor %}
@@ -48,7 +48,7 @@
                 </ol>
             {% endif %}
         </div>
- 
+
         <div class="form-field">
             <label for="{{ form.user_type.id_for_label }}">{{ form.user_type.label }}</label>
             {% if form.name.help_text %}
@@ -68,8 +68,8 @@
         <input type="hidden" name="{{ form.id.id_for_label }}" id="{{ form.id.id_for_label }}">
 
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
+            <a href="{% url 'federation_user_list' %}" class="button button--secondary">Annuleren</a>
             <input type="submit" value="Opslaan" class="button button--primary">
-            <a href="{% url 'federation_user_list' %}" class="button button--secondary">Annuleer</a>
         </div>
     </form>
 {% endblock %}

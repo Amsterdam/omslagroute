@@ -1,15 +1,15 @@
 // ********************
 // BUTTONS
-// 
+//
 // <div class="form-field form-field--buttons">
+//     <a href="" class="button button--secondary">Annuleren</a>
 //     <input type="submit" value="Wijzigingen opslaan" class="button button--primary">
-//     <a href="" class="button button--secondary">Annuleer</a>
 // </div>
-// 
-// Multiple buttons next to eachother (Submit and cancel, for example) 
+//
+// Multiple buttons next to eachother (Submit and cancel, for example)
 // should be grouped in a container with a class of .form-field--buttons .
 // ********************
-    
+
 [type="submit"] {
     margin: .625rem 0;
 }
@@ -93,7 +93,7 @@
 // ********************
 // PRIMARY BUTTON STYLING
 // ********************
-    
+
 .button--primary,
 [type="submit"]:not(.text-link):not(.button--next) {
     border: .063rem solid $primary-darkblue;
@@ -112,12 +112,12 @@
 // ********************
 // SECONDARY BUTTON STYLING
 // ********************
-    
+
 .button--secondary {
     border: .063rem solid $primary-darkblue;
     background-color: $primary-white;
     color: $primary-darkblue;
-    
+
     &:hover,
     &:focus,
     &:active {
@@ -130,12 +130,12 @@
 // ********************
 // TERTIARY BUTTON STYLING
 // ********************
-    
+
 .button--tertiary {
     border: .063rem solid $neutral-grey2;
     background-color: $neutral-grey2;
     color: $primary-black;
-    
+
     &:hover,
     &:focus,
     &:active {
@@ -164,7 +164,7 @@
     margin: .625rem 0;
     color: $neutral-grey3;
     cursor: not-allowed;
-    
+
     svg {
         vertical-align: text-top;
     }
@@ -190,9 +190,9 @@ button.text-link {
     min-width: inherit;
 }
 
-// button that serves as a read more 
+// button that serves as a read more
 .button--readmore {
-    display: inline-block; 
+    display: inline-block;
 
     @media screen and (min-width: $tablets) {
         margin-top: 1.875rem;
@@ -214,7 +214,7 @@ button.text-link {
     background-color: $support-valid;
     color: $primary-white;
 
-    
+
     &.button--secondary {
         background-color: $primary-white;
         color: $support-valid;
@@ -365,7 +365,7 @@ button.text-link {
     &:not(:disabled):hover .arrow {
         border-left-color: rgb(185, 0, 0);
     }
-    
+
     &:after {
         content: "";
         display: block;

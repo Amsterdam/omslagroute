@@ -20,19 +20,19 @@
     <div>
         <h2>Beëindig samenwerking</h2>
         <hr class="" />
-        
+
         <form method="post">
             {% csrf_token %}
- 
+
             {{ form }}
 
-            
+
             <div class="form-field form-field--buttons screen-only u-margin-top-2x">
-                <input type="submit" value="Beëindig samenwerking" class="button button--primary">
                 <a data-handler="modal-close" href="#" class="button button--secondary">Annuleren</a>
+                <input type="submit" value="Beëindig samenwerking" class="button button--primary">
             </div>
         </form>
-    </div>    
+    </div>
 <!-- END content uitnodigen -->
 
 </div>

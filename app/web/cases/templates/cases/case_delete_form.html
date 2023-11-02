@@ -20,8 +20,8 @@
         <p>Weet u zeker dat u de informatie van cliënt '{{ object.client_name }}' wil verwijderen?</p>
 
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
+            <a href="{% url 'cases_by_profile' %}" class="button button--primary">Annuleren</a>
             <input type="submit" value="Verwijder" class="button button--secondary">
-            <a href="{% url 'cases_by_profile' %}" class="button button--primary">Annuleer</a>
         </div>
     </form>
 {% endblock %}

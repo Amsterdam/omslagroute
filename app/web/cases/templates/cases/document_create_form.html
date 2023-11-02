@@ -16,7 +16,7 @@
     </button>
     <h2>Bijlage uploaden</h2>
     <hr />
-    
+
     <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
         <div class="form-field">
             {% if form.errors %}
@@ -83,11 +83,11 @@
         </div>
 
         <div class="form-field form-field--buttons screen-only u-margin-top-2x">
+            <a href="#" class="button button--secondary" data-handler="modal-close">Annuleren</a>
             {% if request.GET.next %}
             <input type="hidden" name="next" value="{{ request.GET.next }}{% if request.GET.hash %}#{{ request.GET.hash }}{% endif %}">
             {% endif %}
             <input type="submit" value="Upload" class="button button--primary" data-handler="show-loading">
-            <a href="#" class="button button--secondary" data-handler="modal-close">Annuleer</a>
         </div>
     </form>
 </div>
