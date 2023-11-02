@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block main %}
-    <section class="section section--timeline section--timeline-management"> 
+    <section class="section section--timeline section--timeline-management">
 
         <div class="flex-container u-margin-bottom-3x">
             <div class="flex-item">
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        
+
         <form method="post" enctype="multipart/form-data" data-decorator="edit-timeline">
             {% csrf_token %}
             {{ moment_form_set.management_form }}
@@ -47,7 +47,7 @@
 
             <div data-submit-container class="form-field form-field--buttons screen-only">
                 <input type="submit" value="Opslaan" class="button button--primary">
-                <a href="{% url 'home' %}" class="button button--secondary">Annuleer</a>
+                <a href="{% url 'home' %}" class="button button--secondary">Annuleren</a>
             </div>
         </form>
     </section>

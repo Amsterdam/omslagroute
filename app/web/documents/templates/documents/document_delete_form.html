@@ -13,9 +13,9 @@
 </nav>
 {% endblock %}
 
-{% block main %} 
+{% block main %}
     <h2>Verwijder document</h2>
-    
+
     <form method="post">{% csrf_token %}
         {% if form.errors %}
             <div class="errors" aria-live="polite">
@@ -23,7 +23,7 @@
                     {% for field in form %}
                         {% for error in field.errors %}
                             <li>
-                                <a href="#{{field.id_for_label }}">{{field.label}}</a>: 
+                                <a href="#{{field.id_for_label }}">{{field.label}}</a>:
                                 {{ error|escape }}
                             </li>
                         {% endfor %}
@@ -34,13 +34,13 @@
                 </ul>
             </div>
         {% endif %}
-        
-        <p>Weet u zeker dat u het document {{ object.name|striptags }} 
-            {% if object.document_to_document_version.all|length %} 
+
+        <p>Weet u zeker dat u het document {{ object.name|striptags }}
+            {% if object.document_to_document_version.all|length %}
                 met <strong>alle versies</strong>
-            {% endif %} 
+            {% endif %}
             wilt verwijderen?
-        </p> 
+        </p>
 
         {% if object.document_to_document_version.all|length %}
             <h3>Versies:</h3>
@@ -55,7 +55,7 @@
 
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
             <input type="submit" value="Verwijder" class="button button--secondary">
-            <a href="{% url 'home' %}{% if request.GET.moment_id %}?m={{ request.GET.moment_id }}{% endif %}" class="button button--primary">Annuleer</a>
+            <a href="{% url 'home' %}{% if request.GET.moment_id %}?m={{ request.GET.moment_id }}{% endif %}" class="button button--primary">Annuleren</a>
         </div>
-    </form> 
+    </form>
 {% endblock %}

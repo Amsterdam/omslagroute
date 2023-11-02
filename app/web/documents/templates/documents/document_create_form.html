@@ -28,7 +28,7 @@
                     {% for field in form %}
                         {% for error in field.errors %}
                             <li>
-                                <a href="#{{field.id_for_label }}">{{field.label}}</a>: 
+                                <a href="#{{field.id_for_label }}">{{field.label}}</a>:
                                 {{ error|escape }}
                             </li>
                         {% endfor %}
@@ -41,7 +41,7 @@
         {% endif %}
 
         <div class="form-field"  data-decorator="document-name-exists">
-            {{ form.name.label_tag }} 
+            {{ form.name.label_tag }}
             {% if form.name.help_text %}
                 <div class="help-text">{{ form.name.help_text|safe }}</div>
             {% endif %}
@@ -73,7 +73,7 @@
 
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
             <input type="submit" value="Uploaden" class="button button--primary">
-            <a href="{% url 'home' %}{% if request.GET.moment_id %}?m={{ request.GET.moment_id }}{% endif %}" class="button button--secondary">Annuleer</a>
+            <a href="{% url 'home' %}{% if request.GET.moment_id %}?m={{ request.GET.moment_id }}{% endif %}" class="button button--secondary">Annuleren</a>
         </div>
     </form>
 {% endblock %}
