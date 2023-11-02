@@ -32,6 +32,7 @@
             <div class="help-text">Zoek gebruikers op Voornaam, Achternaam en/of E-mailadres.</div>
             {{ form.search }}
         </div>
+        <a href="{% url 'user_list' %}" class="button button--secondary u-margin-right">Filters wissen</a>
         <button type="submit" >Filter</button>
     </form>
     <p>{{ object_list.paginator.count }}{% if object_list.paginator.count == 1 %} resultaat{% else %} resultaten{% endif %}</p>
