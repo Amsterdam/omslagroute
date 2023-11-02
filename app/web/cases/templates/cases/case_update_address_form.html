@@ -131,12 +131,12 @@
         </div>
         {% else %}
         <div class="form-field form-field--buttons screen-only {% if not request.GET.iframe_content %}u-margin-top-3x {% else %} u-margin-top-none {% endif %}">
-            <input type="submit" value="Opslaan" class="button button--primary">
             {% if not request.GET.iframe_content %}
             <a href="{% url 'cases_by_profile' %}" class="button button--secondary">Annuleren</a>
             {% else %}
             <a href="#" data-handler='modal-close' class="button button--secondary">Annuleren</a>
             {% endif %}
+            <input type="submit" value="Opslaan" class="button button--primary">
         </div>
         {% endif %}
     </form>

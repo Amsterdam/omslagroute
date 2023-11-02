@@ -79,12 +79,12 @@
         </table>
         {% endif %}
         <div class="form-field form-field--buttons screen-only u-margin-top-3x">
-            <input type="submit" value="Opslaan" class="button button--primary">
             {% if request.user|is_beheerder %}
-                <a href="{% url 'federation_list' %}" class="button button--secondary">Annuleren</a>
+            <a href="{% url 'federation_list' %}" class="button button--secondary">Annuleren</a>
             {% else %}
-                <a href="{% url 'home' %}" class="button button--secondary">Annuleren</a>
+            <a href="{% url 'home' %}" class="button button--secondary">Annuleren</a>
             {% endif %}
+            <input type="submit" value="Opslaan" class="button button--primary">
         </div>
     </form>
 {% endblock %}
