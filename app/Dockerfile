@@ -13,7 +13,7 @@ COPY --from=node /usr/local/bin /usr/local/bin
 RUN node -v
 RUN npm -v
 
-RUN adduser --system --uid 1111 datapunt
+RUN adduser --system datapunt
 RUN adduser datapunt sudo
 
 ENV PYTHONUNBUFFERED 1
