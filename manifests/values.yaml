@@ -27,8 +27,6 @@ secrets:
     tls: wonen
 deployments:
   wonen-omslagroute:
-    securityContext:
-      runAsUser: 1111
     image:
       repository: salmagundi/wonen-omslagroute
     selectorLabels:
