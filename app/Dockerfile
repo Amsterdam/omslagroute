@@ -1,6 +1,6 @@
 FROM python:3.8-bullseye
 
-RUN adduser --system --uid 1111 datapunt
+RUN adduser --system datapunt
 RUN adduser datapunt sudo
 
 ENV PYTHONUNBUFFERED 1
