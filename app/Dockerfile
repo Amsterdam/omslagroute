@@ -13,7 +13,7 @@ COPY --from=node /usr/local/bin /usr/local/bin
 RUN node -v
 RUN npm -v
 
-RUN adduser --system datapunt
+RUN adduser --system --uid 1111 datapunt
 RUN adduser datapunt sudo
 
 ENV PYTHONUNBUFFERED 1
@@ -42,12 +42,15 @@ RUN apt-get -y install locales
 RUN apt-get install -y nginx
 
 RUN mkdir -p /static
+RUN mkdir -p /static/images
 RUN mkdir -p /app
 RUN mkdir -p /downloads
 RUN mkdir -p /certificates
 RUN mkdir -p /deploy
 RUN mkdir -p /var/log/uwsgi
 RUN mkdir -p /var/uwsgi/
+
+RUN chmod -R 777 /static
 
 COPY ./nginx/vhost.conf /etc/nginx/sites-enabled/
 COPY . /app/

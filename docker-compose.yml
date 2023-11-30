@@ -1,69 +1,13 @@
-version: '3.5'
-
+version: "3"
 services:
-  database:
-    image: amsterdam/postgres12
-    shm_size: '512m'
+  omslagroute:
+    image: ${REGISTRY:-127.0.0.1:5001}/${REPOSITORY:-salmagundi/wonen-omslagroute}:${VERSION:-latest}
+    build:
+      dockerfile: Dockerfile
+      context: app
+    container_name: salmagundi_wonen_omslagroute
     ports:
-      - "5409:5432"
+      - "127.0.0.1:8088:8080"
     environment:
-      POSTGRES_DB: omslagroute
-      POSTGRES_USER: omslagroute
-      POSTGRES_PASSWORD: insecure
-    volumes:
-      - type: volume
-        source: pg_data
-        target: /var/lib/postgresql/data
-  web:
-    build: ./app/
-    env_file: .env
-    ports:
-      - "8088:8088"
-    environment:
-      - DJANGO_SETTINGS_MODULE=settings.settings
-      - DJANGO_SECRET_KEY=local
-      - DJANGO_DEBUG=True
-      - DJANGO_ALLOWED_HOSTS=0.0.0.0,localhost,*
-      - DJANGO_ROOT_URLCONF=web.urls
-      - DJANGO_STATIC_URL=/static/
-      - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=insecure
-      - DATABASE_NAME=omslagroute
-      - DATABASE_USER=omslagroute
-      - DATABASE_PASSWORD=insecure
-      - DATABASE_HOST=database
-      - UWSGI_HTTP=0.0.0.0:8088
-      - UWSGI_MASTER=1
-      - UWSGI_STATIC_INDEX=index.html
-      - UWSGI_STATIC_MAP=/omslagroute/static=/static
-      - UWSGI_CALLABLE=application
-      - UWSGI_VACUUM=1
-      - UWSGI_STATIC_EXPIRES=/* 3600
-      - UWSGI_OFFLOAD_THREADS=1
-      - UWSGI_HARAKIRI=15
-      - UWSGI_DIE_ON_TERM=1
-      - UWSGI_ENABLE_THREADS=1
-      - UWSGI_MODULE=wsgi:application
-    volumes:
-      - ./app:/app
-      - ./media:/media
-      - ./app/deploy:/deploy
-      - ./.git:/.git
-    command: bash -c "
-      cd /app &&
-      npm install &&
-      npm rebuild node-sass &&
-      ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass &&
-      ./node_modules/.bin/webpack --config webpack.config.js &&
-      python ./manage.py collectstatic --noinput &&
-      python ./manage.py migrate --noinput &&
-      python ./manage.py initadmin --username name@email.com --password insecure &&
-      python ./manage.py runserver 0.0.0.0:8088 --settings settings.settings"
-    depends_on:
-      - database
-
-networks:
-  default:
-    name: omslagroute
-volumes:
-  pg_data:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=insecure

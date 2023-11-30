@@ -1,0 +1,75 @@
+name: wonen-omslagroute
+tenantId: 72fca1b1-2c2e-4376-a445-294d80196804
+
+labels:
+  app: wonen-omslagroute
+
+image:
+  registry: saks01weuacrpgpgo5qvmwo.azurecr.io
+  tag: latest
+
+network:
+  allow-ingress:
+    selector: app == 'wonen-omslagroute'
+    ingress:
+      - action: Allow
+    egress:
+      - action: Allow
+
+serviceAccount: app
+serviceAccounts:
+  app:
+    enableWorkloadIdentity: true
+
+secrets:
+  certificate:
+    type: keyvault
+    tls: wonen
+deployments:
+  wonen-omslagroute:
+    securityContext:
+      runAsUser: 1111
+    image:
+      repository: salmagundi/wonen-omslagroute
+    selectorLabels:
+      component: omslagroute
+    containers:
+      - name: main
+        ports:
+          - port: 8080
+            name: http
+
+services:
+  wonen-omslagroute:
+    selector:
+      component: omslagroute
+    ports:
+      - port: 8080
+        targetPort: http
+
+ingress:
+  wonen-omslagroute-internal:
+    className: nginx-internal
+    paths:
+      - path: /
+        pathType: Prefix
+        service: wonen-omslagroute
+        port: 8080
+    tls: certificate
+
+jobs:
+  certificate-init:
+    image:
+      repository: salmagundi/wonen-omslagroute
+    annotations:
+      helm.sh/hook: post-install,post-upgrade
+    labels:
+      component: certificate
+    secrets:
+      - certificate
+    containers:
+      - name: main
+        command:
+          - sleep
+        args:
+          - "1"
