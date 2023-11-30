@@ -10,6 +10,5 @@ if [ -n "${ADMIN_USERNAME}" ] && [ -n "${ADMIN_PASSWORD}" ]; then
   python manage.py initadmin --settings settings.settings --username $ADMIN_USERNAME --password $ADMIN_PASSWORD
 fi
 
-chmod -R 777 /static
 
 exec uwsgi uwsgi.ini

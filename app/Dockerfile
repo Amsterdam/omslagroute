@@ -1,6 +1,6 @@
 FROM python:3.8-bullseye
 
-RUN adduser --system datapunt
+RUN adduser --system --uid 1111 datapunt
 RUN adduser datapunt sudo
 
 ENV PYTHONUNBUFFERED 1
@@ -43,12 +43,15 @@ RUN apt-get install -y nginx
 # RUN apt-get install -y --no-install-recommends apt-utils
 
 RUN mkdir -p /static
+RUN mkdir -p /static/images
 RUN mkdir -p /app
 RUN mkdir -p /downloads
 RUN mkdir -p /certificates
 RUN mkdir -p /deploy
 RUN mkdir -p /var/log/uwsgi
 RUN mkdir -p /var/uwsgi/
+
+RUN chmod -R 777 /static
 
 COPY ./nginx/vhost.conf /etc/nginx/sites-enabled/
 COPY . /app/
@@ -65,7 +68,6 @@ RUN npm install
 COPY requirements.txt /app/
 RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
-
 
 RUN pip install --no-cache-dir -r requirements.txt
 

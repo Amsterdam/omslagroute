@@ -1,0 +1,13 @@
+version: "3"
+services:
+  omslagroute:
+    image: ${REGISTRY:-127.0.0.1:5001}/${REPOSITORY:-salmagundi/wonen-omslagroute}:${VERSION:-latest}
+    build:
+      dockerfile: Dockerfile
+      context: app
+    container_name: salmagundi_wonen_omslagroute
+    ports:
+      - "127.0.0.1:8088:8080"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=insecure
