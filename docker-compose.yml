@@ -9,5 +9,7 @@ services:
     ports:
       - "127.0.0.1:8088:8080"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=insecure
+      - DATABASE_NAME=omslagroute
+      - DATABASE_USER=salmagundi
+      - DATABASE_PASSWORD=insecure
+      - DATABASE_HOST=psql-postgresql
