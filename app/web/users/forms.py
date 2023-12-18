@@ -2,16 +2,9 @@ from django.contrib.auth.forms import (
     AuthenticationForm as DefaultAuthenticationForm, authenticate
 )
 from django import forms
-from django.forms import widgets
 from .models import *
-from django.http import HttpResponse
-from web.profiles.models import Profile
-from django.forms.models import inlineformset_factory
-from web.organizations.models import Organization
-from django.shortcuts import render
-from django.contrib.auth.forms import UserCreationForm as DefaultUserCreationForm
+from web.organizations.models import Federation
 from web.forms.widgets import CheckboxSelectMultiple
-from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -73,6 +66,7 @@ class UserUpdateForm(forms.ModelForm):
             'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
         }
 
+
 class FederationUserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
@@ -116,6 +110,7 @@ class UserCreationFederationForm(forms.ModelForm):
         label=_('E-mailadres (gebruikersnaam)'),
         required=True
     )
+
     class Meta:
         model = User
         fields = (
@@ -132,24 +127,9 @@ class UserCreationFederationForm(forms.ModelForm):
         self.fields['user_type'].choices = user_type_choices
 
 
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        exclude = [
-            'cases',
-            'user',
-            'organization',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_suffix = ''
-
-
-ProfileFormSet = inlineformset_factory(
-    parent_model=User,
-    model=Profile,
-    form=ProfileForm,
-    can_delete=False,
-    extra=1
-)
+class ChangeFederationForm(forms.Form):
+    new_federation = forms.ModelChoiceField(
+        queryset=Federation.objects.all(),
+        required=True,
+        label=_('Nieuwe federatie'),
+    )
