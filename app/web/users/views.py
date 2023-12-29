@@ -93,6 +93,9 @@ class UserList(UserPassesTestMixin, TemplateView):
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
 
+        # Sort the list by username
+        object_list = sorted(object_list, key=lambda o: o.username)
+
         # Pagination
         paginator = Paginator(object_list, self.per_page)
         page = self.request.GET.get('page', 1)
@@ -168,6 +171,9 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         object_list = [[o, [USER_TYPES_ACTIVE.index(value) for value in o.user_type_values]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
+
+        # Sort the list by username
+        object_list = sorted(object_list, key=lambda o: o.username)
 
         # Pagination
         paginator = Paginator(object_list, self.per_page)

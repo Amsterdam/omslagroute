@@ -1,18 +1,15 @@
-from django.contrib.auth.models import AbstractBaseUser, AbstractUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from .managers import UserManager
-from .statics import USER_TYPES, USER_TYPES_DICT, USER_TYPES_ACTIVE, USER_TYPES_FEDERATIE
+from .statics import USER_TYPES, USER_TYPES_DICT, USER_TYPES_ACTIVE
 from django.db import models
-from django import forms
-from django.forms import widgets
 from django.db.models import JSONField
 
 
 class User(AbstractUser):
     user_types = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_ACTIVE]
-    user_type = MultiSelectField( # MultiSelectField stores vales as a comma separated string in a CharField
+    user_type = MultiSelectField(  # MultiSelectField stores vales as a comma separated string in a CharField
         verbose_name=_('Gebruiker rol'),
         choices=user_types,
         default=[6],
