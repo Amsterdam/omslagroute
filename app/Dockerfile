@@ -1,4 +1,5 @@
-FROM python:3.8-bullseye
+# FROM python:3.8-bullseye
+FROM python:3.12-bullseye
 
 RUN adduser --system datapunt
 RUN adduser datapunt sudo

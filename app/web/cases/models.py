@@ -1,6 +1,6 @@
 import os
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .statics import *
 from web.core.models import PrintableModel
 from web.forms.forms import BaseGenericForm
@@ -964,7 +964,7 @@ class CaseBase(PrintableModel):
     def address_complete(self):
         return bool(
             self.adres_straatnaam and self.adres_huisnummer and self.adres_postcode and self.adres_plaatsnaam
-        ) 
+        )
 
     def __str__(self):
         if self.client_first_name:
@@ -1037,7 +1037,7 @@ class Case(CaseBase):
         return Federation.objects.filter(
             federation_id__in=list(set([u.federation.federation_id for u in self.get_linked_users()]))
         )
-        
+
     def delete_related(self):
         document_path = os.path.join(
             'uploads',
@@ -1063,13 +1063,13 @@ class Case(CaseBase):
     def address_history(self):
         qs = self.case_version_list.all()
         qs = qs.annotate(address=Concat(
-            'adres_straatnaam', 
-            'adres_huisnummer', 
-            'adres_toevoeging', 
-            'adres_postcode', 
-            'adres_plaatsnaam', 
-            'adres_wijziging_reden', 
-            'woningcorporatie', 
+            'adres_straatnaam',
+            'adres_huisnummer',
+            'adres_toevoeging',
+            'adres_postcode',
+            'adres_plaatsnaam',
+            'adres_wijziging_reden',
+            'woningcorporatie',
             output_field=models.TextField()
             )
         )
@@ -1221,17 +1221,17 @@ class CaseStatus(models.Model):
     @property
     def is_most_recent(self):
         qs = CaseStatus.objects.filter(
-            case=self.case, 
-            form=self.form, 
+            case=self.case,
+            form=self.form,
         ).order_by('-created')
         return self.id == qs.first().id
 
     @property
     def is_first_of_statustype(self):
         return CaseStatus.objects.filter(
-            case=self.case, 
-            status=self.status, 
-            form=self.form, 
+            case=self.case,
+            status=self.status,
+            form=self.form,
         ).count() <= 1
 
     def __str__(self):
@@ -1262,13 +1262,13 @@ class CaseStatus(models.Model):
     def case_form_is_opnieuw_ingediend(self):
         status_list = CaseStatus.objects.order_by('-created')
         status_list = status_list.filter(
-                form=self.form, 
+                form=self.form,
                 case=self.case,
         )
         first = status_list.first()
         is_first = first.status == CASE_STATUS_INGEDIEND if first else False
         return is_first and status_list.count() > 1
-        
+
     class Meta:
         verbose_name = _('Cliënt status')
         verbose_name_plural = _('Cliënt statussen')

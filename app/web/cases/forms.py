@@ -5,7 +5,7 @@ from web.forms.forms import GenericModelForm
 from web.forms.widgets import RadioSelect, CheckboxSelectMultipleDocument, CheckboxSelectMultiple, CheckboxSelectMultipleUser
 from .statics import GESLACHT
 from web.forms.statics import FORMS_CHOICES
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from web.forms.fields import MultiSelectFormField
 from web.users.models import User
 from web.profiles.models import Profile
