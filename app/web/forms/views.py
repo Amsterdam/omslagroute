@@ -8,6 +8,7 @@ import datetime
 from .statics import FORMS_BY_SLUG
 from django.http import Http404
 from web.organizations.models import Federation
+from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE
 
 
 class DateTimeEncoder(JSONEncoder):
@@ -76,17 +77,29 @@ class GenericUpdateFormView(UpdateView):
         return kwargs
 
     def get_context_data(self, **kwargs):
+
         kwargs = super().get_context_data(**kwargs)
         form_config = FORMS_BY_SLUG.get(self.kwargs.get('form_config_slug'), {})
         kwargs.update(
             self.kwargs
         )
         kwargs.update(form_config)
+
+        federation_type = form_config.get('federation_type')
+        federation = Federation.objects.filter(
+            organization__federation_type=federation_type,
+        ).first()
+
+        case = kwargs.get("case")
+        woningcorporatie = getattr(case, 'woningcorporatie', None) if case else None
+
+        # If federation type is woningcorporatie, set the woningcorporatie which is connected to the case address.
+        if federation_type == FEDERATION_TYPE_WONINGCORPORATIE and woningcorporatie:
+            federation = woningcorporatie
+
         kwargs.update({
             'discard_url': self.get_discard_url(),
-            'federation': Federation.objects.filter(
-                organization__federation_type=form_config.get('federation_type'),
-            ).first(),
+            'federation': federation
         })
         return kwargs
 

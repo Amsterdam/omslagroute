@@ -12,7 +12,7 @@ class User(AbstractUser):
     user_type = MultiSelectField(  # MultiSelectField stores vales as a comma separated string in a CharField
         verbose_name=_('Gebruiker rol'),
         choices=user_types,
-        default=[6],
+        default=["6"],
     )
     federation = models.ForeignKey(
         to='organizations.Federation',

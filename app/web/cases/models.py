@@ -6,14 +6,12 @@ from web.core.models import PrintableModel
 from web.forms.forms import BaseGenericForm
 from web.forms.utils import get_sections_fields
 from web.forms.statics import FIELDS_DICT, FIELDS_REQUIRED_DICT, FORMS_CHOICES
-import os
 from multiselectfield import MultiSelectField
 from django.utils.safestring import mark_safe
 import locale
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils import timezone
-from django.conf import settings
-from django.urls import reverse_lazy, reverse
+# from django.conf import settings
 from django.core.files.storage import default_storage
 from constance import config
 from .managers import *
@@ -243,7 +241,6 @@ class CaseBase(PrintableModel):
         blank=True,
         null=True,
     )
-
 
     # omklap form
     organisatie = models.CharField(
@@ -871,7 +868,6 @@ class CaseBase(PrintableModel):
         null=True,
     )
 
-
     @property
     def centrale_toegang_naam_value(self):
         if self.centrale_toegang_naam:
@@ -1004,14 +1000,12 @@ class Case(CaseBase):
 
     @property
     def delete_request_seconds_left(self):
-        from datetime import datetime
-        datetime_treshold = datetime.now() - timedelta(seconds=config.CASE_DELETE_SECONDS)
+        datetime_treshold = timezone.now() - timedelta(seconds=config.CASE_DELETE_SECONDS)
         time_left = self.delete_request_date - datetime_treshold
         return time_left
 
     def delete_enabled(self):
-        from datetime import datetime
-        datetime_treshold = datetime.now() - timedelta(seconds=config.CASE_DELETE_SECONDS)
+        datetime_treshold = timezone.now() - timedelta(seconds=config.CASE_DELETE_SECONDS)
         time_left = self.delete_request_date - datetime_treshold
         return time_left.total_seconds() <= 0
 
@@ -1062,15 +1056,16 @@ class Case(CaseBase):
 
     def address_history(self):
         qs = self.case_version_list.all()
-        qs = qs.annotate(address=Concat(
-            'adres_straatnaam',
-            'adres_huisnummer',
-            'adres_toevoeging',
-            'adres_postcode',
-            'adres_plaatsnaam',
-            'adres_wijziging_reden',
-            'woningcorporatie',
-            output_field=models.TextField()
+        qs = qs.annotate(
+            address=Concat(
+                'adres_straatnaam',
+                'adres_huisnummer',
+                'adres_toevoeging',
+                'adres_postcode',
+                'adres_plaatsnaam',
+                'adres_wijziging_reden',
+                'woningcorporatie',
+                output_field=models.TextField()
             )
         )
         qs = qs.order_by('address')
@@ -1084,7 +1079,8 @@ class Case(CaseBase):
         qs = qs.filter(version_verbose=form_config.get('form_config_slug'))
 
         fields = [f for f in get_sections_fields(form_config.get('sections')) if f not in form_config.get('options', {}).get('no_history', [])]
-        if 'document_list' in fields: fields.remove('document_list')
+        if 'document_list' in fields:
+            fields.remove('document_list')
         fields = fields + ['version_verbose', 'saved']
 
         value_key = 'value'
@@ -1100,7 +1096,7 @@ class Case(CaseBase):
         } for dic in ld] for k in fields if k in ld[0]}
 
         dl = {k: [
-            v[i] for i in range(len(v)) if len(v)-1 > i and v[i].get(value_key) != v[i+1].get(value_key) or len(v)-1 == i
+            v[i] for i in range(len(v)) if len(v) - 1 > i and v[i].get(value_key) != v[i + 1].get(value_key) or len(v) - 1 == i
         ] for k, v in dl.items()}
 
         dl = {k: [
@@ -1114,9 +1110,8 @@ class Case(CaseBase):
             form=form,
         ).order_by('-created').first()
 
-
     def get_versions(self, form):
-        l = CaseStatus.objects.filter(
+        qs = CaseStatus.objects.filter(
             case=self,
             form=form,
         ).values(
@@ -1124,9 +1119,9 @@ class Case(CaseBase):
             'status',
             'case_version',
         ).order_by('-created')
-        l = [l[i+1].get('case_version') for i in range(len(l)) if l[i].get('status') in IN_CONCEPT and len(l)-1 > i]
+        qs = [qs[i + 1].get('case_version') for i in range(len(qs)) if qs[i].get('status') in IN_CONCEPT and len(qs) - 1 > i]
         vl = CaseVersion.objects.filter(
-            id__in=l
+            id__in=qs
         ).order_by('-created')
         return vl
 
@@ -1240,11 +1235,10 @@ class CaseStatus(models.Model):
     def html(self):
         locale.setlocale(locale.LC_TIME, "nl_NL.UTF-8")
         return mark_safe('<div><span>%s</span><small>%s</small><small>%s</small></div>' % (
-                self.case.id,
-                self.form,
-                self.created.strftime('%d %b %Y %H:%M:%S').lower()
-            )
-        )
+            self.case.id,
+            self.form,
+            self.created.strftime('%d %b %Y %H:%M:%S').lower()
+        ))
 
     def save(self, *args, **kwargs):
         """
@@ -1257,13 +1251,12 @@ class CaseStatus(models.Model):
         else:
             raise Exception("It's not allowed to update a case status")
 
-
     @property
     def case_form_is_opnieuw_ingediend(self):
         status_list = CaseStatus.objects.order_by('-created')
         status_list = status_list.filter(
-                form=self.form,
-                case=self.case,
+            form=self.form,
+            case=self.case,
         )
         first = status_list.first()
         is_first = first.status == CASE_STATUS_INGEDIEND if first else False
@@ -1277,7 +1270,8 @@ class CaseStatus(models.Model):
 
 def get_upload_path(instance, filename):
     return os.path.join(
-      "uploads", 'cases', '%s' % instance.case.id, filename)
+        "uploads", 'cases', '%s' % instance.case.id, filename
+    )
 
 
 class Document(models.Model):

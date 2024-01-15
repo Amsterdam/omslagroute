@@ -1,12 +1,14 @@
-from datetime import datetime
+from django.utils import timezone
 
 
 def birth_dates_years():
-    return [y for y in range(datetime.now().year - 100, datetime.now().year)]
+    current_year = timezone.now().year
+    return [y for y in range(current_year - 100, current_year)]
 
 
 def future_dates_years():
-    return [y for y in range(datetime.now().year + 10, datetime.now().year)]
+    current_year = timezone.now().year
+    return [y for y in range(current_year + 10, current_year)]
 
 
 def get_sections_fields(sections):

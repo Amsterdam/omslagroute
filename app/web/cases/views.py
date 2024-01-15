@@ -35,6 +35,7 @@ from datetime import datetime
 from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list
 from operator import or_
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -462,7 +463,7 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         case = form.save(commit=False)
-        case.delete_request_date = datetime.now()
+        case.delete_request_date = timezone.now()
         case.delete_request_by = self.request.user.profile
         case.save()
 
