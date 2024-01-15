@@ -1,4 +1,15 @@
 from .models import User
+import re
+
+
+def is_valid_email(email):
+    # Regular expression for a basic email validation
+    email_pattern = re.compile(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
+    return bool(re.match(email_pattern, email))
+
+
+def filter_valid_emails(email_list):
+    return [email for email in email_list if is_valid_email(email)]
 
 
 def get_wonen_medewerkers_email_list():

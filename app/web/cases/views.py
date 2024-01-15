@@ -33,7 +33,7 @@ from django.db.models import TextField
 from django.core.exceptions import PermissionDenied
 from datetime import datetime
 from web.users.utils import *
-from web.users.utils import get_zorginstelling_medewerkers_email_list
+from web.users.utils import get_zorginstelling_medewerkers_email_list, filter_valid_emails
 from operator import or_
 from django.utils import timezone
 
@@ -810,7 +810,8 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
         elif federation_type == FEDERATION_TYPE_WONINGCORPORATIE:
             recipient_list += get_woningcorporatie_medewerkers_email_list(self.object)
         recipient_list = list(set(recipient_list))
-        return recipient_list
+        filtered_recipients = filter_valid_emails(recipient_list)
+        return filtered_recipients
 
     def get_context_data(self, **kwargs):
         kwargs.update(self.kwargs)
@@ -846,6 +847,7 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
 
         recipient_list = self.get_recipient_list()
         federation = self.get_federation()
+
         if recipient_list:
             current_site = get_current_site(self.request)
             body = render_to_string('cases/mail/case_link.txt', {
