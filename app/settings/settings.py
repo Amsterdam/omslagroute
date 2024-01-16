@@ -5,8 +5,9 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 # flake8: noqa
 from keycloak_oidc.default_settings import *
+from .azure_settings import Azure
 
-
+azure = Azure()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 
@@ -96,26 +97,29 @@ AUTH_USER_MODEL = 'users.User'
 
 
 # Database
-DEFAULT_DATABASE_NAME = 'default'
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
+DATABASE_USER = os.getenv("DATABASE_USER", "dev")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
+DATABASE_OPTIONS = {'sslmode': 'allow', 'connect_timeout': 5}
 
-if os.environ.get('DATABASE_NAME'):
-    DATABASES = {
-        DEFAULT_DATABASE_NAME: {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'USER': os.environ.get('DATABASE_USER'),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-            'HOST': os.environ.get('DATABASE_HOST', 'database'),
-            'PORT': '5432',
-        }
-    }
-else:
-    DATABASES = {
-        DEFAULT_DATABASE_NAME: {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+if 'azure.com' in DATABASE_HOST:
+    DATABASE_PASSWORD = azure.auth.db_password
+    DATABASE_OPTIONS['sslmode'] = 'require'
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": DATABASE_NAME,
+        "USER": DATABASE_USER,
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
+        "CONN_MAX_AGE": 60 * 5,
+        "PORT": DATABASE_PORT,
+        'OPTIONS': {'sslmode': 'allow', 'connect_timeout': 5},
+    },
+}
 
 
 # General
