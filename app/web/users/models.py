@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 from .managers import UserManager
 from .statics import USER_TYPES, USER_TYPES_DICT, USER_TYPES_ACTIVE
@@ -12,7 +12,7 @@ class User(AbstractUser):
     user_type = MultiSelectField(  # MultiSelectField stores vales as a comma separated string in a CharField
         verbose_name=_('Gebruiker rol'),
         choices=user_types,
-        default=[6],
+        default=["6"],
     )
     federation = models.ForeignKey(
         to='organizations.Federation',

@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.forms import widgets
 from .utils import *
@@ -438,7 +438,7 @@ FIELDS = (
         widget=forms.Textarea(attrs={'rows': 4, 'cols': 15, 'placeholder': ' '}),
         help_text='Bijvoorbeeld: doelen niet behaald maar geen risico voor zelfstandig wonen',
         required=False,
-    ), {}), 
+    ), {}),
     ('omklap_akkoord_client', forms.BooleanField(
         label=_('Akkoord cliënt'),
         required=False,
@@ -795,7 +795,7 @@ FIELDS = (
             }
         ),
     ), {'step_required': True}),
-    
+
     ('kennismaking_wooncorporatie_goed_huurderschap', forms.BooleanField(
         label=_('Ik verklaar dat ik me als een goed huurder zal gedragen. Dit houdt in dat ik me houd aan de woonregels, geen overlast veroorzaak en mijn huur op tijd betaal.'),
         required=False,
@@ -1351,7 +1351,7 @@ EVALUATIE_WONEN = [
                     'woonevaluatie_netwerk_behoefte_meer_contacten',
                 ],
             },
-            
+
         ]
     },
     {
@@ -1742,8 +1742,8 @@ FORMS = (
                     'required_fields': ['omklap_akkoord_derde_toelichting',],
                 },
             ),
-        }, 
-            'addres_required': True, 
+        },
+            'addres_required': True,
             'bijlages': True,
             'no_history': [
                 'urgentiecriteria_zinvolle_dagbesteding_akkoord',
@@ -1815,7 +1815,7 @@ FORMS = (
                     'required_fields': ['woonevaluatie_netwerk_behoefte',],
                 },
             ],
-            
+
             'woonevaluatie_huur_betalen_op_tijd': (
                 {
                     'values': [2],
@@ -1832,9 +1832,9 @@ FORMS = (
                                         'aanvraag_omklap_steunstructuren',],
                 },
             ),
-            
-        }, 
-            'addres_required': True, 
+
+        },
+            'addres_required': True,
             'bijlages': False,
             'no_history': [
                 'woonevaluatie_moment_volgend_gesprek',
@@ -1875,9 +1875,9 @@ FORMS = (
                     'required_fields': ['kennismaking_wooncorporatie_borg_bedrag',],
                 },
             ),
-            
-        }, 
-            'addres_required': True, 
+
+        },
+            'addres_required': True,
             'bijlages': False,
             'no_history': [
                 'kennismaking_wooncorporatie_goed_huurderschap',

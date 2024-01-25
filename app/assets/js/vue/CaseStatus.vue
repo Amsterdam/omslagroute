@@ -9,7 +9,7 @@
                 <span>{{ caseStatusPrefix }}{{ caseStatusOptions[currentCaseStatus.status].current }}</span>
                 <div class="status-container">
                     <div class="facts">
-                        <small>{{ currentCaseStatus.created | moment("DD-MM-YYYY HH:mm") }} </small><small class="u-float-right">{{ currentCaseStatus.username }}</small>
+                        <small>{{ formattedDate(currentCaseStatus.created) }} </small><small class="u-float-right">{{ currentCaseStatus.username }}</small>
                         <p>{{ currentCaseStatus.status_comment}}</p>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                                     <small class="status">{{caseStatusOptions[h.status].current }}</small>
                                     <div class="facts">
                                         <div class="u-clearfix">
-                                            <small>{{ h.created | moment("DD-MM-YYYY HH:mm") }} </small><small class="u-float-right">{{ h.username }}</small>
+                                            <small>{{ formattedDate(h.created) }} </small><small class="u-float-right">{{ h.username }}</small>
                                         </div>
                                         <p>{{ h.status_comment}}</p>
                                     </div>
@@ -88,6 +88,7 @@
 
 <script>
 import axios from "axios";
+import dayjs from 'dayjs';
 
 export default {
 
@@ -156,6 +157,9 @@ export default {
         this.getInitialData();
     },
     methods: {
+        formattedDate(date) {
+            return dayjs(date).format("DD-MM-YYYY HH:mm")
+        },
         getCaseStatusOptions(){
             return Object.keys(this.caseStatusOptions).reduce((a, b, c) => {
                 if (b !== '1' && b !== String(this.currentCaseStatus.status)){
@@ -174,7 +178,7 @@ export default {
             return this.historyClass[status];
         },
         setButtonClass: function(status){
-            return (this.buttonClass[status] + (this._data.currentCaseStatus.status !== 1 ? ' button--secondary': ''));
+            return (this.buttonClass[status] + (this.currentCaseStatus.status !== 1 ? ' button--secondary': ''));
         },
         setNextStatus: function(status){
             this.nextCaseStatus.status = status;

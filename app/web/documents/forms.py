@@ -3,7 +3,7 @@ from django.forms import widgets
 from django.forms.widgets import RadioSelect
 from django.forms import ValidationError
 from .models import *
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.forms.models import inlineformset_factory
 from django.urls import reverse_lazy
 from django.utils.html import mark_safe

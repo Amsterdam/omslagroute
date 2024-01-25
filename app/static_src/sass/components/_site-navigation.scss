@@ -5,11 +5,11 @@
     height: 2.75rem;
     margin: 0 auto;
     max-width: 60rem;
-    display: flex; 
-    
+    display: flex;
+
     font-size: 1.125rem;
     font-weight: 500;
-    
+
     a {
         display: inline-block;
         color: $primary-black;
@@ -26,13 +26,14 @@
     > li {
         display: flex;
         align-items: center;
-        
+
         &:hover,
         &:active {
             ul {
                 opacity: 1;
                 visibility: visible;
                 pointer-events: auto;
+                z-index: 1;
             }
         }
     }
@@ -49,23 +50,23 @@
     li ul {
         position: absolute;
         background-color: $neutral-grey1;
-        
+
         font-size: 1rem;
-        
+
         box-shadow: (((60rem - 87.5rem) / 2) + .938rem) 0 0 0 $neutral-grey1, (((87.5rem - 60rem) / 2) - .938rem) 0 0 0 $neutral-grey1;
-        
+
         top: 100%;
         left: -.938rem;
         right: -.938rem;
-        
+
         list-style-type: none;
-        
+
         pointer-events: none;
         opacity: 0;
         visibility: hidden;
-        
+
         transition: visibility 0s linear .2s;
-        
+
         li {
             margin-top: -.5rem;
         }

@@ -6,7 +6,7 @@ from .models import *
 from web.profiles.models import Profile
 from django.forms.models import inlineformset_factory
 from web.forms.widgets import CheckboxSelectMultiple, RadioSelect
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class FilterListForm(forms.Form):

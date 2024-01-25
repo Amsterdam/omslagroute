@@ -1,12 +1,13 @@
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 from web.cases.models import Case
 from web.users.models import User
 from web.forms.statics import FORMS_BY_SLUG
 from web.forms.utils import get_sections_fields
 from web.core.utils import validate_email_wrapper
-from .statics import FEDERATION_TYPE_CHOICES, FEDERATION_TYPE_ZORGINSTELLING
+from .statics import FEDERATION_TYPE_CHOICES, FEDERATION_TYPE_ZORGINSTELLING, FEDERATION_TYPE_WONINGCORPORATIE
+
 
 def get_fields():
     return [[str(f.name), '%s [%s]' % (
@@ -56,7 +57,7 @@ class Organization(models.Model):
         return case.to_dict(self.field_restrictions)
 
     def get_case_form_data(self, case, form):
-        if self.federation_type == FEDERATION_TYPE_ZORGINSTELLING:
+        if self.federation_type in [FEDERATION_TYPE_ZORGINSTELLING, FEDERATION_TYPE_WONINGCORPORATIE]:
             return case.to_dict()
         form_sections = FORMS_BY_SLUG.get(form, {}).get('sections', [])
         fields = [f for f in self.field_restrictions if f in get_sections_fields(form_sections)]
@@ -124,7 +125,6 @@ class Federation(models.Model):
         if self.main_email:
             return [e.strip() for e in self.main_email.split(',') if validate_email_wrapper(e.strip())]
         return []
-
 
     def __str__(self):
         return self.name
