@@ -1,5 +1,7 @@
 asgiref==3.5.0
 azure-identity
+azure-core==1.29.3
+azure-storage-blob==12.19.0
 backcall==0.2.0
 blessings==1.7
 boto3==1.21.25
