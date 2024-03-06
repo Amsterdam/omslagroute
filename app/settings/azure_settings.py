@@ -59,7 +59,7 @@ class AzureAuth:
                 access_token = self.credential.get_token(*self.scopes)
                 return access_token.token
 
-        scopes = ['https://ossrdbms-aad.database.windows.net/.default']
+        scopes = ['https://ossrdbms-aad.database.windows.net/.default', 'https://storage.azure.com/.default']
         return DynamicString(self.credential, scopes)
 
 
