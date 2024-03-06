@@ -312,7 +312,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['sentry', 'console'],
-        'level': 'INFO',
+        'level': 'DEBUG',
     },
 }
 
@@ -350,7 +350,7 @@ BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
 DEFAULT_FILE_STORAGE = 'web.core.storage.MyAzureStorage'
 THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
-AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
+# AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
 AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
 CREDENTIAL = WorkloadIdentityCredential()
 AZURE_TOKEN_CREDENTIAL =  WorkloadIdentityCredential().get_token('https://storage.azure.com/.default')
