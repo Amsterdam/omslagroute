@@ -6,7 +6,7 @@ from subprocess import PIPE
 from azure.identity import DefaultAzureCredential, WorkloadIdentityCredential
 
 
-class AzureAuth:
+class AzureStorageAuth:
     def __init__(self):
         self._credential = None
 
@@ -59,10 +59,10 @@ class AzureAuth:
                 access_token = self.credential.get_token(*self.scopes)
                 return access_token.token
 
-        scopes = ['https://ossrdbms-aad.database.windows.net/.default']
+        scopes = ['https://storage.azure.com/.default']
         return DynamicString(self.credential, scopes)
 
 
-class Azure:
+class AzureStorage:
     def __init__(self) -> None:
-        self.auth = AzureAuth()
+        self.auth = AzureStorageAuth()
