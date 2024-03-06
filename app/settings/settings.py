@@ -6,8 +6,11 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # flake8: noqa
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
+from .azure_settings_storage import AzureStorage
+
 from azure.identity import WorkloadIdentityCredential
 azure = Azure()
+azureStorage = AzureStorage()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 
