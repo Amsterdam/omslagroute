@@ -1,5 +1,6 @@
-# from swift.storage import SwiftStorage as SwiftStorageNative
-# from storages.backends.azure_storage import AzureStorage
+from swift.storage import SwiftStorage as SwiftStorageNative
+from storages.backends.azure_storage import AzureStorage
+from azure.identity import DefaultAzureCredential
 
 # from time import time
 # from six.moves.urllib import parse as urlparse
@@ -22,3 +23,17 @@
 #             url = urlparse.urljoin(self.base_url, tmp_path)
 
 #         return url
+class MyAzureStorage(AzureStorage):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.azure_credentials = DefaultAzureCredential()
+
+    def _save(self, name, content):
+        # Obtain a token using AZURE_CREDENTIAL
+        print("Saving..")
+        token = self.azure_credentials.get_token('https://storage.azure.com/.default')
+        
+        # Pass the token to azure_storage for authentication
+        self.azure_token_credential = token.token
+
+        return super()._save(name, content)
