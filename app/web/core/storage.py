@@ -32,7 +32,7 @@ class MyAzureStorage(AzureStorage):
         # Obtain a token using AZURE_CREDENTIAL
         print("Saving..")
         token = self.azure_credentials.get_token('https://storage.azure.com/.default')
-        
+        print(token.token)
         # Pass the token to azure_storage for authentication
         self.azure_token_credential = token.token
 
