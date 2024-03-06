@@ -350,7 +350,7 @@ BRK_API_OBJECT_EXPAND_URL = 'https://acc.api.data.amsterdam.nl/brk/object-expand
 
 BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
-AZURE_TOKEN_CREDENTIAL =  azure.auth.db_password
+AZURE_TOKEN_CREDENTIAL =  azureStorage.auth.db_password
 DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
 THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
