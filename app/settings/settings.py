@@ -6,7 +6,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # flake8: noqa
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
-
+from azure.identity import WorkloadIdentityCredential
 azure = Azure()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
@@ -347,19 +347,9 @@ BRK_API_OBJECT_EXPAND_URL = 'https://acc.api.data.amsterdam.nl/brk/object-expand
 
 BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
-# swift storage
-if os.environ.get("SWIFT_AUTH_URL"):
-    SWIFT_BASE_URL = 'https://%s.%s' % (os.environ.get("SWIFT_PROJECT_ID"), os.environ.get("SWIFT_EXTERNAL_DOMAIN"))
-    SWIFT_AUTH_URL = os.environ.get("SWIFT_AUTH_URL")
-    SWIFT_USERNAME = os.environ.get("SWIFT_USER")
-    SWIFT_PASSWORD = os.environ.get("SWIFT_PASSWORD")
-    SWIFT_TENANT_ID = os.environ.get("SWIFT_TENANT")
-    SWIFT_TEMP_URL_KEY = os.environ.get("SWIFT_TEMP_URL_KEY")
-    SWIFT_TEMP_URL_DURATION = os.environ.get("SWIFT_TEMP_URL_DURATION", 30)
 
-    SWIFT_USE_TEMP_URLS = os.environ.get("SWIFT_USE_TEMP_URLS", 'True') == 'True'
-    SWIFT_CONTAINER_NAME = os.environ.get("SWIFT_CONTAINER_NAME", 'media_private')
-    DEFAULT_FILE_STORAGE = 'web.core.storage.SwiftStorage'
-    THUMBNAIL_DEFAULT_STORAGE = 'web.core.storage.SwiftStorage'
-
-    CORS_ORIGIN_WHITELIST = [SWIFT_BASE_URL, ]
+DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
+AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+AZURE_TOKEN_CREDENTIAL =  WorkloadIdentityCredential()
