@@ -354,4 +354,5 @@ AZURE_TOKEN_CREDENTIAL =  azureStorage.auth.db_password
 DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
 THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
-AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+# AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
