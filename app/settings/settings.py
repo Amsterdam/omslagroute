@@ -352,4 +352,5 @@ DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
 THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
 AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
-AZURE_TOKEN_CREDENTIAL =  WorkloadIdentityCredential()
+CREDENTIAL = WorkloadIdentityCredential()
+AZURE_TOKEN_CREDENTIAL =  WorkloadIdentityCredential().get_token('https://storage.azure.com/.default')
