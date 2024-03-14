@@ -9,7 +9,7 @@ chardet==5.2.0
 click==8.1.7
 coverage==7.4.0
 cryptography==42.0.2
-datapunt-keycloak-oidc @ git+https://github.com/remyvdwereld/keycloak_oidc.git
+datapunt-keycloak-oidc @ git+https://github.com/remyvdwereld/keycloak_oidc.git@5420da523be0cc195efac7f0553b24dcda554418
 debtcollector==2.5.0
 decorator==5.1.1
 dj-database-url==2.1.0
@@ -78,7 +78,7 @@ pycparser==2.21
 pyflakes==2.1.1
 Pygments==2.17.2
 PyJWT==2.8.0
-pyOpenSSL==23.3.0
+pyOpenSSL==24.1.0
 pyparsing==3.0.7
 python-dateutil==2.8.2
 python-http-client==3.3.7
