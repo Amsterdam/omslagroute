@@ -42,7 +42,7 @@
                             </div>
                             <span class="helptext">Als je een bericht wil meesturen met in de bevestings e-mail, dan kun je dat hier doen.</span>
                             <div class="form-field form-field--buttons screen-only u-margin-top-2x">
-                                <button type="button" class="button button--secondary" v-on:click="setNextStatus(null)" data-handler="modal-close">Annuleren</button>
+                                <button type="button" class="button button--secondary u-margin-right" v-on:click="setNextStatus(null)" data-handler="modal-close">Annuleren</button>
                                 <button type="button" class="button button--primary"  v-on:click="addCaseStatus()">{{ getButtonText(nextCaseStatus.status) }}</button>
                             </div>
                         </form>
