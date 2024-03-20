@@ -28,7 +28,7 @@ RUN pip install uwsgi
 RUN apt-get -y install locales
 
 # install curl
-RUN apt-get install -y curl
+RUN apt-get install -y curl postgresql-client
 # get install script and version and pass it to execute:
 
 #RUN curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
