@@ -19,8 +19,9 @@ from django.db.models import Count, Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 import sendgrid
-from sendgrid.helpers.mail import Mail
 from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from sendgrid.helpers.mail import Mail
 
 try:
     from urllib.parse import urlencode
@@ -263,27 +264,43 @@ class UserCreationView(UserPassesTestMixin, CreateView):
         user = form.save(commit=False)
         user.email = user.username
         user.save()
+
         profile = Profile()
         profile.user = user
         profile.save()
 
-        if settings.SENDGRID_KEY:
+        if settings.EMAIL_HOST_USER:
             current_site = get_current_site(self.request)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
             data = {
                 'creator': self.request.user,
                 'user': user,
                 'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
-            body = render_to_string('users/mail/to_new_user.txt', data)
-            email = Mail(
-                from_email='no-reply@%s' % current_site.domain,
-                to_emails=user.username,
-                subject='Omslagroute - je account aangemaakt',
-                plain_text_content=body
-            )
-            sg.send(email)
+            subject = 'Omslagroute - je account aangemaakt'
+            message = render_to_string('users/mail/to_new_user.txt', data)
+            from_email = 'no-reply@%s' % current_site.domain
+            to_emails = [user.username]
+            # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
+
+        # if settings.SENDGRID_KEY:
+        #     current_site = get_current_site(self.request)
+        #     sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
+        #     data = {
+        #         'creator': self.request.user,
+        #         'user': user,
+        #         'user_type': user.user_type_names,
+        #         'url': 'https://%s' % current_site.domain,
+        #     }
+        #     body = render_to_string('users/mail/to_new_user.txt', data)
+        #     email = Mail(
+        #         from_email='no-reply@%s' % current_site.domain,
+        #         to_emails=user.username,
+        #         subject='Omslagroute - je account aangemaakt',
+        #         plain_text_content=body
+        #     )
+        #     sg.send(email)
 
         messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)
@@ -316,6 +333,7 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
         profile = Profile()
         profile.user = user
         profile.save()
+
         if settings.SENDGRID_KEY:
             current_site = get_current_site(self.request)
             sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
