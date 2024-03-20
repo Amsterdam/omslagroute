@@ -279,7 +279,7 @@ class UserCreationView(UserPassesTestMixin, CreateView):
             }
             subject = 'Omslagroute - je account aangemaakt NIEUWE MAIL SERVER'
             message = render_to_string('users/mail/to_new_user.txt', data)
-            from_email = 'no-reply@%s' % current_site.domain
+            from_email = 'no-reply@amsterdam.nl'
             to_emails = [user.username]
             # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
             send_mail(subject, message, from_email, to_emails, fail_silently=False)
