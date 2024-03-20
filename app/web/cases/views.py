@@ -11,9 +11,8 @@ from web.users.statics import BEGELEIDER, WONEN, PB_FEDERATIE_BEHEERDER, WONINGC
 from web.forms.statics import FORMS_BY_SLUG, FORMS_SLUG_BY_FEDERATION_TYPE
 from web.forms.views import GenericUpdateFormView, GenericCreateFormView
 from web.forms.utils import get_sections_fields
-import sendgrid
 import logging
-from sendgrid.helpers.mail import Mail
+from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -429,15 +428,11 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
             ),
             'user': self.request.user,
         })
-        if settings.SENDGRID_KEY and recipient_list:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=recipient_list,
-                subject='Omslagroute - Cliënt definitief verwijderd',
-                plain_text_content=body
-            )
-            sg.send(email)
+        if settings.EMAIL_HOST_USER and recipient_list:
+            subject = 'Omslagroute - Cliënt definitief verwijderd',
+            from_email = settings.FROM_EMAIL
+            to_emails = recipient_list
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "De cliënt '%s' is verwijderd." % case.client_name)
 
@@ -486,15 +481,11 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
             ),
             'user': self.request.user,
         })
-        if settings.SENDGRID_KEY:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=recipient_list,
-                subject='Omslagroute - Verzoek verwijderen cliënt',
-                plain_text_content=body
-            )
-            sg.send(email)
+        if settings.EMAIL_HOST_USER:
+            subject = 'Omslagroute - Verzoek verwijderen cliënt'
+            from_email = settings.FROM_EMAIL
+            to_emails = recipient_list
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "Het verwijder verzoek is verstuurd.")
         return super().form_valid(form)
@@ -544,15 +535,11 @@ class CaseDeleteRequestRevokeView(UserPassesTestMixin, UpdateView):
             'delete_request_revoke_message': form.cleaned_data.get('delete_request_revoke_message'),
             'user': self.request.user,
         })
-        if settings.SENDGRID_KEY:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=recipient_list,
-                subject='Omslagroute - Verzoek verwijderen cliënt terug gedraaid',
-                plain_text_content=body
-            )
-            sg.send(email)
+        if settings.EMAIL_HOST_USER:
+            subject = 'Omslagroute - Verzoek verwijderen cliënt terug gedraaid'
+            from_email = settings.FROM_EMAIL
+            to_emails = recipient_list
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "Het verwijder verzoek is teruggedraaid.")
         return super().form_valid(form)
@@ -762,15 +749,12 @@ class ValidateCaseView(UserPassesTestMixin, RedirectView):
             ),
             'user': self.request.user,
         })
-        if settings.SENDGRID_KEY and recipient_list:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=recipient_list,
-                subject='Omslagroute - %s controleren' % form_config.get('title'),
-                plain_text_content=body
-            )
-            sg.send(email)
+        if settings.EMAIL_HOST_USER and recipient_list:
+            subject = 'Omslagroute - %s controleren' % form_config.get('title'),
+            from_email = settings.FROM_EMAIL
+            to_emails = recipient_list
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+
             messages.add_message(
                 self.request, messages.INFO, "De aanvraag is ter controle gestuurd naar '%s'." % (
                     self.request.user.federation.name_form_validation_team if self.request.user.federation.name_form_validation_team else self.request.user.federation.name,
@@ -861,15 +845,12 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
                 ),
                 'user': self.request.user,
             })
-            if settings.SENDGRID_KEY:
-                sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-                email = Mail(
-                    from_email='noreply@%s' % current_site.domain,
-                    to_emails=recipient_list,
-                    subject='Omslagroute - %s' % form_config.get('title'),
-                    plain_text_content=body
-                )
-                sg.send(email)
+            if settings.EMAIL_HOST_USER:
+                subject = 'Omslagroute - %s' % form_config.get('title')
+                from_email = settings.FROM_EMAIL
+                to_emails = recipient_list
+                send_mail(subject, body, from_email, to_emails, fail_silently=False)
+
             messages.add_message(
                 self.request, messages.INFO, "De aanvraag is ingediend bij en vanaf nu zichtbaar voor medewerkers van '%s'." % (
                     federation.name,
@@ -957,8 +938,8 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
         user_list = form_data.get('user_list', [])
         for user in user_list:
             user.profile.cases.add(self.instance)
-        if settings.SENDGRID_KEY:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
+        if settings.EMAIL_HOST_USER:
+
             current_site = get_current_site(self.request)
             for invited in user_list:
                 context = {}
@@ -973,13 +954,10 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                     ),
                 })
                 body = render_to_string('cases/mail/invite.txt', context)
-                email = Mail(
-                    from_email='noreply@%s' % current_site.domain,
-                    to_emails=invited.username,
-                    subject='Omslagroute - je bent toegevoegd aan een team',
-                    plain_text_content=body
-                )
-                sg.send(email)
+                subject = 'Omslagroute - je bent toegevoegd aan een team'
+                from_email = settings.FROM_EMAIL
+                to_emails = [invited.username]
+                send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "De nieuwe gebruikers hebben een email gekregen van hun uitnodiging.")
         return HttpResponseRedirect(self.get_success_url())
@@ -1024,8 +1002,8 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
         for user in form.cleaned_data.get('user_list'):
             user.profile.cases.remove(self.instance)
 
-        if settings.SENDGRID_KEY:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
+        if settings.EMAIL_HOST_USER:
+
             current_site = get_current_site(self.request)
             for user in form.cleaned_data.get('user_list'):
                 context = {}
@@ -1039,13 +1017,10 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
                     ),
                 })
                 body = render_to_string('cases/mail/invated_removed.txt', context)
-                email = Mail(
-                    from_email='noreply@%s' % current_site.domain,
-                    to_emails=user.username,
-                    subject='Omslagroute - je bent uit een team verwijderd',
-                    plain_text_content=body
-                )
-                sg.send(email)
+                subject = 'Omslagroute - je bent uit een team verwijderd'
+                from_email = settings.FROM_EMAIL
+                to_emails = [user.username]
+                send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "De gebruikers hebben een mail ontvangen van het verbreken van de samenwerking.")
         return super().form_valid(form)
@@ -1158,15 +1133,11 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
         if self.request.user.username in recipient_list:
             recipient_list.remove(self.request.user.username)
 
-        if settings.SENDGRID_KEY:
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=recipient_list,
-                subject='Omslagroute - Cliënt adres wijiging',
-                plain_text_content=body
-            )
-            sg.send(email)
+        if settings.EMAIL_HOST_USER:
+            subject = 'Omslagroute - Cliënt adres wijziging'
+            from_email = settings.FROM_EMAIL
+            to_emails = recipient_list
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "Het adres is opgeslagen.")
         self.object.create_version(CASE_VERSION_ADDRESS)

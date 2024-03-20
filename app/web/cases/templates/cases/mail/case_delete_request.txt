@@ -3,5 +3,6 @@ Er is een verzoek om een cliënt te verwijderen uit de Omslagroute door {{ user.
 Bericht van {{ user.username }}:
 {{ case.delete_request_message|safe }}{% endif %}
 
-Als je bent ingelogd in de Omslagroute kun je de cliënt gegevens inzien met de onderstaande url:
+Als je bent ingelogd op de Omslagroute kun je de cliëntgegevens inzien met onderstaande url.
+
 {{ case_url }}

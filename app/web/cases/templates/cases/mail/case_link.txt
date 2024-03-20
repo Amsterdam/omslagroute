@@ -1,3 +1,5 @@
-De persoonlijk begeleider met het e-mailadres '{{ user.username }}', heeft het formulier '{{ form_name }}' ingediend.
-Als je bent ingelogd op de omslagroute, kun je de inhoud van het formulier zien met de volgende url: 
+De persoonlijk begeleider met e-mailadres '{{ user.username }}', heeft het formulier '{{ form_name }}' ingediend.
+
+Als je bent ingelogd op de omslagroute, kun je de inhoud van het formulier zien met de volgende url:
+
 {{ case_url }}
