@@ -277,7 +277,7 @@ class UserCreationView(UserPassesTestMixin, CreateView):
                 'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
-            subject = 'Omslagroute - je account aangemaakt'
+            subject = 'Omslagroute - je account aangemaakt NIEUWE MAIL SERVER'
             message = render_to_string('users/mail/to_new_user.txt', data)
             from_email = 'no-reply@%s' % current_site.domain
             to_emails = [user.username]
