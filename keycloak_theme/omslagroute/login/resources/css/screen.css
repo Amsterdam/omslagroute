@@ -5,7 +5,7 @@
     text-decoration: none;
     background-color: transparent;
     color: black;
-} 
+}
 .login-pf-page .login-pf-social-link a:hover {
     border: 2px solid #084897;
     color: #084897 !important;
@@ -20,15 +20,15 @@
     border-bottom: 1px solid #d1d1d1;
     border-left: 0;
     padding-left: 0;
-}  
+}
 .login-pf-page #kc-social-providers:before {
     content: 'Selecteer hieronder de organisatie waar je voor werkt, en log in met de gegevens van jouw organisatie.';
-}  
+}
 .login-pf-page #kc-form-wrapper {
     padding-right: 0;
     border-right: none;
     max-width: 100% !important;
-    width: 100% !important;  
+    width: 100% !important;
     margin-right: -1px;
     order: 2;
 }
@@ -36,15 +36,15 @@
     content: 'Als je organisatie er niet bij staat, log dan in met het formulier hieronder.';
     display: inline-block;
     margin-bottom: 20px;
-}  
+}
 #kc-content-wrapper .row#kc-form {
     display: flex;
     flex-direction: column;
-}  
+}
 .login-pf-page .login-pf-social {
     margin-top: 20px
 }
-.login-pf-page .login-pf-social-link {  
+.login-pf-page .login-pf-social-link {
     margin-bottom: 15px;
     margin-right: 0;
     width: 100% !important;

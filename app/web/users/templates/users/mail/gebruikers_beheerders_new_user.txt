@@ -1,5 +1,7 @@
 Beste beheerder,
 
 Er is een nieuwe gebruiker aangemaakt op {{ site }}.
+
 Met de onderstaande url kun je de gebruiker een rol geven op deze site.
+
 https://{{ site }}{{ url }}

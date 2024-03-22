@@ -1,4 +1,10 @@
 Beste gebruiker,
-Je bent door '{{ creator.username }}' met het e-mailadres(gebruikersnaam) '{{ user.username }}' toegevoegd aan de Omslagroute organisatie '{{ user.federation.name }}', met als rol '{{ user_type }}'.
-Login op de Omslagroute met de knop rechtsboven op de onderstaande pagina:
+
+Je bent door '{{ creator.username }}' met het e-mailadres(gebruikersnaam) '{{ user.username }}' toegevoegd aan de Omslagroute.
+
+Organisatie: {{ user.federation.name }}
+Rol: {{ user_type }}
+
+Login op Omslagroute met de knop rechtsboven op onderstaande pagina.
+
 {{ url }}

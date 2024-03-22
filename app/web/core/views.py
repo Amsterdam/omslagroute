@@ -7,10 +7,8 @@ from web.timeline.models import *
 from web.documents.models import *
 from web.organizations.models import *
 from django.urls import reverse_lazy
-import sendgrid
-from sendgrid.helpers.mail import *
+from django.core.mail import send_mail
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from .utils import *
 from django.contrib.auth.decorators import user_passes_test
 from django.core.management import call_command
@@ -94,16 +92,11 @@ class SendMailView(UserPassesTestMixin, RedirectView):
     def get(self, request, *args, **kwargs):
         mailadres = request.GET.get('mailadres')
         if mailadres:
-            current_site = get_current_site(self.request)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=mailadres,
-                subject='Omslagroute - mail',
-                plain_text_content='Het werkt!'
-            )
-
-            sg.send(email)
+            subject = 'Omslagroute - mail',
+            from_email = settings.FROM_EMAIL
+            to_emails = [mailadres]
+            message = 'Het versturen van een mail werkt!'
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         return super().get(request, *args, **kwargs)
 

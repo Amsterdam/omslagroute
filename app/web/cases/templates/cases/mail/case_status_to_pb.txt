@@ -1,7 +1,10 @@
 {% load client_status_tags %}
-{{ case_status.profile.user.username }} van de afdeling Wonen Amsterdam heeft de status voor '{{ form_name }}' gewijzigd naar '{{ case_status.status|status_verbose|capfirst }}'. 
-Als je bent ingelogd op de omslagroute, kun je de status van de stap zien met de volgdende url: 
+{{ case_status.profile.user.username }} van de afdeling Wonen Amsterdam heeft de status voor '{{ form_name }}' gewijzigd naar '{{ case_status.status|status_verbose|capfirst }}'.
+
+Als je bent ingelogd op de omslagroute, kun je de status van de stap zien met de volgdende url:
+
 {{ case_form_url }}{% if case_status.status_comment %}
 
 Toelichting:
+
 {{ case_status.status_comment|safe }}{% endif %}

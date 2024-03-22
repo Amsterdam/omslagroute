@@ -3,8 +3,9 @@ from os.path import join
 from datetime import timedelta
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+# flake8: noqa
 from keycloak_oidc.default_settings import *
-import urllib.parse
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
@@ -69,9 +70,14 @@ FILE_UPLOAD_HANDLERS = [
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'local')
 WSGI_APPLICATION = 'wsgi.application'
 
-# Email
+# Email SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-SENDGRID_KEY = os.environ.get("SENDGRID_KEY")
+EMAIL_HOST = 'smr.amsterdam.nl'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+FROM_EMAIL = 'no-reply@amsterdam.nl'
 
 # Error logging through Sentry
 sentry_sdk.init(
@@ -242,7 +248,7 @@ CONSTANCE_CONFIG = {
     CONSTANCE_HOMEPAGE_INTRO_KEY: ('', 'Homepage introduction html'),
     CONSTANCE_NEW_USER_INTRO_KEY: ('', 'Nieuwe gebruiker introduction html'),
     CONSTANCE_FEEDBACK_RECIPIENT_LIST_KEY: ('', 'Feedback ontvangers lijst(kommagescheiden)'),
-    CONSTANCE_CASE_DELETE_SECONDS_KEY: (60*60*24*30, 'Na het aantal seconden nadat de persoonlijk begeleider de cliënt het verzoek om de cliënt te verwijderen heeft ingediend, wordt de cliënt echt verwijderd. Standaard is dit 30 dagen (60*60*24*30)'),
+    CONSTANCE_CASE_DELETE_SECONDS_KEY: (60 * 60 * 24 * 30, 'Na het aantal seconden nadat de persoonlijk begeleider de cliënt het verzoek om de cliënt te verwijderen heeft ingediend, wordt de cliënt echt verwijderd. Standaard is dit 30 dagen (60*60*24*30)'),
 }
 
 OIDC_RP_CLIENT_ID = os.environ.get('IAM_CLIENT_ID')
@@ -253,7 +259,7 @@ OIDC_FEDERATION_DEFAULT = 'onbekend'
 
 IAM_URL = None
 if os.environ.get("IAM_URL"):
-    IAM_URL = '%s%s' %(
+    IAM_URL = '%s%s' % (
         os.environ.get(
             'IAM_URL', 'https://iam.amsterdam.nl/auth/realms/datapunt-acc'
         ),
@@ -310,7 +316,7 @@ LOGGING = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'bundles/', # must end with slash
+        'BUNDLE_DIR_NAME': 'bundles/',  # must end with slash
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
         'POLL_INTERVAL': 0.1,
         'TIMEOUT': None,

@@ -3,5 +3,6 @@ Het verzoek om de cliënt te verwijderen is ongedaan gemaakt door {{ user.userna
 Bericht van {{ user.username }}:
 {{ delete_request_revoke_message|safe }}{% endif %}
 
-Als je bent ingelogd in de Omslagroute kun je de cliënt gegevens inzien met de onderstaande url:
+Als je bent ingelogd op de Omslagroute kun je de cliëntgegevens inzien met onderstaande url.
+
 {{ case_url }}

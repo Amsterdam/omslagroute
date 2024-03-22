@@ -1,23 +1,19 @@
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets, generics
 from .models import CaseStatus, Case
 from .statics import CASE_STATUS_INGEDIEND, CASE_STATUS_DICT
 from .serializers import CaseStatusSerializer, CaseDossierNrSerializer
 from django.contrib.auth.mixins import UserPassesTestMixin
-from web.users.statics import BEGELEIDER, WONEN, PB_FEDERATIE_BEHEERDER, WONINGCORPORATIE_MEDEWERKER
+from web.users.statics import WONEN, WONINGCORPORATIE_MEDEWERKER
 from web.forms.statics import FORMS_BY_SLUG
 from web.users.auth import auth_test
 from web.users.utils import get_zorginstelling_medewerkers_email_list
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions
 from rest_framework import status
-from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.conf import settings
-import sendgrid
-from sendgrid.helpers.mail import Mail
+from django.core.mail import send_mail
 
 
 class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
@@ -43,7 +39,7 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
             data.update({
                 'case_version': Case.objects.get(id=data.get('case')).create_version(data.get('form')).id,
             })
-            
+
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -51,7 +47,7 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
         if serializer.instance.status != CASE_STATUS_INGEDIEND:
             current_site = get_current_site(request)
             form_config = FORMS_BY_SLUG.get(serializer.instance.form)
-            body = render_to_string('cases/mail/case_status_to_pb.txt', {
+            message = render_to_string('cases/mail/case_status_to_pb.txt', {
                 'case_status': serializer.instance,
                 'form_name': form_config.get('title'),
                 'case_form_url': 'https://%s%s' % (
@@ -63,18 +59,14 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
                 ),
             })
             email_adresses = get_zorginstelling_medewerkers_email_list(serializer.instance.case)
-            if settings.SENDGRID_KEY and email_adresses:
-                sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-                email = Mail(
-                    from_email='noreply@%s' % current_site.domain,
-                    to_emails=email_adresses,
-                    subject='Omslagroute - %s, status: %s' % (
-                        form_config.get('title'),
-                        CASE_STATUS_DICT.get(serializer.instance.status).get('current'),
-                    ),
-                    plain_text_content=body
+            if settings.EMAIL_HOST_USER and email_adresses:
+                subject = 'Omslagroute - %s, status: %s' % (
+                    form_config.get('title'),
+                    CASE_STATUS_DICT.get(serializer.instance.status).get('current'),
                 )
-                sg.send(email)
+                from_email = settings.FROM_EMAIL
+                to_emails = email_adresses
+                send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
