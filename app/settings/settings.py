@@ -15,6 +15,7 @@ azureStorage = AzureStorage()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 config_integration.trace_integrations(['requests', 'logging', 'postgresql'])
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +55,7 @@ BRANCH_NAME = os.environ.get('BRANCH_NAME')
 
 # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
 MIDDLEWARE = (
+    'opencensus.ext.django.middleware.OpencensusMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
