@@ -1,8 +1,6 @@
 import os
 from os.path import join
 from datetime import timedelta
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 # flake8: noqa
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
@@ -55,7 +53,6 @@ BRANCH_NAME = os.environ.get('BRANCH_NAME')
 
 # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
 MIDDLEWARE = (
-    'opencensus.ext.django.middleware.OpencensusMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -65,6 +62,7 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'opencensus.ext.django.middleware.OpencensusMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('DJANGO_ROOT_URLCONF', 'web.urls')
@@ -86,14 +84,6 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 FROM_EMAIL = 'no-reply@amsterdam.nl'
 
-# Error logging through Sentry
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN", ""),
-    integrations=[DjangoIntegration(), ],
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
 
 ADMINS = (
     ('admin', 'name@email.com'),
