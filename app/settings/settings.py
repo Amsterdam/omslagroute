@@ -7,13 +7,14 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
 from .azure_settings_storage import AzureStorage
-
+from opencensus.trace import config_integration
 from azure.identity import WorkloadIdentityCredential
+
 azure = Azure()
 azureStorage = AzureStorage()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
-
+config_integration.trace_integrations(['requests', 'logging', 'postgresql'])
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -301,24 +302,52 @@ if os.environ.get("IAM_URL"):
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'sentry': {
-            'level': 'ERROR',  # Log errors and above to Sentry
-            'class': 'sentry_sdk.integrations.logging.EventHandler',
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
+    "version": 1,
+    "disable_existing_loggers": True,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "level": "DEBUG"},
+        "celery": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler"
         },
     },
-    'root': {
-        'handlers': ['sentry', 'console'],
-        'level': 'DEBUG',
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG"
     },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": True,
+        }
+    },  
 }
 
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"
+)
+
+if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    OPENCENSUS = {
+        "TRACE": {
+            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
+            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+        }
+    }
+    LOGGING["handlers"]["azure"] = {
+        "level": "DEBUG",
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
+    }
+    LOGGING["root"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"]["django"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"][""]["handlers"] = ["azure", "console"]
 
 WEBPACK_LOADER = {
     'DEFAULT': {
