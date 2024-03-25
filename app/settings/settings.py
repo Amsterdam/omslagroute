@@ -305,24 +305,24 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "level": "DEBUG"},
+        "console": {"class": "logging.StreamHandler", "level": "INFO"},
         "celery": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler"
         },
     },
     "root": {
         "handlers": ["console"],
-        "level": "DEBUG"
+        "level": "INFO"
     },
     "loggers": {
         "django": {
             "handlers": ["console"],
-            "level": "DEBUG",
+            "level": "INFO",
             "propagate": True,
         },
         "": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": ["console"],
             "propagate": True,
         }
