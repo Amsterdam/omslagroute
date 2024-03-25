@@ -7,10 +7,13 @@ from web.core.views import *
 from web.health.views import health_default, health_db
 from web.users.views import generic_logout, generic_login
 from django.views.generic import TemplateView
-from django.conf import settings
 from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
 from django.views.generic import RedirectView
+
+
+def trigger_error(request):
+    division_by_zero = 1 / 0  # noqa: Test purposes
 
 
 urlpatterns = [
@@ -39,6 +42,8 @@ urlpatterns = [
 
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
+
+    path('sentry-debug/', trigger_error),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
