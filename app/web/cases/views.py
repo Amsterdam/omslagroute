@@ -409,7 +409,7 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
     def test_func(self):
         return auth_test(self.request.user, [WONEN])
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         case = self.get_object()
         response = super().delete(request, *args, **kwargs)
 
@@ -1245,7 +1245,7 @@ class DocumentDelete(UserPassesTestMixin, DeleteView):
         })
         return super().get_context_data(**kwargs)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         document_name = self.get_object().name
         response = super().delete(self, request, *args, **kwargs)
         messages.add_message(self.request, messages.INFO, "De bijlage '%s' is verwijderd." % document_name)

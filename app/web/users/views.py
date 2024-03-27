@@ -350,7 +350,7 @@ class UserDelete(UserPassesTestMixin, DeleteView):
     def test_func(self):
         return auth_test(self.request.user, BEHEERDER)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         obj = self.get_object()
         obj.profile.delete()
         return super().delete(request, *args, **kwargs)

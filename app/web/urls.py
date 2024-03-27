@@ -7,7 +7,6 @@ from web.core.views import *
 from web.health.views import health_default, health_db
 from web.users.views import generic_logout, generic_login
 from django.views.generic import TemplateView
-from django.conf import settings
 from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
 from django.views.generic import RedirectView

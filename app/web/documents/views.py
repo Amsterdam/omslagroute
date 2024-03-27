@@ -5,17 +5,15 @@ from .forms import *
 from web.users.auth import auth_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django.http.response import HttpResponse, HttpResponseForbidden, FileResponse, Http404, HttpResponseRedirect
-from django.forms.models import inlineformset_factory
 from web.timeline.models import Moment
 from django.core.files.storage import default_storage
 from web.users.auth import user_passes_test
 from django.views.decorators.http import require_http_methods
 from web.users.statics import REDACTIE
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 import json
-from django.http import HttpResponseRedirect, JsonResponse
 
 
 class DocumentList(ListView):
@@ -38,7 +36,7 @@ class DocumentDelete(UserPassesTestMixin, DeleteView):
     def test_func(self):
         return auth_test(self.request.user, REDACTIE)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         response = super().delete(self, request, *args, **kwargs)
         messages.add_message(self.request, messages.INFO, "Het document '%s' is verwijderd." % self.object.name)
         return response
