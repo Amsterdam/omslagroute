@@ -278,6 +278,8 @@ if os.environ.get("IAM_URL"):
     AUTHENTICATION_BACKENDS = [
         'web.users.auth.OIDCAuthenticationBackend',
     ]
+
+    #TODO Can probably be removed because it is defined twice, needs to be tested
     MIDDLEWARE = (
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
