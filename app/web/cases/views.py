@@ -35,6 +35,7 @@ from web.users.utils import *
 from web.users.utils import get_zorginstelling_medewerkers_email_list, filter_valid_emails
 from operator import or_
 from django.utils import timezone
+from django.http.response import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -1270,7 +1271,10 @@ def download_document(request, case_pk, document_pk):
     if not default_storage.exists(default_storage.generate_filename(document.uploaded_file.name)):
         raise Http404()
 
-    return HttpResponseRedirect(document.uploaded_file.url)
+    with default_storage.open(document.uploaded_file.name, 'rb') as file:
+        response = HttpResponse(file.read(), content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{document.uploaded_file.name}"'
+        return response
 
 
 
