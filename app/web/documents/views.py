@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 from web.users.auth import user_passes_test
 from django.views.decorators.http import require_http_methods
 from web.users.statics import REDACTIE
-from django.http import HttpResponseRedirect, JsonResponse, Http404
+from django.http import HttpResponse, JsonResponse, Http404
 import json
 
 
