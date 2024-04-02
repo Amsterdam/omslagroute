@@ -50,9 +50,3 @@ The city of Amsterdam has developed a [design system](https://designsystem.amste
 
 The documentation for (React) components based on elements from the design system can be found in the [storybook](https://amsterdam.github.io/amsterdam-styled-components/?path=/story/experimental-atoms-accordion--single-accordion-with-paragraph) pages of the [Amsterdam Styled Components repository](https://github.com/Amsterdam/amsterdam-styled-components/tree/master/.storybook).
 
-
-# UX designs
-
-[Figma](https://www.figma.com/file/CYyugtNLULjfyubpkXySlz/Brainstorm-omslagroute)
-
-[Sketch Cloud](https://sketch.cloud/s/o5W1Q)
