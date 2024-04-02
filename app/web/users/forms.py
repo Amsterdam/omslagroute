@@ -3,6 +3,8 @@ from django.contrib.auth.forms import (
 )
 from django import forms
 from .models import *
+from web.organizations.models import Federation
+from web.forms.widgets import CheckboxSelectMultiple
 from web.profiles.models import Profile
 from django.forms.models import inlineformset_factory
 from web.forms.widgets import CheckboxSelectMultiple, RadioSelect
@@ -75,6 +77,7 @@ class UserUpdateForm(forms.ModelForm):
         )
 
 
+
 class FederationUserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
@@ -140,24 +143,9 @@ class UserCreationFederationForm(forms.ModelForm):
         )
 
 
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        exclude = [
-            'cases',
-            'user',
-            'organization',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_suffix = ''
-
-
-ProfileFormSet = inlineformset_factory(
-    parent_model=User,
-    model=Profile,
-    form=ProfileForm,
-    can_delete=False,
-    extra=1
-)
+class ChangeFederationForm(forms.Form):
+    new_federation = forms.ModelChoiceField(
+        queryset=Federation.objects.all(),
+        required=True,
+        label=_('Nieuwe federatie'),
+    )
