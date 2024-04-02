@@ -1,13 +1,12 @@
 from django.conf import settings
-from django.urls import path, include as path_include
-from django.conf.urls import url, include
+from django.urls import path, re_path, include as path_include
+from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib import admin
 from web.core.views import *
 from web.health.views import health_default, health_db
 from web.users.views import generic_logout, generic_login
 from django.views.generic import TemplateView
-from django.conf import settings
 from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
 from django.views.generic import RedirectView
@@ -51,7 +50,7 @@ if settings.DEBUG:
 
 if settings.IAM_URL:
     urlpatterns += [
-        url(r'^oidc/', include('keycloak_oidc.urls')),
+        re_path(r'^oidc/', include('keycloak_oidc.urls')),
         path('inloggen/', OIDCAuthenticationRequestView.as_view(), name='inloggen'),
     ]
 if settings.BRANCH_NAME != 'production':

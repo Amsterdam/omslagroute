@@ -1,55 +1,63 @@
 var path = require("path")
 var webpack = require('webpack')
-var BundleTracker = require('webpack-bundle-tracker')
 
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
-module.exports = {
-  context: __dirname,
-  mode: 'development',
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === 'production';
 
-  entry: {
-    'case-status': './assets/js/case-status', 
-    'case': './assets/js/case',
-  }, // entry point of our app. assets/js/index.js should require other js modules and dependencies it needs
+  // Define feature flags based on environment
+  const definePluginArgs = {
+    __VUE_OPTIONS_API__: JSON.stringify(true),
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(true),
+    __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
+  };
 
-  output: {
-      path: path.resolve('./assets/bundles/'),
-      // filename: 'bundle.js'
-      filename: "[name].js",
-  },
+  return {
+    context: __dirname,
+    mode: isProduction ? 'production' : 'development',
 
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
+    entry: {
+      'case-status': './assets/js/case-status',
+      'case': './assets/js/case',
+    }, // entry point of our app. assets/js/index.js should require other js modules and dependencies it needs
+
+    output: {
+        path: path.resolve('./assets/bundles/'),
+        filename: "[name].js",
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader'
+        },
+        {
+          test: /\.(scss|css)$/,
+          use: [
+              "vue-style-loader",
+              "css-loader",
+              "sass-loader"
+          ]
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader'
+        },
+      ]
+    },
+    resolve: {
+      alias: {
+        'vue$': isProduction ? 'vue/dist/vue.runtime.esm-bundler.js' : 'vue/dist/vue.esm-bundler.js',
       },
-      {
-        test: /\.(scss|css)$/,
-        use: [
-            "vue-style-loader",
-            "css-loader",
-            "sass-loader"
-        ]
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader'
-      },
-    ]
-  },
-
-  resolve: {
-   alias: {
-    vue$: "vue/dist/vue.esm.js"
-   },
-    // modules: ['node_modules', 'bower_components'],
-    extensions: ["*", ".js", ".vue", ".json"]
-  },
-  plugins: [
-    // new BundleTracker({filename: './webpack-stats.json'}),
-    new VueLoaderPlugin(),
-  ],
+      extensions: [".*", ".js", ".vue", ".json"]
+    },
+    plugins: [
+      new VueLoaderPlugin(),
+      // Define feature flags as global constants
+      new webpack.DefinePlugin(definePluginArgs)
+    ],
+  }
 }

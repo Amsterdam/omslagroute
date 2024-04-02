@@ -20,7 +20,7 @@
                     <svg class="u-margin-right" width="20" height="20" >
                         <use href="#download" xlink:href="#download"  width="20" height="20"></use>
                     </svg>
-                    Download excel
+                    Download Excel
                 </a>
             </div>
 
@@ -28,7 +28,7 @@
     </div>
 </section>
 
-<section class="section section--client u-margin-bottom-4x">
+<section class="section section--client u-margin-bottom-2x">
     <div class="details-client details-client--basic u-width-60 u-margin-top-2x">
         <dl>
             <div>
@@ -45,56 +45,56 @@
 </section>
 
 
-                <table id="excel-data" class="table--double-row table--condensed u-border-top-none">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th>Totaal</th>
-                            <th>
-                                <a href=".{{ prev_month }}"  style="text-decoration: none; font-size: 2rem; position: absolute; transform: rotate(180deg); line-height: 1rem; transform-origin: left center;">&#8227;</a>&nbsp;{{ start_month|timezone:FRONTEND_TIMEZONE|date:"M Y" }}
-                                {% if next_month %}&nbsp;<a href=".{{ next_month }}" style="text-decoration: none; font-size: 2rem; position: absolute; transform: rotate(0deg);  line-height: 1rem;">&#8227;</a>{% endif %}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for zorginstelling_data in zorginstelling_list %}
-                        <tr class="u-border-top">
-                            <th colspan="4">
-                                <h2><strong>{{ zorginstelling_data.zorginstelling.name }}</strong></h2>
-                                <p>Aantal omslagroute medewerkers: {{ zorginstelling_data.user_list|length }}</p>
-                            </th>
-                        </tr>
-                        <tr class="u-border-top">
-                            <th colspan="2">Cliënten aangemaakt</th>
-                            <td>{{ zorginstelling_data.case_list|length }}</td>
-                            <td>{{ zorginstelling_data.case_list_period|length }}</td>
-                        </tr>
-                        <tr class="u-border-top">
-                            <th rowspan="2">Aanvraag Urgentie onder voorwaarden</th>
-                            <th class="u-font-weight-normal">Ingediend</th>
-                            <td>{{ zorginstelling_data.urgentie_ingediend|length }}</td>
-                            <td>{{ zorginstelling_data.urgentie_ingediend_period|length }}</td>
-                        </tr>
-                        <tr class="u-border-top">
-                            <th class="u-font-weight-normal">Goedgekeurd</th>
-                            <td>{{ zorginstelling_data.urgentie_goedgekeurd|length }}</td>
-                            <td>{{ zorginstelling_data.urgentie_goedgekeurd_period|length }}</td>
-                        </tr>
-                        <tr class="u-border-top">
-                            <th rowspan="2">Aanvraag Voordracht omklap</th>
-                            <th class="u-font-weight-normal">Ingediend</th>
-                            <td>{{ zorginstelling_data.omklap_ingediend|length }}</td>
-                            <td>{{ zorginstelling_data.omklap_ingediend_period|length }}</td>
-                        </tr>
-                        <tr class="u-border-top">
-                            <th class="u-font-weight-normal">Goedgekeurd</th>
-                            <td>{{ zorginstelling_data.omklap_goedgekeurd|length }}</td>
-                            <td>{{ zorginstelling_data.omklap_goedgekeurd_period|length }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<table id="excel-data" class="table--double-row table--condensed u-border-top-none">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Totaal</th>
+            <th>
+                <a href=".{{ prev_month }}"  style="text-decoration: none; font-size: 2rem; position: absolute; transform: rotate(180deg); line-height: 1rem; transform-origin: left center;">&#8227;</a>&nbsp;{{ start_month|timezone:FRONTEND_TIMEZONE|date:"M Y" }}
+                {% if next_month %}&nbsp;<a href=".{{ next_month }}" style="text-decoration: none; font-size: 2rem; position: absolute; transform: rotate(0deg);  line-height: 1rem; padding-top: 0.25rem;">&#8227;</a>{% endif %}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for zorginstelling_data in zorginstelling_list %}
+        <tr class="u-border-top">
+            <th colspan="4">
+                <h2><strong>{{ zorginstelling_data.zorginstelling.name }}</strong></h2>
+                <p>Aantal omslagroute medewerkers: {{ zorginstelling_data.user_list|length }}</p>
+            </th>
+        </tr>
+        <tr class="u-border-top">
+            <th colspan="2">Cliënten aangemaakt</th>
+            <td>{{ zorginstelling_data.case_list|length }}</td>
+            <td>{{ zorginstelling_data.case_list_period|length }}</td>
+        </tr>
+        <tr class="u-border-top">
+            <th rowspan="2">Aanvraag Urgentie onder voorwaarden</th>
+            <th class="u-font-weight-normal">Ingediend</th>
+            <td>{{ zorginstelling_data.urgentie_ingediend|length }}</td>
+            <td>{{ zorginstelling_data.urgentie_ingediend_period|length }}</td>
+        </tr>
+        <tr class="u-border-top">
+            <th class="u-font-weight-normal">Goedgekeurd</th>
+            <td>{{ zorginstelling_data.urgentie_goedgekeurd|length }}</td>
+            <td>{{ zorginstelling_data.urgentie_goedgekeurd_period|length }}</td>
+        </tr>
+        <tr class="u-border-top">
+            <th rowspan="2">Aanvraag Voordracht omklap</th>
+            <th class="u-font-weight-normal">Ingediend</th>
+            <td>{{ zorginstelling_data.omklap_ingediend|length }}</td>
+            <td>{{ zorginstelling_data.omklap_ingediend_period|length }}</td>
+        </tr>
+        <tr class="u-border-top">
+            <th class="u-font-weight-normal">Goedgekeurd</th>
+            <td>{{ zorginstelling_data.omklap_goedgekeurd|length }}</td>
+            <td>{{ zorginstelling_data.omklap_goedgekeurd_period|length }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}
 
@@ -114,4 +114,5 @@ link.addEventListener('click', function(e){
     });
 });
 </script>
+
 {% endblock %}

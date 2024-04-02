@@ -5,7 +5,10 @@ from django import forms
 from .models import *
 from web.organizations.models import Federation
 from web.forms.widgets import CheckboxSelectMultiple
-from django.utils.translation import ugettext_lazy as _
+from web.profiles.models import Profile
+from django.forms.models import inlineformset_factory
+from web.forms.widgets import CheckboxSelectMultiple, RadioSelect
+from django.utils.translation import gettext_lazy as _
 
 
 class FilterListForm(forms.Form):
@@ -62,9 +65,17 @@ class UserUpdateForm(forms.ModelForm):
             'user_type',
             'federation',
         )
-        widgets = {
-            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['federation'].label = 'Organisatie'
+        user_type_choices = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_ACTIVE]
+        self.fields['user_type'] = forms.ChoiceField(
+            choices=user_type_choices,
+            widget=RadioSelect(attrs={'class': 'u-list-style-none list-container'}),
+            label=User._meta.get_field('user_type').verbose_name
+        )
+
 
 
 class FederationUserUpdateForm(forms.ModelForm):
@@ -73,14 +84,15 @@ class FederationUserUpdateForm(forms.ModelForm):
         fields = (
             'user_type',
         )
-        widgets = {
-            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
-        }
 
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
         super().__init__(*args, **kwargs)
-        self.fields['user_type'].choices = user_type_choices
+        self.fields['user_type'] = forms.ChoiceField(
+            choices=user_type_choices,
+            widget=RadioSelect(attrs={'class': 'u-list-style-none list-container'}),
+            label=User._meta.get_field('user_type').verbose_name
+        )
 
 
 class UserCreationForm(forms.ModelForm):
@@ -96,13 +108,16 @@ class UserCreationForm(forms.ModelForm):
             'federation',
             'user_type',
         )
-        widgets = {
-            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['federation'].label = 'Organisatie'
+        user_type_choices = [ut for ut in USER_TYPES if ut[0] in USER_TYPES_ACTIVE]
+        self.fields['user_type'] = forms.ChoiceField(
+            choices=user_type_choices,
+            widget=RadioSelect(attrs={'class': 'u-list-style-none list-container'}),
+            label=User._meta.get_field('user_type').verbose_name
+        )
 
 
 class UserCreationFederationForm(forms.ModelForm):
@@ -117,14 +132,15 @@ class UserCreationFederationForm(forms.ModelForm):
             'username',
             'user_type',
         )
-        widgets = {
-            'user_type': CheckboxSelectMultiple(attrs={'class': 'u-list-style-none list-container'})
-        }
 
     def __init__(self, *args, **kwargs):
         user_type_choices = kwargs.pop('user_type_choices', ())
         super().__init__(*args, **kwargs)
-        self.fields['user_type'].choices = user_type_choices
+        self.fields['user_type'] = forms.ChoiceField(
+            choices=user_type_choices,
+            widget=RadioSelect(attrs={'class': 'u-list-style-none list-container'}),
+            label=User._meta.get_field('user_type').verbose_name
+        )
 
 
 class ChangeFederationForm(forms.Form):

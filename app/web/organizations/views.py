@@ -74,6 +74,10 @@ class FederationUpdateView(UserPassesTestMixin, UpdateView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if BEHEERDER in self.request.user.user_type_values:
+            pk = self.kwargs.get('pk')
+            return queryset.filter(id=pk)
+
         if any(user_type in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER] for user_type in self.request.user.user_type_values):
             queryset = queryset.filter(
                 id=self.request.user.federation.id,

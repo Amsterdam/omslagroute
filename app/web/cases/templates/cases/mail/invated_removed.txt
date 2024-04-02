@@ -1,3 +1,5 @@
 Beste {{ removed_user.first_name }},
+
 Je bent door de medewerker met het e-mailadres '{{ user.username }}' verwijderd van het team voor een cliënt in de omslagroute.
+
 {{ case_url}}

@@ -11,23 +11,14 @@ from web.users.auth import auth_test
 from .statics import *
 from mozilla_django_oidc.views import OIDCAuthenticationRequestView as DatapuntOIDCAuthenticationRequestView
 from django.core.paginator import Paginator
-from mozilla_django_oidc.utils import (
-    absolutify
-)
+from mozilla_django_oidc.utils import absolutify
 from web.cases.models import Case
 from django.db.models import Count, Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-import sendgrid
-from sendgrid.helpers.mail import Mail
 from django.template.loader import render_to_string
-
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    # Python < 3
-    from urllib import urlencode
-
+from django.core.mail import send_mail
+from urllib.parse import urlencode
 from mozilla_django_oidc.views import get_next_url, get_random_string
 
 
@@ -92,6 +83,9 @@ class UserList(UserPassesTestMixin, TemplateView):
         object_list = [[o, [USER_TYPES_ACTIVE.index(value) for value in o.user_type_values]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
+
+        # Sort the list by username
+        object_list = sorted(object_list, key=lambda o: o.username)
 
         # Pagination
         paginator = Paginator(object_list, self.per_page)
@@ -168,6 +162,9 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
         object_list = [[o, [USER_TYPES_ACTIVE.index(value) for value in o.user_type_values]] for o in object_list]
         object_list = sorted(object_list, key=lambda o: o[1])
         object_list = [o[0] for o in object_list]
+
+        # Sort the list by username
+        object_list = sorted(object_list, key=lambda o: o.username)
 
         # Pagination
         paginator = Paginator(object_list, self.per_page)
@@ -257,27 +254,25 @@ class UserCreationView(UserPassesTestMixin, CreateView):
         user = form.save(commit=False)
         user.email = user.username
         user.save()
+
         profile = Profile()
         profile.user = user
         profile.save()
 
-        if settings.SENDGRID_KEY:
+        if settings.EMAIL_HOST_USER:
             current_site = get_current_site(self.request)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
             data = {
                 'creator': self.request.user,
                 'user': user,
                 'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
-            body = render_to_string('users/mail/to_new_user.txt', data)
-            email = Mail(
-                from_email='no-reply@%s' % current_site.domain,
-                to_emails=user.username,
-                subject='Omslagroute - je account aangemaakt',
-                plain_text_content=body
-            )
-            sg.send(email)
+            subject = 'Omslagroute - je account is aangemaakt'
+            message = render_to_string('users/mail/to_new_user.txt', data)
+            from_email = settings.FROM_EMAIL
+            to_emails = [user.username]
+            # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)
@@ -307,26 +302,25 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
         user.email = user.username
         user.federation = self.request.user.federation
         user.save()
+
         profile = Profile()
         profile.user = user
         profile.save()
-        if settings.SENDGRID_KEY:
+
+        if settings.EMAIL_HOST_USER:
             current_site = get_current_site(self.request)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
             data = {
                 'creator': self.request.user,
                 'user': user,
                 'user_type': user.user_type_names,
                 'url': 'https://%s' % current_site.domain,
             }
-            body = render_to_string('users/mail/to_new_user.txt', data)
-            email = Mail(
-                from_email='no-reply@%s' % current_site.domain,
-                to_emails=user.username,
-                subject='Omslagroute - je account aangemaakt',
-                plain_text_content=body
-            )
-            sg.send(email)
+            subject = 'Omslagroute - je account is aangemaakt'
+            message = render_to_string('users/mail/to_new_user.txt', data)
+            from_email = settings.FROM_EMAIL
+            to_emails = [user.username]
+            # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)
@@ -356,7 +350,7 @@ class UserDelete(UserPassesTestMixin, DeleteView):
     def test_func(self):
         return auth_test(self.request.user, BEHEERDER)
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         obj = self.get_object()
         obj.profile.delete()
         return super().delete(request, *args, **kwargs)

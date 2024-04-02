@@ -9,7 +9,7 @@
                 <span>{{ caseStatusPrefix }}{{ caseStatusOptions[currentCaseStatus.status].current }}</span>
                 <div class="status-container">
                     <div class="facts">
-                        <small>{{ currentCaseStatus.created | moment("DD-MM-YYYY HH:mm") }} </small><small class="u-float-right">{{ currentCaseStatus.username }}</small>
+                        <small>{{ formattedDate(currentCaseStatus.created) }} </small><small class="u-float-right">{{ currentCaseStatus.username }}</small>
                         <p>{{ currentCaseStatus.status_comment}}</p>
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                             </div>
                             <span class="helptext">Als je een bericht wil meesturen met in de bevestings e-mail, dan kun je dat hier doen.</span>
                             <div class="form-field form-field--buttons screen-only u-margin-top-2x">
-                                <button type="button" class="button button--secondary" v-on:click="setNextStatus(null)" data-handler="modal-close">Annuleren</button>
+                                <button type="button" class="button button--secondary u-margin-right" v-on:click="setNextStatus(null)" data-handler="modal-close">Annuleren</button>
                                 <button type="button" class="button button--primary"  v-on:click="addCaseStatus()">{{ getButtonText(nextCaseStatus.status) }}</button>
                             </div>
                         </form>
@@ -72,7 +72,7 @@
                                     <small class="status">{{caseStatusOptions[h.status].current }}</small>
                                     <div class="facts">
                                         <div class="u-clearfix">
-                                            <small>{{ h.created | moment("DD-MM-YYYY HH:mm") }} </small><small class="u-float-right">{{ h.username }}</small>
+                                            <small>{{ formattedDate(h.created) }} </small><small class="u-float-right">{{ h.username }}</small>
                                         </div>
                                         <p>{{ h.status_comment}}</p>
                                     </div>
@@ -88,6 +88,7 @@
 
 <script>
 import axios from "axios";
+import dayjs from 'dayjs';
 
 export default {
 
@@ -156,6 +157,9 @@ export default {
         this.getInitialData();
     },
     methods: {
+        formattedDate(date) {
+            return dayjs(date).format("DD-MM-YYYY HH:mm")
+        },
         getCaseStatusOptions(){
             return Object.keys(this.caseStatusOptions).reduce((a, b, c) => {
                 if (b !== '1' && b !== String(this.currentCaseStatus.status)){
@@ -174,7 +178,7 @@ export default {
             return this.historyClass[status];
         },
         setButtonClass: function(status){
-            return (this.buttonClass[status] + (this._data.currentCaseStatus.status !== 1 ? ' button--secondary': ''));
+            return (this.buttonClass[status] + (this.currentCaseStatus.status !== 1 ? ' button--secondary': ''));
         },
         setNextStatus: function(status){
             this.nextCaseStatus.status = status;

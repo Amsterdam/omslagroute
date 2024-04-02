@@ -7,20 +7,19 @@ from web.timeline.models import *
 from web.documents.models import *
 from web.organizations.models import *
 from django.urls import reverse_lazy
-import sendgrid
-from sendgrid.helpers.mail import *
+from django.core.mail import send_mail
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from .utils import *
 from django.contrib.auth.decorators import user_passes_test
 from django.core.management import call_command
 from django.http import HttpResponse
 from web.users.statics import BEHEERDER
-from web.organizations.statics import FEDERATION_TYPE_ADW, FEDERATION_TYPE_ZORGINSTELLING
+from web.organizations.statics import FEDERATION_TYPE_ZORGINSTELLING
 from web.users.auth import auth_test
 from web.cases.statics import *
 from web.cases.models import Case, CaseStatus
-import datetime
+from datetime import timedelta, datetime
+from django.utils import timezone
 import calendar
 
 
@@ -52,11 +51,11 @@ class VariablesView(UserPassesTestMixin, TemplateView):
         return self.request.user.is_superuser
 
     def get_context_data(self, **kwargs):
-        l = [[k, v] for k, v in os.environ.items()]
-        l = sorted(l)
+        list_items = [[k, v] for k, v in os.environ.items()]
+        list_items = sorted(list_items)
 
         kwargs.update({
-            'var_list': dict(l),
+            'var_list': dict(list_items),
         })
         return super().get_context_data(**kwargs)
 
@@ -93,16 +92,11 @@ class SendMailView(UserPassesTestMixin, RedirectView):
     def get(self, request, *args, **kwargs):
         mailadres = request.GET.get('mailadres')
         if mailadres:
-            current_site = get_current_site(self.request)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='noreply@%s' % current_site.domain,
-                to_emails=mailadres,
-                subject='Omslagroute - mail',
-                plain_text_content='Het werkt!'
-            )
-
-            sg.send(email)
+            subject = 'Omslagroute - mail',
+            from_email = settings.FROM_EMAIL
+            to_emails = [mailadres]
+            message = 'Het versturen van een mail werkt!'
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         return super().get(request, *args, **kwargs)
 
@@ -114,25 +108,30 @@ class DataView(UserPassesTestMixin, TemplateView):
         return auth_test(self.request.user, [BEHEERDER])
 
     def get_context_data(self, **kwargs):
-        month = datetime.datetime.now().strftime('%m')
-        year = datetime.datetime.now().strftime('%Y')
+        current_datetime = timezone.now()
+        month = current_datetime.strftime('%m')
+        year = current_datetime.strftime('%Y')
         monthrange = calendar.monthrange(int(year), int(month))
         try:
             monthrange = calendar.monthrange(int(self.request.GET.get('jaar')), int(self.request.GET.get('maand')))
             month = self.request.GET.get('maand')
             year = self.request.GET.get('jaar')
-            
-        except:
-            print('querystring params wrong format')
-        start_month = datetime.datetime(year=int(year), month=int(month), day=1)
-        end_month = datetime.datetime(year=int(year), month=int(month), day=monthrange[1]) + datetime.timedelta(days=1)
+        except (ValueError, TypeError) as e:
+            print(f'querystring params wrong format: {e}')
+
         data = []
         zorginstelling_list = Federation.objects.filter(
             organization__federation_type=FEDERATION_TYPE_ZORGINSTELLING,
         )
         all_cases = Case.objects.all()
-        next_month = end_month.strftime('?jaar=%Y&maand=%m') if end_month < datetime.datetime.now() else None 
-        prev_month = (start_month - datetime.timedelta(days=1)).strftime('?jaar=%Y&maand=%m')
+
+        start_month_naive = datetime(year=int(year), month=int(month), day=1)
+        start_month = timezone.make_aware(start_month_naive)
+        end_month_naive = datetime(year=int(year), month=int(month), day=monthrange[1]) + timedelta(days=1)
+        end_month = timezone.make_aware(end_month_naive)
+
+        next_month = end_month.strftime('?jaar=%Y&maand=%m') if end_month < timezone.now() else None
+        prev_month = (start_month - timedelta(days=1)).strftime('?jaar=%Y&maand=%m')
 
         casestatus_period = CaseStatus.objects.filter(
             created__gt=start_month,
@@ -147,7 +146,6 @@ class DataView(UserPassesTestMixin, TemplateView):
                 created__gt=start_month,
                 created__lte=end_month,
             )
-
             casestatus_list = CaseStatus.objects.filter(
                 case__in=case_list,
             )
@@ -157,7 +155,6 @@ class DataView(UserPassesTestMixin, TemplateView):
             omklap = casestatus_list.filter(
                 form=CASE_VERSION_FORM_OMKLAP,
             )
-
             urgentie_ingediend = urgentie.filter(
                 status=CASE_STATUS_INGEDIEND,
             ).order_by('case__id', 'created').distinct('case__id')
@@ -170,8 +167,6 @@ class DataView(UserPassesTestMixin, TemplateView):
             omklap_goedgekeurd = omklap.filter(
                 status=CASE_STATUS_GOEDGEKEURD,
             ).order_by('case__id', '-created').distinct('case__id')
-
-
             urgentie_ingediend_period = casestatus_period.filter(
                 id__in=urgentie_ingediend.values_list('id', flat=True)
             )
@@ -202,6 +197,7 @@ class DataView(UserPassesTestMixin, TemplateView):
                 'omklap_goedgekeurd': omklap_goedgekeurd,
                 'omklap_goedgekeurd_period': omklap_goedgekeurd_period,
             })
+
         kwargs.update({
             'zorginstelling_list': data,
             'all_cases': all_cases,
@@ -210,7 +206,6 @@ class DataView(UserPassesTestMixin, TemplateView):
             'prev_month': prev_month,
         })
         return super().get_context_data(**kwargs)
-
 
 
 @user_passes_test(lambda u: u.is_superuser)

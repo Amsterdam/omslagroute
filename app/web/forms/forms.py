@@ -1,5 +1,5 @@
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .statics import FIELDS_DICT, FIELDS_REQUIRED_DICT
 from django.forms.utils import ErrorDict, ErrorList
 from django.utils.html import conditional_escape
@@ -165,7 +165,7 @@ class GenericModelForm(BaseGenericForm, forms.ModelForm):
         self.federation_types = form_config.get('federation_types', [])
         self.options = form_config.get('options', {})
         exclude_fields = self.options.get('exclude_fields', [])
-        
+
         for f in self._get_fields(self.sections):
             if f not in exclude_fields:
                 self.fields[f] = FIELDS_DICT.get(f)

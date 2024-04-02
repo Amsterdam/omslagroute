@@ -11,19 +11,9 @@ try:
 except ImportError:
     # Django < 2.0.0
     from django.core.urlresolvers import reverse
-from django.contrib.auth import BACKEND_SESSION_KEY
 from django.http import HttpResponseRedirect, JsonResponse
 from django.utils.crypto import get_random_string
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import cached_property
-from django.utils.module_loading import import_string
-
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend
-from mozilla_django_oidc.utils import (
-    absolutify,
-    import_from_settings,
-    is_authenticated
-)
+from mozilla_django_oidc.utils import absolutify
 
 
 LOGGER = logging.getLogger(__name__)
@@ -71,13 +61,15 @@ class SessionRefresh(DatapuntSessionRefresh):
             })
             request.session['oidc_nonce'] = nonce
 
-        request.session['oidc_states'] = {state:{'nonce':None}}
+        request.session['oidc_states'] = {state: {'nonce': None}}
         request.session['oidc_login_next'] = request.get_full_path()
 
         query = urlencode(params)
 
         redirect_url = '{url}?{query}'.format(url=auth_url, query=query)
-        if request.is_ajax():
+
+        if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            # This request is an AJAX request
             # Almost all XHR request handling in client-side code struggles
             # with redirects since redirecting to a page where the user
             # is supposed to do something is extremely unlikely to work

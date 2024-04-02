@@ -4,26 +4,18 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import SuspiciousOperation
 from keycloak_oidc.auth import OIDCAuthenticationBackend as DatapuntOIDCAuthenticationBackend
 from mozilla_django_oidc.utils import absolutify
 import logging
-from .statics import BEHEERDER
-from web.core.utils import validate_email_wrapper
 from web.organizations.models import Federation
-import sendgrid
 from django.contrib.sites.shortcuts import get_current_site
-from django.conf import settings
-from sendgrid.helpers.mail import Mail
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.urls import reverse
+
 LOGGER = logging.getLogger(__name__)
-try:
-    from django.urls import reverse
-except ImportError:
-    # Django < 2.0.0
-    from django.core.urlresolvers import reverse
 
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, user_type=None):
@@ -58,7 +50,7 @@ def auth_test(user, user_type):
     if not hasattr(user, 'profile'):
         return False
     if isinstance(user_type, list):
-         return hasattr(user, 'user_type_values') and any(role in user.user_type_values for role in user_type)
+        return hasattr(user, 'user_type_values') and any(role in user.user_type_values for role in user_type)
     return hasattr(user, 'user_type_values') and user_type in user.user_type_values
 
 
@@ -69,7 +61,6 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
             settings.OIDC_FEDERATION_KEY: payload.get(settings.OIDC_FEDERATION_KEY)
         })
         return userinfo
-
 
     def create_user(self, claims):
         user = super().create_user(claims)
@@ -93,21 +84,17 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
             if federatie_beheerder_recipient_list:
                 beheerder_recipient_list = federatie_beheerder_recipient_list
 
-        if settings.SENDGRID_KEY and beheerder_recipient_list:
+        if settings.EMAIL_HOST_USER and beheerder_recipient_list:
             current_site = get_current_site(self.request)
             data = {
                 'site': current_site.domain,
                 'url': reverse('update_user', kwargs={'pk': user.id})
             }
-            body = render_to_string('users/mail/gebruikers_beheerders_new_user.txt', data)
-            sg = sendgrid.SendGridAPIClient(settings.SENDGRID_KEY)
-            email = Mail(
-                from_email='no-reply@%s' % current_site.domain,
-                to_emails=beheerder_recipient_list,
-                subject='Omslagroute - gebruiker aangemaakt',
-                plain_text_content=body
-            )
-            sg.send(email)
+            subject = 'Omslagroute - gebruiker aangemaakt'
+            message = render_to_string('users/mail/gebruikers_beheerders_new_user.txt', data)
+            from_email = settings.FROM_EMAIL
+            to_emails = beheerder_recipient_list
+            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         return user
 

@@ -1,8 +1,12 @@
 Beste {{ invited.first_name }},
+
 Je bent door de medewerker met het email adres '{{ user.username }}' toegevoegd aan het team van medewerkers voor een cliënt in de omslagroute.
+
 Als je bent ingelogd kun je deze cliënt met de onderstaande url beheren.
+
 {{ case_url}}{% if message %}
 
 De medewerker die je heeft uitgenodigd heeft het volgende bericht meegestuurd:
+
 {{ message|safe }}
 {% endif %}

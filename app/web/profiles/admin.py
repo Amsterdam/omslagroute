@@ -22,3 +22,4 @@ class ProfileAdminForm(forms.ModelForm):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('id', 'user',)
     form = ProfileAdminForm
+    search_fields = ["user__username", "user__first_name", "user__last_name", "user__email"]
