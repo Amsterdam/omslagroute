@@ -11,9 +11,12 @@ Start the dev server for local development:
 docker-compose up
 ```
 
-Go to http://localhost:8088/
+Create superuser:
+```
+python manage.py initadmin --settings settings.settings --username <EMAIL> --password <PASSWORD>
+```
 
-Initial user and password in docker-compose.
+Go to http://localhost:8088/
 
 For the admin interface:
 http://localhost:8088/admin/
@@ -49,4 +52,3 @@ docker-compose exec web python manage.py migrate
 The city of Amsterdam has developed a [design system](https://designsystem.amsterdam.nl/7awj1hc9f/p/39359e-design-system). Not all patterns have been built, they are built as soon as they become applicable. Ask colleagues through the OIS Slack #frontend channel.
 
 The documentation for (React) components based on elements from the design system can be found in the [storybook](https://amsterdam.github.io/amsterdam-styled-components/?path=/story/experimental-atoms-accordion--single-accordion-with-paragraph) pages of the [Amsterdam Styled Components repository](https://github.com/Amsterdam/amsterdam-styled-components/tree/master/.storybook).
-

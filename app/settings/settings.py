@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'wsgi.application'
 
 # Email SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smr.amsterdam.nl'
+EMAIL_HOST = 'prd.mail-relay.secumailer.cloud'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
@@ -374,9 +374,12 @@ BRK_API_OBJECT_EXPAND_URL = 'https://acc.api.data.amsterdam.nl/brk/object-expand
 
 BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
-AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
-DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
-THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
-# AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
-AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
+
+if AZURE_CONTAINER:
+    AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
+    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+    THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
+
+    # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+    AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
