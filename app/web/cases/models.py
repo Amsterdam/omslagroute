@@ -963,11 +963,14 @@ class CaseBase(PrintableModel):
         )
 
     def __str__(self):
-        if self.client_first_name:
+        if self.client_first_name and self.client_last_name:
+            return f"{self.client_first_name} {self.client_last_name}"
+        elif self.client_first_name:
             return self.client_first_name
-        if self.client_last_name:
+        elif self.client_last_name:
             return self.client_last_name
-        return '%s' % self.id
+        else:
+            return str(self.id)
 
     class Meta:
         abstract = True
