@@ -4,12 +4,12 @@ from datetime import timedelta
 # flake8: noqa
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
-from .azure_settings_storage import AzureStorage
+
 from opencensus.trace import config_integration
 from azure.identity import WorkloadIdentityCredential
 
 azure = Azure()
-azureStorage = AzureStorage()
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 config_integration.trace_integrations(['requests', 'logging', 'postgresql'])
