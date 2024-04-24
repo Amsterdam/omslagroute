@@ -11,7 +11,7 @@ cffi==1.16.0
 chardet==5.2.0
 click==8.1.7
 coverage==7.4.0
-cryptography==42.0.2
+cryptography==42.0.4
 datapunt-keycloak-oidc @ git+https://github.com/remyvdwereld/keycloak_oidc.git@5420da523be0cc195efac7f0553b24dcda554418
 debtcollector==2.5.0
 decorator==5.1.1
