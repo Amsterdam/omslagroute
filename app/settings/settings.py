@@ -1,14 +1,18 @@
 import os
 from os.path import join
 from datetime import timedelta
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 # flake8: noqa
 from keycloak_oidc.default_settings import *
+from .azure_settings import Azure
 
+from opencensus.trace import config_integration
+from azure.identity import WorkloadIdentityCredential
+
+azure = Azure()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
+config_integration.trace_integrations(['requests', 'logging', 'postgresql'])
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -58,6 +62,7 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'opencensus.ext.django.middleware.OpencensusMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('DJANGO_ROOT_URLCONF', 'web.urls')
@@ -72,21 +77,13 @@ WSGI_APPLICATION = 'wsgi.application'
 
 # Email SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smr.amsterdam.nl'
+EMAIL_HOST = 'prd.mail-relay.secumailer.cloud'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 FROM_EMAIL = 'no-reply@amsterdam.nl'
 
-# Error logging through Sentry
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN", ""),
-    integrations=[DjangoIntegration(), ],
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
 
 ADMINS = (
     ('admin', 'name@email.com'),
@@ -96,26 +93,29 @@ AUTH_USER_MODEL = 'users.User'
 
 
 # Database
-DEFAULT_DATABASE_NAME = 'default'
+DATABASE_HOST = os.getenv("DATABASE_HOST", "database")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "dev")
+DATABASE_USER = os.getenv("DATABASE_USER", "dev")
+DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "dev")
+DATABASE_PORT = os.getenv("DATABASE_PORT", "5432")
+DATABASE_OPTIONS = {'sslmode': 'allow', 'connect_timeout': 5}
 
-if os.environ.get('DATABASE_NAME'):
-    DATABASES = {
-        DEFAULT_DATABASE_NAME: {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'USER': os.environ.get('DATABASE_USER'),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-            'HOST': os.environ.get('DATABASE_HOST', 'database'),
-            'PORT': '5432',
-        }
-    }
-else:
-    DATABASES = {
-        DEFAULT_DATABASE_NAME: {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+if 'azure.com' in DATABASE_HOST:
+    DATABASE_PASSWORD = azure.auth.db_password
+    DATABASE_OPTIONS['sslmode'] = 'require'
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": DATABASE_NAME,
+        "USER": DATABASE_USER,
+        "PASSWORD": DATABASE_PASSWORD,
+        "HOST": DATABASE_HOST,
+        "CONN_MAX_AGE": 60 * 5,
+        "PORT": DATABASE_PORT,
+        'OPTIONS': {'sslmode': 'allow', 'connect_timeout': 5},
+    },
+}
 
 
 # General
@@ -277,6 +277,8 @@ if os.environ.get("IAM_URL"):
     AUTHENTICATION_BACKENDS = [
         'web.users.auth.OIDCAuthenticationBackend',
     ]
+
+    #TODO Can probably be removed because it is defined twice, needs to be tested
     MIDDLEWARE = (
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
@@ -287,6 +289,7 @@ if os.environ.get("IAM_URL"):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'opencensus.ext.django.middleware.OpencensusMiddleware',
     )
     LOGIN_URL_NAME = 'oidc_authentication_callback'
     LOGOUT_URL_NAME = 'oidc_logout'
@@ -294,24 +297,52 @@ if os.environ.get("IAM_URL"):
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'sentry': {
-            'level': 'ERROR',  # Log errors and above to Sentry
-            'class': 'sentry_sdk.integrations.logging.EventHandler',
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
+    "version": 1,
+    "disable_existing_loggers": True,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "level": "INFO"},
+        "celery": {
+            "level": "INFO",
+            "class": "logging.StreamHandler"
         },
     },
-    'root': {
-        'handlers': ['sentry', 'console'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO"
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": True,
+        }
     },
 }
 
+APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"
+)
+
+if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    OPENCENSUS = {
+        "TRACE": {
+            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
+            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+        }
+    }
+    LOGGING["handlers"]["azure"] = {
+        "level": "DEBUG",
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
+    }
+    LOGGING["root"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"]["django"]["handlers"] = ["azure", "console"]
+    LOGGING["loggers"][""]["handlers"] = ["azure", "console"]
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -343,19 +374,12 @@ BRK_API_OBJECT_EXPAND_URL = 'https://acc.api.data.amsterdam.nl/brk/object-expand
 
 BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
-# swift storage
-if os.environ.get("SWIFT_AUTH_URL"):
-    SWIFT_BASE_URL = 'https://%s.%s' % (os.environ.get("SWIFT_PROJECT_ID"), os.environ.get("SWIFT_EXTERNAL_DOMAIN"))
-    SWIFT_AUTH_URL = os.environ.get("SWIFT_AUTH_URL")
-    SWIFT_USERNAME = os.environ.get("SWIFT_USER")
-    SWIFT_PASSWORD = os.environ.get("SWIFT_PASSWORD")
-    SWIFT_TENANT_ID = os.environ.get("SWIFT_TENANT")
-    SWIFT_TEMP_URL_KEY = os.environ.get("SWIFT_TEMP_URL_KEY")
-    SWIFT_TEMP_URL_DURATION = os.environ.get("SWIFT_TEMP_URL_DURATION", 30)
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
 
-    SWIFT_USE_TEMP_URLS = os.environ.get("SWIFT_USE_TEMP_URLS", 'True') == 'True'
-    SWIFT_CONTAINER_NAME = os.environ.get("SWIFT_CONTAINER_NAME", 'media_private')
-    DEFAULT_FILE_STORAGE = 'web.core.storage.SwiftStorage'
-    THUMBNAIL_DEFAULT_STORAGE = 'web.core.storage.SwiftStorage'
+if AZURE_CONTAINER:
+    AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
+    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+    THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 
-    CORS_ORIGIN_WHITELIST = [SWIFT_BASE_URL, ]
+    # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
+    AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
