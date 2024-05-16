@@ -11,6 +11,7 @@ class ProfileAdminForm(forms.ModelForm):
         queryset=Case.objects.all(),
         widget=FilteredSelectMultiple(_('Cliënten'), is_stacked=False),
         label=_('Cliënten'),
+        required=False,
     )
 
     class Meta:

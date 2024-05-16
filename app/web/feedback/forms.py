@@ -2,7 +2,6 @@ from django import forms
 from captcha.fields import CaptchaField
 
 
-
 class FeedbackForm(forms.Form):
     name = forms.CharField(
         required=False,
