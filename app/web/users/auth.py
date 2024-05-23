@@ -100,6 +100,9 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
 
     def update_user_federation(self, user, claims):
         federation_id = claims.get(settings.OIDC_FEDERATION_KEY, settings.OIDC_FEDERATION_DEFAULT)
+        federation_test_id = claims.get("federation_test_id")
+        print(f"User {user.email} authenticates with federation {federation_test_id}")
+        LOGGER.info(f"User {user.email} authenticates with federation {federation_test_id}")
         user.federation, created = Federation.objects.get_or_create(
             federation_id=federation_id,
             defaults={'name': federation_id},
