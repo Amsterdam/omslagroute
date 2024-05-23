@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 from .statics import *
 from web.organizations.statics import (
     FEDERATION_TYPE_ADW,
@@ -43,20 +43,14 @@ class UserManager(BaseUserManager):
     def beheerders(self):
         queryset = self.get_queryset()
         queryset = queryset.filter(
-            user_type__in=[
-                BEHEERDER,
-            ],
+            user_type__contains=BEHEERDER
         )
         return queryset
 
     def federation_beheerders_by_federation(self, federation, federation_type):
         queryset = self.get_queryset()
         queryset = queryset.filter(
-            user_type__in=[
-                PB_FEDERATIE_BEHEERDER,
-                FEDERATIE_BEHEERDER,
-                WONEN,
-            ],
+            Q(user_type__contains=PB_FEDERATIE_BEHEERDER) | Q(user_type__contains=FEDERATIE_BEHEERDER) | Q(user_type__contains=WONEN),
             federation=federation,
             federation__organization__federation_type=federation_type,
         )
@@ -65,7 +59,7 @@ class UserManager(BaseUserManager):
     def woningcorporatie_medewerkers(self, case):
         queryset = self.get_queryset()
         queryset = queryset.filter(
-            user_type__in=[WONINGCORPORATIE_MEDEWERKER],
+            user_type__contains=WONINGCORPORATIE_MEDEWERKER,
             federation__organization__federation_type=FEDERATION_TYPE_WONINGCORPORATIE,
             federation=case.woningcorporatie,
         )
@@ -87,4 +81,3 @@ class UserManager(BaseUserManager):
             federation__organization__federation_type=FEDERATION_TYPE_ADW,
         )
         return queryset
-
