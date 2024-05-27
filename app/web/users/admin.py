@@ -10,7 +10,10 @@ from django.shortcuts import render
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'profile_link', 'is_staff', 'is_superuser', 'user_type', 'federation')
+    list_display = (
+        'username', 'email', 'profile_link', 'is_staff', 'is_superuser',
+        'user_type', 'federation', 'date_joined', 'last_login'
+    )
     save_on_top = True
     fieldsets = (
         (None, {'fields': ('username', 'password')}),

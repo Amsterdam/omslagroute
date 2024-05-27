@@ -8,11 +8,11 @@
 
 Start the dev server for local development:
 ```bash
-docker-compose up
+docker-compose -f docker-compose.local.yml up
 ```
 
 Create superuser:
-```
+```bash
 python manage.py initadmin --settings settings.settings --username <EMAIL> --password <PASSWORD>
 ```
 
@@ -26,7 +26,7 @@ http://localhost:8088/admin/
 
 To rebuild (for example, when dependencies are added requirements.txt):
 ```bash
-docker-compose build
+docker-compose -f docker-compose.local.yml build
 ```
 
 Start watching static files changes scss:
