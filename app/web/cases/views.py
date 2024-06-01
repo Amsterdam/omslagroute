@@ -1000,7 +1000,18 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
+        case = self.instance
         for user in form.cleaned_data.get('user_list'):
+            # Check if there are other profiles with this case
+            profiles_with_case_count = Profile.objects.filter(cases=case).count()
+            # If there is just 1 user or less with this case in his profile, do not remove this case (yet).
+            # If you delete this case from this profile, there will no longer be a relation between a user and this case.
+            # To prevent a floating case, add this case to the current user (Probably PB & Organisatie beheerder).
+            if profiles_with_case_count <= 1:
+                # Check if the currently logged in user has this case in their profile.
+                current_user_cases = self.request.user.profile.cases
+                if not current_user_cases.filter(pk=case.pk).exists():
+                    current_user_cases.add(case)
             user.profile.cases.remove(self.instance)
 
         if settings.EMAIL_HOST_USER:
