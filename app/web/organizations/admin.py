@@ -19,7 +19,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 
     class Media:
         css = {
-            'all': ('static/custom_admin.css',)
+            'all': ('admin_css/custom_admin.css',)
         }
 
 
