@@ -13,6 +13,7 @@ class Profile(models.Model):
     cases = models.ManyToManyField(
         to='cases.Case',
         verbose_name=_('Cliënten'),
+        related_name='profiles',  # Explicit reverse relation name
         blank=True,
     )
 
