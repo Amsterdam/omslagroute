@@ -7,6 +7,7 @@ from .azure_settings import Azure
 
 from opencensus.trace import config_integration
 from azure.identity import WorkloadIdentityCredential
+from opencensus.ext.azure.trace_exporter import AzureExporter
 
 azure = Azure()
 
@@ -296,28 +297,30 @@ if os.environ.get("IAM_URL"):
     LOGIN_URL = '/oidc/authenticate/'
 
 
+LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "WARNING")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "level": "INFO"},
+        "console": {"class": "logging.StreamHandler", "level": LOGGING_LEVEL},
         "celery": {
-            "level": "INFO",
+            "level": LOGGING_LEVEL,
             "class": "logging.StreamHandler"
         },
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO"
+        "level": LOGGING_LEVEL
     },
     "loggers": {
         "django": {
             "handlers": ["console"],
-            "level": "INFO",
+            "level": LOGGING_LEVEL,
             "propagate": True,
         },
         "": {
-            "level": "INFO",
+            "level": LOGGING_LEVEL,
             "handlers": ["console"],
             "propagate": True,
         }
@@ -329,14 +332,26 @@ APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
 )
 
 if APPLICATIONINSIGHTS_CONNECTION_STRING:
+    # Only log queries when in DEBUG due to high cost
+    def filter_traces(envelope):
+        if LOGGING_LEVEL == "DEBUG":
+            return True
+        log_data = envelope.data.baseData
+        if 'query' in log_data["name"].lower():
+            return False
+        if log_data["name"] == "GET /":
+            return False
+        return True
+    exporter = AzureExporter(connection_string=APPLICATIONINSIGHTS_CONNECTION_STRING)
+    exporter.add_telemetry_processor(filter_traces)
     OPENCENSUS = {
         "TRACE": {
             "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
-            "EXPORTER": f"opencensus.ext.azure.trace_exporter.AzureExporter(connection_string='{APPLICATIONINSIGHTS_CONNECTION_STRING}')",
+            "EXPORTER": exporter,
         }
     }
     LOGGING["handlers"]["azure"] = {
-        "level": "DEBUG",
+        "level": LOGGING_LEVEL,
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
         "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
     }
