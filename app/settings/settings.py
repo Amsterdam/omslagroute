@@ -36,7 +36,6 @@ INSTALLED_APPS = (
     'keycloak_oidc',
     'corsheaders',
     'captcha',                  # captcha for feedback form
-
     'web.core',
     'web.documents',
     'web.timeline',
