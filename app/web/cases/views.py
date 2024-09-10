@@ -964,6 +964,95 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
         return HttpResponseRedirect(self.get_success_url())
 
 
+class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
+    model = Case
+    template_name = 'cases/case_invite_cross_federation.html'
+    form_class = CaseInviteUsersCrossFederationForm
+    success_url = reverse_lazy('cases_by_profile')
+    instance = None
+    form_list = [
+        CaseInviteUsersCrossFederationForm,
+        CaseInviteUsersConfirmForm,
+    ]
+
+    def get_success_url(self):
+        return '%s?iframe=true' % reverse('case', kwargs={'pk': self.instance.id})
+
+    def get_all_users(self):
+        return User.objects.filter(
+            profile__isnull=False,
+        ).exclude(id=self.request.user.id)
+
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step=step)
+        self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
+        kwargs.update({
+            'queryset': []
+        })
+        return kwargs
+
+    def get_queryset(self):
+        return self.model._default_manager.by_user(user=self.request.user)
+
+    def test_func(self):
+        return auth_test(self.request.user, [BEGELEIDER, PB_FEDERATIE_BEHEERDER])
+
+    def get_context_data(self, **kwargs):
+        self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
+        kwargs.update({
+            'instance': self.instance,  # For the client/case name
+        })
+        kwargs = super().get_context_data(**kwargs)
+        return kwargs
+
+    def done(self, form_list, **kwargs):
+        form_data = {}
+        for f in form_list:
+            form_data.update(f.cleaned_data)
+
+        # Get email input from form
+        user_email_cross_federation = form_data.get('user_email_cross_federation')
+        queryset = self.get_all_users().filter(
+            email=user_email_cross_federation
+        )
+        invited_user = queryset.first()
+
+        # Check if user exists
+        if not invited_user:
+            messages.add_message(self.request, messages.ERROR, "Er is geen gebruiker met dit e-mailadres gevonden.")
+            return HttpResponseRedirect(self.get_success_url())
+
+        # Check if user has role BEGELEIDER or PB_FEDERATIE_BEHEERDER
+        if BEGELEIDER not in invited_user.user_type_values and PB_FEDERATIE_BEHEERDER not in invited_user.user_type_values:
+            messages.add_message(self.request, messages.ERROR, "De persoon met wie u wilt samenwerken is geen persoonlijk begeleider.")
+            return HttpResponseRedirect(self.get_success_url())
+
+        # Add client/case to profile
+        invited_user.profile.cases.add(self.instance)
+
+        if settings.EMAIL_HOST_USER:
+            current_site = get_current_site(self.request)
+            context = {}
+            context.update(form_data)
+            context.update({
+                'case': self.instance,
+                'user': self.request.user,
+                'invited': invited_user,
+                'case_url': 'https://%s%s' % (
+                    current_site.domain,
+                    reverse('case', kwargs={'pk': self.instance.id})
+                ),
+            })
+            body = render_to_string('cases/mail/invite.txt', context)
+            subject = 'Omslagroute - je bent toegevoegd aan een team'
+            from_email = settings.FROM_EMAIL
+            to_emails = [invited_user.email]
+            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+
+        messages.add_message(self.request, messages.INFO, "De gebruiker is toegevoegd en heeft een e-mail gekregen met een uitnodiging.")
+        return HttpResponseRedirect(self.get_success_url())
+
+
 class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
     model = Case
     template_name = 'cases/case_remove_invited.html'
@@ -979,7 +1068,6 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
     def get_user_options(self):
         instance = self.model.objects.get(id=self.kwargs.get('pk'))
         return self.get_all_users().filter(
-            federation=self.request.user.federation,
             profile__in=instance.profile_set.all(),
         )
 
