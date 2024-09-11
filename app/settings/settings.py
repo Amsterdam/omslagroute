@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'web.profiles',
     'web.forms',
     'web.feedback',
+    'web.alerts',
 
 )
 SOURCE_COMMIT = os.environ.get('COMMIT_HASH')
@@ -158,6 +159,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'web.core.context_processors.app_settings',
+                'web.alerts.context_processors.alerts_processor',
             ],
             # 'loaders': [
             #     ('django.template.loaders.cached.Loader', [

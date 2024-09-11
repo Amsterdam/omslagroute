@@ -41,19 +41,19 @@ docker-compose -f docker-compose.local.yml build
 Start watching static files changes scss:
 
 ```bash
-docker-compose exec web ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass --watch
+docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass --watch
 ```
 
 Start watching static files changes js, vue:
 
 ```bash
-docker-compose exec web ./node_modules/.bin/webpack --config webpack.config.js --watch
+docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/webpack --config webpack.config.js --watch
 ```
 
 Migrate database without restarting containers:
 
 ```bash
-docker-compose exec web python manage.py migrate
+docker-compose -f docker-compose.local.yml exec omslagroute python manage.py migrate
 ```
 
 # Styling resources
