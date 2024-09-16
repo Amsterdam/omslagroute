@@ -180,3 +180,14 @@ footer {
     top: 0;
     transition: margin-top .3s ease-in-out;
 }
+
+.alert-wrapper {
+    width: 100%;
+}
+
+.alert-message {
+    padding: 15px;
+    background-color: #FF9100;
+    color: white;
+    text-align: center;
+}

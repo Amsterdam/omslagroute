@@ -42,6 +42,16 @@
 </head>
 <body>
 
+{% if alerts %}
+    <div class="alert-wrapper">
+        {% for alert in alerts %}
+            <div class="alert-message">
+                <strong>{{ alert.message|safe }}</strong> 
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="site-container">
     {% include 'svg-sprite.html' %}
     {% block skiplinks %}
@@ -90,6 +100,7 @@
                 {% endif %}
             </div>
         </header>
+
         {% include 'users/user_type_menus.html' %}
         {% block messages %}
             <ul class="alert-container screen-only">
