@@ -879,8 +879,8 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
 
     def get_all_users(self):
         return User.objects.filter(
+            Q(user_type__contains=PB_FEDERATIE_BEHEERDER) | Q(user_type__contains=BEGELEIDER),
             profile__isnull=False,
-            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):
@@ -1061,8 +1061,8 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
 
     def get_all_users(self):
         return User.objects.filter(
+            Q(user_type__contains=PB_FEDERATIE_BEHEERDER) | Q(user_type__contains=BEGELEIDER),
             profile__isnull=False,
-            user_type__contains=BEGELEIDER
         ).exclude(id=self.request.user.id).order_by('federation', 'username')
 
     def get_user_options(self):
