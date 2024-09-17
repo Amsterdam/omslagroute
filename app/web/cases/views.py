@@ -36,6 +36,7 @@ from web.users.utils import get_zorginstelling_medewerkers_email_list, filter_va
 from operator import or_
 from django.utils import timezone
 from django.http.response import HttpResponse
+import mimetypes  
 
 logger = logging.getLogger(__name__)
 
@@ -1286,14 +1287,37 @@ def download_document(request, case_pk, document_pk):
         response = HttpResponse(file.read(), content_type='application/octet-stream')
         response['Content-Disposition'] = f'attachment; filename="{document.uploaded_file.name}"'
         return response
+    
 
+@user_passes_test(auth_test, user_type=[WONEN, BEGELEIDER, PB_FEDERATIE_BEHEERDER, WONINGCORPORATIE_MEDEWERKER])
+def view_document(request, case_pk, document_pk):
+    qs = Case._default_manager.by_user(user=request.user)
+    case = qs.filter(pk=case_pk).first()
+    if not case:
+        raise PermissionDenied
+    document = get_object_or_404(Document, id=document_pk)
+    
+    if any(user_type in [WONEN, WONINGCORPORATIE_MEDEWERKER] for user_type in request.user.user_type_values):
+        form_status_list = [f[0] for f in case.casestatus_set.all().order_by('form').distinct().values_list('form')]
+        shared_in_forms = [f for f in document.forms if f in form_status_list]
+        if not shared_in_forms:
+            raise PermissionDenied
 
+    if document.case != case:
+        raise PermissionDenied
 
+    if not default_storage.exists(default_storage.generate_filename(document.uploaded_file.name)):
+        raise Http404()
 
+    # Open the file and adjust the content type to match the file type
+    with default_storage.open(document.uploaded_file.name, 'rb') as file:
+        file_data = file.read()
 
+    # Guess the MIME type of the file based on its name
+    content_type = mimetypes.guess_type(document.uploaded_file.name)[0] or 'application/octet-stream'
 
-
-
-
-
-
+    # Set Content-Disposition to inline for browser preview
+    response = HttpResponse(file_data, content_type=content_type)
+    response['Content-Disposition'] = f'inline; filename="{document.uploaded_file.name}"'
+    
+    return response

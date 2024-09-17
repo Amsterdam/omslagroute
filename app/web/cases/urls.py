@@ -34,4 +34,5 @@ urlpatterns = [
     path('<int:case_pk>/verwijder-bijlage/<int:pk>/', DocumentDelete.as_view(), name='delete_case_document'),
 
     path('<int:case_pk>/download-bijlage/<int:document_pk>', download_document, name='download_case_document'),
+    path('<int:case_pk>/bekijk-bijlage/<int:document_pk>', view_document, name='view_case_document'),
 ]
