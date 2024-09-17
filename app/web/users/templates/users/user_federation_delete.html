@@ -14,9 +14,9 @@
 
 {% block main %}
     <h2>Gebruiker verwijderen</h2>
-    <p class="u-margin-bottom-2x">Weet je zeker dat de gebruiker '{{ object.username }}' wilt verwijderen?</p>
+    <p class="u-margin-bottom-2x">Weet je zeker dat je gebruiker <strong>'{{ object.username }}'</strong> wilt verwijderen?</p>
     {% if cases %}
-    <p>De onderstaande cliënten hebben na het verwijderen van deze gebruiker geen persoonlijk begeleider meer in de omslagroute.</p>
+    <p>De onderstaande cliënten hebben na het verwijderen van deze gebruiker geen persoonlijk begeleider meer in de omslagroute en zullen aan jou worden toegekend.</p>
     <ul>
     {% for case in cases %}
         <li>cliënt id: {{ case.id }}</li>
