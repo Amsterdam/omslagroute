@@ -103,9 +103,17 @@
             {% if document_list %}
             {% for document in document_list %}
                 <li>
-                    <div><a href="{% url 'download_case_document' object.id document.id %}
-                    " target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span></div>
-
+                    <div>
+                        <a href="{% url 'view_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer">
+                            <span>{{ document.name }}</span>
+                        </a> 
+                        <span>{{ document.extension }}</span>
+                        <span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span>
+                        <a href="{% url 'download_case_document' object.id document.id %}" title="Bijlage downloaden" target="_blank" rel="noopener noreferrer" class="u-margin-right u-color-black" >
+                            <svg class="button__icon"  width="20" height="20" >
+                                <use href="#download" xlink:href="#download"  width="20" height="20"></use>
+                            </svg></a>
+                    </div>
                 </li>
             {% endfor %}
             {% else %}
