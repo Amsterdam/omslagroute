@@ -156,28 +156,44 @@
             {% for document in object.document_set.all %}
                 {% if forloop.counter0 < 4 %}
                     <li>
-                        <div><a href="{% url 'download_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a> <span>{{ document.extension }}</span><span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span></div>
-                        {% if not object.delete_request_date %}
                         <div>
-
-                            <button type="button" title="Bijlage aanpassen" class="text-link u-margin-top-none" data-handler="modal" data-contentid="modalDocumentUpdate-{{ document.id }}">
-                                <span><svg class="button__icon"  width="20" height="20" >
-                                    <use href="#edit-document" xlink:href="#edit-document"  width="20" height="20"></use>
-                                </svg></span>
-                            </button>
-                            <div role="dialog" class="modal" id="modalDocumentUpdate-{{ document.id }}">
-                                <iframe class="modal--update-document" id="iFrameDocumentUpdate-{{ document.id }}" data-src="{% url 'update_case_document' object.id document.id %}" src="about:blank" title="Bijlage {{ document.name }} aanpassen"></iframe>
-                            </div>
-                            <button type="button" title="Bijlage verwijderen" class="text-link u-margin-top-none" data-handler="modal" data-contentid="modalDocumentDelete-{{ document.id }}">
-                                <svg class="button__icon"  width="20" height="20" >
-                                    <use href="#trash" xlink:href="#trash"  width="20" height="20"></use>
-                                </svg>
-                            </button>
-                            <div role="dialog" class="modal" id="modalDocumentDelete-{{ document.id }}">
-                                <iframe class="modal--delete-document" id="iFrameDocumentDelete-{{ document.id }}" data-src="{% url 'delete_case_document' object.id document.id %}" src="about:blank" title="Verwijder bijlage {{ document.name }}"></iframe>
-                            </div>
+                            <a href="{% url 'view_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer">
+                                <span>{{ document.name }}</span>
+                            </a> 
+                            <span>{{ document.extension }}</span>
+                            <span> {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }} </span>
                         </div>
+
+                        {% if not object.delete_request_date %}
+                            <div>
+                                <a class="grid__wrapper" href="{% url 'download_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer">
+                                    <button type="button" title="Bijlage downloaden" class="text-link u-margin-top-none">
+                                        <span>
+                                            <svg class="button__icon"  width="20" height="20" >
+                                                <use href="#download" xlink:href="#download"  width="20" height="20"></use>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </a>
+                                <button type="button" title="Bijlage aanpassen" class="text-link u-margin-top-none" data-handler="modal" data-contentid="modalDocumentUpdate-{{ document.id }}">
+                                    <span><svg class="button__icon"  width="20" height="20" >
+                                        <use href="#edit-document" xlink:href="#edit-document"  width="20" height="20"></use>
+                                    </svg></span>
+                                </button>
+                                <div role="dialog" class="modal" id="modalDocumentUpdate-{{ document.id }}">
+                                    <iframe class="modal--update-document" id="iFrameDocumentUpdate-{{ document.id }}" data-src="{% url 'update_case_document' object.id document.id %}" src="about:blank" title="Bijlage {{ document.name }} aanpassen"></iframe>
+                                </div>
+                                <button type="button" title="Bijlage verwijderen" class="text-link u-margin-top-none" data-handler="modal" data-contentid="modalDocumentDelete-{{ document.id }}">
+                                    <svg class="button__icon"  width="20" height="20" >
+                                        <use href="#trash" xlink:href="#trash"  width="20" height="20"></use>
+                                    </svg>
+                                </button>
+                                <div role="dialog" class="modal" id="modalDocumentDelete-{{ document.id }}">
+                                    <iframe class="modal--delete-document" id="iFrameDocumentDelete-{{ document.id }}" data-src="{% url 'delete_case_document' object.id document.id %}" src="about:blank" title="Verwijder bijlage {{ document.name }}"></iframe>
+                                </div>
+                            </div>
                         {% endif %}
+                        
                     </li>
                 {% endif %}
             {% endfor %}
