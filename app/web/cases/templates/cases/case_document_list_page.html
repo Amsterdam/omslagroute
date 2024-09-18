@@ -36,7 +36,7 @@
                 <tr>
                     <td>
                         <span class="show-on-mobile">Naam:</span>
-                        <a href="{% url 'download_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a>
+                        <a href="{% url 'view_case_document' object.id document.id %}" target="_blank" rel="noopener noreferrer"><span>{{ document.name }}</span></a>
                     </td>
                     <td>
                         <span class="show-on-mobile">Bestandstype:</span>
@@ -49,6 +49,10 @@
                     {% if not object.delete_request_date %}
                     <td>
                         <span class="show-on-mobile">Bewerk:</span>
+                        <a href="{% url 'download_case_document' object.id document.id %}" title="Bijlage downloaden" target="_blank" rel="noopener noreferrer" class="u-margin-right u-color-black" >
+                            <svg class="button__icon"  width="20" height="20" >
+                                <use href="#download" xlink:href="#download"  width="20" height="20"></use>
+                            </svg></a>
                         <a href="#" title="Bijlage aanpassen" class="u-margin-right u-color-black" data-handler="modal" data-contentid="modalDocumentUpdate-{{ document.id }}">
                             <svg class="button__icon"  width="20" height="20" >
                                 <use href="#edit-document" xlink:href="#edit-document"  width="20" height="20"></use>
