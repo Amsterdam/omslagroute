@@ -898,13 +898,6 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
             profile__in=instance.profile_set.all(),
         )
 
-    def get_linked_federation_users(self):
-        instance = self.model.objects.get(id=self.kwargs.get('pk'))
-        return self.get_all_users().filter(
-            profile__in=instance.profile_set.all(),
-            federation=self.request.user.federation,
-        )
-
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step=step)
         self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
@@ -921,11 +914,9 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
 
     def get_context_data(self, **kwargs):
         self.instance = self.model.objects.get(id=self.kwargs.get('pk'))
-
         kwargs.update({
             'linked_users': self.get_linked_users(),
             'unlinked_users': self.get_user_options(),
-            'linked_federation_users': self.get_linked_federation_users(),
             'instance': self.instance,
             'selected_users': self.get_all_cleaned_data().get('user_list', []),
         })
