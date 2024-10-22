@@ -379,14 +379,13 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         return auth_test(self.request.user, [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER, WONEN])
-    
-    
+
     def post(self, request, *args, **kwargs):
         # Get user who will be deleted
         deleted_user = self.get_object()
         # Get all cases from the deleted user's profile
         deleted_user_profile_cases = deleted_user.profile.cases.all()
-        
+
         # Loop through all cases in profile
         for profile_case in deleted_user_profile_cases:
             # Check if case exists in other profiles
@@ -396,8 +395,6 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
                 # Add this case to current user
                 self.request.user.profile.cases.add(profile_case)
 
-        # Delete user profile as well
-        deleted_user.profile.delete()
         return super().delete(request, *args, **kwargs)
 
 
