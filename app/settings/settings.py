@@ -5,15 +5,12 @@ from datetime import timedelta
 from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
 
-from opencensus.trace import config_integration
 from azure.identity import WorkloadIdentityCredential
-from opencensus.ext.azure.trace_exporter import AzureExporter
 
 azure = Azure()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
-config_integration.trace_integrations(['requests', 'logging', 'postgresql'])
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -62,7 +59,6 @@ MIDDLEWARE = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'opencensus.ext.django.middleware.OpencensusMiddleware',
 )
 
 ROOT_URLCONF = os.environ.get('DJANGO_ROOT_URLCONF', 'web.urls')
@@ -289,74 +285,10 @@ if os.environ.get("IAM_URL"):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'opencensus.ext.django.middleware.OpencensusMiddleware',
     )
     LOGIN_URL_NAME = 'oidc_authentication_callback'
     LOGOUT_URL_NAME = 'oidc_logout'
     LOGIN_URL = '/oidc/authenticate/'
-
-
-LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "WARNING")
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": True,
-    "handlers": {
-        "console": {"class": "logging.StreamHandler", "level": LOGGING_LEVEL},
-        "celery": {
-            "level": LOGGING_LEVEL,
-            "class": "logging.StreamHandler"
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": LOGGING_LEVEL
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": LOGGING_LEVEL,
-            "propagate": True,
-        },
-        "": {
-            "level": LOGGING_LEVEL,
-            "handlers": ["console"],
-            "propagate": True,
-        }
-    },
-}
-
-APPLICATIONINSIGHTS_CONNECTION_STRING = os.getenv(
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"
-)
-
-if APPLICATIONINSIGHTS_CONNECTION_STRING:
-    # Only log queries when in DEBUG due to high cost
-    def filter_traces(envelope):
-        if LOGGING_LEVEL == "DEBUG":
-            return True
-        log_data = envelope.data.baseData
-        if 'query' in log_data["name"].lower():
-            return False
-        if log_data["name"] == "GET /":
-            return False
-        return True
-    exporter = AzureExporter(connection_string=APPLICATIONINSIGHTS_CONNECTION_STRING)
-    exporter.add_telemetry_processor(filter_traces)
-    OPENCENSUS = {
-        "TRACE": {
-            "SAMPLER": "opencensus.trace.samplers.ProbabilitySampler(rate=1)",
-            "EXPORTER": exporter,
-        }
-    }
-    LOGGING["handlers"]["azure"] = {
-        "level": LOGGING_LEVEL,
-        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
-        "connection_string": APPLICATIONINSIGHTS_CONNECTION_STRING,
-    }
-    LOGGING["root"]["handlers"] = ["azure", "console"]
-    LOGGING["loggers"]["django"]["handlers"] = ["azure", "console"]
-    LOGGING["loggers"][""]["handlers"] = ["azure", "console"]
 
 WEBPACK_LOADER = {
     'DEFAULT': {
