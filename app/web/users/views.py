@@ -351,8 +351,7 @@ class UserDelete(UserPassesTestMixin, DeleteView):
         return auth_test(self.request.user, BEHEERDER)
 
     def post(self, request, *args, **kwargs):
-        obj = self.get_object()
-        obj.profile.delete()
+        # Never delete a profile, this will trigger a cascading effect.
         return super().delete(request, *args, **kwargs)
 
 
