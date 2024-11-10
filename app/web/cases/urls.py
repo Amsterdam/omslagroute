@@ -11,6 +11,7 @@ urlpatterns = [
 
     # invite
     path('<int:pk>/uitnodigen/', CaseInviteUsers.as_view(), name='case_invite_users'),
+    path('<int:pk>/uitnodigen-organisatie/', CaseInviteUsersCrossFederation.as_view(), name='case_invite_users_federation'),
     path('<int:pk>/uitgenodigingen-intrekken/', CaseRemoveInvitedUsers.as_view(), name='case_remove_invited_users'),
 
     path('<int:pk>/alle-velden/', CaseDetailAllDataView.as_view(), name='case_all_data'),

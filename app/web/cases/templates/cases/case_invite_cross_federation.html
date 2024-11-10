@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %} - Samenwerken aan cliënt{% endblock %}
+
+{% block skiplinks %}{% endblock %}
+{% block header %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block messages %}{% endblock %}
+{% block feedback %}{% endblock %}
+
+{% block main %}
+<div class="content-container form-invite-container">
+    <button data-handler="modal-close" class="button button--close">
+        <svg width="20" height="20" title="Sluit venster">
+            <use href="#close" xlink:href="#close" width="20" height="20"></use>
+        </svg>
+        <span class="sr-only">Sluit venster</span>
+    </button>
+    <h2>Nodig iemand uit van een andere organisatie om samen te werken aan {{instance.client_name}}</h2>
+
+    <hr class="" />
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ wizard.management_form }}
+            {% if wizard.form.forms %}
+                {{ wizard.form.management_form }}
+                {% for form in wizard.form.forms %}
+                    {{ form }}
+                {% endfor %}
+
+            {% else %}
+                {{ wizard.form }}
+            {% endif %}
+
+
+            <div class="form-field form-field--buttons screen-only u-margin-top-2x">
+                {% if wizard.steps.prev %}
+                    <button name="wizard_goto_step" role="link" value="{{ wizard.steps.prev }}" class="button button--secondary button--previous">
+                        <svg class="button__icon" width="12" height="18">
+                            <use href="#chevron-left" xlink:href="#chevron-left" width="12" height="18"></use>
+                        </svg>
+                        Terug
+                    </button>
+                {% endif %}
+
+                <a data-handler="modal-close" href="#" class="button button--secondary">Annuleren</a>
+                <input type="submit" value="Samenwerken" class="button button--primary">
+            </div>
+        </form>
+    
+</div>
+{% endblock %}
