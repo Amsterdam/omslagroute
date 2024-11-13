@@ -1,0 +1,36 @@
+name: Install & build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Build Docker image
+        run: docker compose -f docker-compose.local.yml build
+      - name: Start images
+        run: docker compose -f docker-compose.local.yml up -d
+
+      - if: ${{ failure() }}
+        name: "ON FAILURE: Which containers were running while failing?"
+        run: docker ps -a
+
+      - if: ${{ failure() }}
+        name: "ON FAILURE: logs"
+        run: docker logs omslagroute-salmagundi_wonen_omslagroute
+
+      - if: ${{ failure() }}
+        name: "ON FAILURE: Database logs"
+        run: docker logs omslagroute-database-1

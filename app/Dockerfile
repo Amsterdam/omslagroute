@@ -1,29 +1,31 @@
 ARG NODE_VERSION=20
+ARG PYTHON_VERSION=3.12
 
-FROM node:$NODE_VERSION-bullseye AS node
+FROM node:${NODE_VERSION}-bullseye AS node
 
-FROM python:3.12-bullseye
+FROM python:${PYTHON_VERSION}-bullseye
 
+# Copy necessary Node.js binaries from the Node.js image
 COPY --from=node /usr/lib /usr/lib
 COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /usr/local/include /usr/local/include
 COPY --from=node /usr/local/bin /usr/local/bin
 
-# Check if node and npm are available
-RUN node -v
-RUN npm -v
+# Check if Node and npm are available
+RUN node -v && npm -v
 
+# Add user and set environment variables
 RUN adduser --system datapunt
 RUN adduser datapunt sudo
-
 ENV PYTHONUNBUFFERED 1
 
+# Set build-time environment variables
 ARG COMMIT_HASH
 ARG BRANCH_NAME
 ARG INVENTORY
-ENV COMMIT_HASH=${COMMIT_HASH}
-ENV BRANCH_NAME=${BRANCH_NAME}
-ENV INVENTORY=${INVENTORY}
+ENV COMMIT_HASH=${COMMIT_HASH} \
+    BRANCH_NAME=${BRANCH_NAME} \
+    INVENTORY=${INVENTORY}
 
 # update
 RUN apt-get update
@@ -33,8 +35,8 @@ COPY ./certificates/adp_rootca.crt /usr/local/share/ca-certificates/adp_rootca.c
 RUN chmod 644 /usr/local/share/ca-certificates/adp_rootca.crt \
   && update-ca-certificates --fresh
 
-RUN pip install --upgrade pip
-RUN pip install uwsgi
+RUN pip install --upgrade pip && \
+  pip install --no-cache-dir uwsgi
 
 RUN apt-get -y install locales
 
