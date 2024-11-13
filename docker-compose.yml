@@ -1,4 +1,3 @@
-version: "3"
 services:
   omslagroute:
     image: ${REGISTRY:-127.0.0.1:5001}/${REPOSITORY:-salmagundi/wonen-omslagroute}:${VERSION:-latest}
