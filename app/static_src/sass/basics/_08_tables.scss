@@ -138,6 +138,8 @@ table table {
 
     td {
         max-width: 200px;
+        overflow-wrap: break-word;
+        word-break: break-word;
      }
 }
 .moment-list {
