@@ -5,7 +5,7 @@
         </header>
         <div class="status--wrapper">
             <div>
-                <span v-html="getSvg(currentCaseStatus.status)" v-bind:class="setHistoryClass(currentCaseStatus.status)"></span>
+                <span class="button-span-svg" v-html="getSvg(currentCaseStatus.status)" v-bind:class="setHistoryClass(currentCaseStatus.status)"></span>
                 <span>{{ caseStatusPrefix }}{{ caseStatusOptions[currentCaseStatus.status].current }}</span>
                 <div class="status-container">
                     <div class="facts">
@@ -17,7 +17,7 @@
             </div>
             <div class="form-field u-margin-bottom-none screen-only">
                 <button v-for="(value, id) in currentCaseStatusOptions" v-bind:key="id" v-on:click="setNextStatus(id)"  v-bind:class="setButtonClass(id)">
-                    <span v-html="getSvg(id)"></span>
+                    <span class="button-span-svg" v-html="getSvg(id)"></span>
                     {{ value.verb }}
                 </button>
             </div>

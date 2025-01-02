@@ -483,19 +483,21 @@
         padding: 5px;
         margin: -5px;
         min-width: 125px;
-        text-align: center;
         font-size: .9rem;
         &--status-approved {
             background-color: $supplement-darkgreen;
             color: $primary-white;
+            text-align: center;
         }
         &--status-disapproved {
             background-color: $support-invalid;
             color: $primary-white;
+            text-align: center;
         }
         &--status-pending {
             background-color: $supplement-orange;
             color: $primary-black;
+            text-align: center;
         }
     }
 
