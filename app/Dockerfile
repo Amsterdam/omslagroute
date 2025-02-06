@@ -37,7 +37,7 @@ RUN chmod 644 /usr/local/share/ca-certificates/adp_rootca.crt \
 
 RUN pip install --upgrade pip && \
   pip install --no-cache-dir uwsgi
-
+RUN apt install libmagic1 -y
 RUN apt-get -y install locales
 
 # install nginx
