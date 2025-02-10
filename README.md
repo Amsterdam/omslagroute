@@ -56,8 +56,15 @@ Migrate database without restarting containers:
 docker-compose -f docker-compose.local.yml exec omslagroute python manage.py migrate
 ```
 
+To add a basic setup for your local environment run the following command to import fixtures:
+```bash
+docker exec -it salmagundi_wonen_omslagroute python manage.py loaddata fixtures.json
+```
+
 # Styling resources
 
 The city of Amsterdam has developed a [design system](https://designsystem.amsterdam.nl/7awj1hc9f/p/39359e-design-system). Not all patterns have been built, they are built as soon as they become applicable. Ask colleagues through the OIS Slack #frontend channel.
 
 The documentation for (React) components based on elements from the design system can be found in the [storybook](https://amsterdam.github.io/amsterdam-styled-components/?path=/story/experimental-atoms-accordion--single-accordion-with-paragraph) pages of the [Amsterdam Styled Components repository](https://github.com/Amsterdam/amsterdam-styled-components/tree/master/.storybook).
+
+

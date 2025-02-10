@@ -1,0 +1,524 @@
+[
+    {
+        "model": "organizations.organization",
+        "pk": 2,
+        "fields": {
+            "name": "Wonen (gemeente)",
+            "name_abbreviation": "WON",
+            "federation_type": 1,
+            "main_email": "test@test.nl",
+            "field_restrictions": "id,created,saved,saved_by,saved_form,client_first_name,client_last_name,geslacht,geboortedatum,emailadres,woningnet_nummer,woningnet_geldigheid,centrale_toegang_naam,jonger_dan_26,jonger_dan_26_plaatsing_project,jonger_dan_26_motivatie_contract_onbepaalde,partner_check,partner_emailadres,partner_naam,partner_geboortedatum,partner_gehuwd,partner_echtscheiding_rond,partner_woonsituatie,kinderen_check,kinderen,centrale_toegang_trajectwijziging_ed,trajecthouder_naam,aanvraag_datum,omslagwoning_zorgaanbieder,urgentiecriteria_zinvolle_dagbesteding,urgentiecriteria_functioneert_sociaal_stabiel,urgentiecriteria_functioneert_psychisch_stabiel,urgentiecriteria_is_financieel_stabiel,urgentiecriteria_kinderen_gezonde_omgeving,medische_problemen_mbt_traplopen,medische_problemen_mbt_traplopen_check,medische_problemen_wooneisen,medische_problemen_bewijslast,uitsluiting_stadsdeel_argumentatie,aanvraagurgentie_akkoord_client,aanvraagurgentie_akkoord_client_naam,aanvraagurgentie_akkoord_client_datum,organisatie,persoonlijk_begeleider,start_zelfstandig_wonen,datum_voordracht,woningcorporatie_akkoord_met_omklap,datum_evaluatie_moment,urgentiecriteria_zinvolle_dagbesteding_behaald_omdat,urgentiecriteria_zinvolle_dagbesteding_beoordeeld_door,urgentiecriteria_zinvolle_dagbesteding_akkoord,urgentiecriteria_zinvolle_dagbesteding_datum_evaluatiemoment,urgentiecriteria_functioneert_sociaal_behaald_omdat,urgentiecriteria_functioneert_sociaal_beoordeeld_door,urgentiecriteria_functioneert_sociaal_akkoord,urgentiecriteria_functioneert_sociaal_datum_evaluatiemoment,urgentiecriteria_functioneert_psychisch_behaald_omdat,urgentiecriteria_functioneert_psychisch_beoordeeld_door,urgentiecriteria_functioneert_psychisch_akkoord,urgentiecriteria_functioneert_psychisch_datum_evaluatiemoment,urgentiecriteria_is_financieel_stabiel_behaald_omdat,urgentiecriteria_is_financieel_stabiel_beoordeeld_door,urgentiecriteria_is_financieel_stabiel_akkoord,urgentiecriteria_is_financieel_stabiel_datum_evaluatiemoment,urgentiecriteria_kinderen_gezonde_behaald_omdat,urgentiecriteria_kinderen_gezonde_beoordeeld_door,urgentiecriteria_kinderen_gezonde_akkoord,urgentiecriteria_kinderen_gezonde_datum_evaluatiemoment,omklap_client_openstaande_vragen,omklap_client_volgende_stappen_gezet,omklap_beoordeeld_door,omklap_datum_evaluatiemoment,omklap_toelichting,omklap_akkoord_derde,omklap_akkoord_derde_toelichting,omklap_akkoord_derde_naam,omklap_akkoord_derde_datum,omklap_akkoord_client,omklap_akkoord_client_naam,omklap_akkoord_client_datum,wonen_dossier_nr,adres_straatnaam,adres_huisnummer,adres_toevoeging,adres_postcode,adres_plaatsnaam,adres_wijziging_reden,woningcorporatie,woningcorporatie_medewerker,kennismaking_woningcorporatie_datum_woonevaluatiegesprek,kennismaking_wooncorporatie_goed_huurderschap,kennismaking_wooncorporatie_goed_huurderschap_naam_bewoner,kennismaking_wooncorporatie_kennisgemaakt_buren,kennismaking_wooncorporatie_kennismaken_buren,kennismaking_wooncorporatie_goede_buur,kennismaking_wooncorporatie_huisregels,kennismaking_wooncorporatie_afval,kennismaking_wooncorporatie_technische_klachten,kennismaking_wooncorporatie_overlast_melden,kennismaking_wooncorporatie_overlast_voorkomen,kennismaking_wooncorporatie_overlast_signalen,kennismaking_wooncorporatie_wijk,kennismaking_wooncorporatie_wijk_voorzieningen_waar,kennismaking_wooncorporatie_wijk_voorzieningen_behoefte,kennismaking_wooncorporatie_wijk_voorzieningen_anders,kennismaking_wooncorporatie_doelen_wonen_huurderschap,kennismaking_wooncorporatie_ondersteuning_medewerker,kennismaking_wooncorporatie_borg_betalen,kennismaking_wooncorporatie_borg_bedrag,kennismaking_wooncorporatie_moment_volgend_gesprek,kennismaking_wooncorporatie_akkoord_bewoner,kennismaking_wooncorporatie_akkoord_bewoner_naam,kennismaking_wooncorporatie_akkoord_bewoner_datum,kennismaking_wooncorporatie_akkoord_zorgaanbieder,kennismaking_wooncorporatie_akkoord_zorgaanbieder_naam,kennismaking_wooncorporatie_akkoord_zorgaanbieder_datum,woningcorporatie_start_intermediaire_verhuur,woningcorporatie_datum_kennismakingsgesprek,woonevaluatie_woningcorporatie_datum_woonevaluatiegesprek,woonevaluatie_ervaring_wonen,woonevaluatie_goed_minder_goed,woonevaluatie_omschrijving_woning,woonevaluatie_omschrijving_balkon_tuin,woonevaluatie_omschrijving_portiek,woonevaluatie_contact_met_buren,woonevaluatie_contact_met_buren_verloop,woonevaluatie_contact_met_buren_gewenst,woonevaluatie_overlast_buren,woonevaluatie_overlast_buren_gemeld,woonevaluatie_overlast_omwonenden_gemeld,woonevaluatie_overlast_omwonenden_oplossing,woonevaluatie_netwerk_aanwezig,woonevaluatie_netwerk_hoe_gaat_dat,woonevaluatie_netwerk_behoefte,woonevaluatie_netwerk_behoefte_meer_contacten,woonevaluatie_huur_betalen_op_tijd,woonevaluatie_huur_betalen_regeling,woonevaluatie_gepersonaliseerd_doel_1,woonevaluatie_gepersonaliseerd_doel_1_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_1_behaald,woonevaluatie_gepersonaliseerd_doel_2,woonevaluatie_gepersonaliseerd_doel_2_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_2_behaald,woonevaluatie_gepersonaliseerd_doel_3,woonevaluatie_gepersonaliseerd_doel_3_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_3_behaald,aanvraag_omklap_actief,aanvraag_omklap_alle_doelen_behaald,aanvraag_omklap_steunstructuren,woonevaluatie_moment_volgend_gesprek,woonevaluatie_bijzonderheden_wonen,woonevaluatie_akkoord_bewoner,woonevaluatie_akkoord_bewoner_naam,woonevaluatie_akkoord_bewoner_datum,woonevaluatie_akkoord_zorgaanbieder,woonevaluatie_akkoord_zorgaanbieder_naam,woonevaluatie_akkoord_zorgaanbieder_datum,delete_request_date,delete_request_by,delete_request_message",
+            "rol_restrictions": "1,2,6,8"
+        }
+    },
+    {
+        "model": "organizations.organization",
+        "pk": 3,
+        "fields": {
+            "name": "Woningcorporatie",
+            "name_abbreviation": "CORP",
+            "federation_type": 3,
+            "main_email": "test@test.nl",
+            "field_restrictions": "id,created,saved,saved_by,saved_form,client_first_name,client_last_name,geslacht,geboortedatum,emailadres,woningnet_nummer,woningnet_geldigheid,centrale_toegang_naam,jonger_dan_26,jonger_dan_26_plaatsing_project,jonger_dan_26_motivatie_contract_onbepaalde,partner_check,partner_emailadres,partner_naam,partner_geboortedatum,partner_gehuwd,partner_echtscheiding_rond,partner_woonsituatie,kinderen_check,kinderen,centrale_toegang_trajectwijziging_ed,trajecthouder_naam,aanvraag_datum,omslagwoning_zorgaanbieder,urgentiecriteria_zinvolle_dagbesteding,urgentiecriteria_functioneert_sociaal_stabiel,urgentiecriteria_functioneert_psychisch_stabiel,urgentiecriteria_is_financieel_stabiel,urgentiecriteria_kinderen_gezonde_omgeving,medische_problemen_mbt_traplopen,medische_problemen_mbt_traplopen_check,medische_problemen_wooneisen,medische_problemen_bewijslast,uitsluiting_stadsdeel_argumentatie,aanvraagurgentie_akkoord_client,aanvraagurgentie_akkoord_client_naam,aanvraagurgentie_akkoord_client_datum,organisatie,persoonlijk_begeleider,start_zelfstandig_wonen,datum_voordracht,woningcorporatie_akkoord_met_omklap,datum_evaluatie_moment,urgentiecriteria_zinvolle_dagbesteding_behaald_omdat,urgentiecriteria_zinvolle_dagbesteding_beoordeeld_door,urgentiecriteria_zinvolle_dagbesteding_akkoord,urgentiecriteria_zinvolle_dagbesteding_datum_evaluatiemoment,urgentiecriteria_functioneert_sociaal_behaald_omdat,urgentiecriteria_functioneert_sociaal_beoordeeld_door,urgentiecriteria_functioneert_sociaal_akkoord,urgentiecriteria_functioneert_sociaal_datum_evaluatiemoment,urgentiecriteria_functioneert_psychisch_behaald_omdat,urgentiecriteria_functioneert_psychisch_beoordeeld_door,urgentiecriteria_functioneert_psychisch_akkoord,urgentiecriteria_functioneert_psychisch_datum_evaluatiemoment,urgentiecriteria_is_financieel_stabiel_behaald_omdat,urgentiecriteria_is_financieel_stabiel_beoordeeld_door,urgentiecriteria_is_financieel_stabiel_akkoord,urgentiecriteria_is_financieel_stabiel_datum_evaluatiemoment,urgentiecriteria_kinderen_gezonde_behaald_omdat,urgentiecriteria_kinderen_gezonde_beoordeeld_door,urgentiecriteria_kinderen_gezonde_akkoord,urgentiecriteria_kinderen_gezonde_datum_evaluatiemoment,omklap_client_openstaande_vragen,omklap_client_volgende_stappen_gezet,omklap_beoordeeld_door,omklap_datum_evaluatiemoment,omklap_toelichting,omklap_akkoord_derde,omklap_akkoord_derde_toelichting,omklap_akkoord_derde_naam,omklap_akkoord_derde_datum,omklap_akkoord_client,omklap_akkoord_client_naam,omklap_akkoord_client_datum,wonen_dossier_nr,adres_straatnaam,adres_huisnummer,adres_toevoeging,adres_postcode,adres_plaatsnaam,adres_wijziging_reden,woningcorporatie,woningcorporatie_medewerker,kennismaking_woningcorporatie_datum_woonevaluatiegesprek,kennismaking_wooncorporatie_goed_huurderschap,kennismaking_wooncorporatie_goed_huurderschap_naam_bewoner,kennismaking_wooncorporatie_kennisgemaakt_buren,kennismaking_wooncorporatie_kennismaken_buren,kennismaking_wooncorporatie_goede_buur,kennismaking_wooncorporatie_huisregels,kennismaking_wooncorporatie_afval,kennismaking_wooncorporatie_technische_klachten,kennismaking_wooncorporatie_overlast_melden,kennismaking_wooncorporatie_overlast_voorkomen,kennismaking_wooncorporatie_overlast_signalen,kennismaking_wooncorporatie_wijk,kennismaking_wooncorporatie_wijk_voorzieningen_waar,kennismaking_wooncorporatie_wijk_voorzieningen_behoefte,kennismaking_wooncorporatie_wijk_voorzieningen_anders,kennismaking_wooncorporatie_doelen_wonen_huurderschap,kennismaking_wooncorporatie_ondersteuning_medewerker,kennismaking_wooncorporatie_borg_betalen,kennismaking_wooncorporatie_borg_bedrag,kennismaking_wooncorporatie_moment_volgend_gesprek,kennismaking_wooncorporatie_akkoord_bewoner,kennismaking_wooncorporatie_akkoord_bewoner_naam,kennismaking_wooncorporatie_akkoord_bewoner_datum,kennismaking_wooncorporatie_akkoord_zorgaanbieder,kennismaking_wooncorporatie_akkoord_zorgaanbieder_naam,kennismaking_wooncorporatie_akkoord_zorgaanbieder_datum,woningcorporatie_start_intermediaire_verhuur,woningcorporatie_datum_kennismakingsgesprek,woonevaluatie_woningcorporatie_datum_woonevaluatiegesprek,woonevaluatie_ervaring_wonen,woonevaluatie_goed_minder_goed,woonevaluatie_omschrijving_woning,woonevaluatie_omschrijving_balkon_tuin,woonevaluatie_omschrijving_portiek,woonevaluatie_contact_met_buren,woonevaluatie_contact_met_buren_verloop,woonevaluatie_contact_met_buren_gewenst,woonevaluatie_overlast_buren,woonevaluatie_overlast_buren_gemeld,woonevaluatie_overlast_omwonenden_gemeld,woonevaluatie_overlast_omwonenden_oplossing,woonevaluatie_netwerk_aanwezig,woonevaluatie_netwerk_hoe_gaat_dat,woonevaluatie_netwerk_behoefte,woonevaluatie_netwerk_behoefte_meer_contacten,woonevaluatie_huur_betalen_op_tijd,woonevaluatie_huur_betalen_regeling,woonevaluatie_gepersonaliseerd_doel_1,woonevaluatie_gepersonaliseerd_doel_1_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_1_behaald,woonevaluatie_gepersonaliseerd_doel_2,woonevaluatie_gepersonaliseerd_doel_2_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_2_behaald,woonevaluatie_gepersonaliseerd_doel_3,woonevaluatie_gepersonaliseerd_doel_3_stand_van_zaken,woonevaluatie_gepersonaliseerd_doel_3_behaald,aanvraag_omklap_actief,aanvraag_omklap_alle_doelen_behaald,aanvraag_omklap_steunstructuren,woonevaluatie_moment_volgend_gesprek,woonevaluatie_bijzonderheden_wonen,woonevaluatie_akkoord_bewoner,woonevaluatie_akkoord_bewoner_naam,woonevaluatie_akkoord_bewoner_datum,woonevaluatie_akkoord_zorgaanbieder,woonevaluatie_akkoord_zorgaanbieder_naam,woonevaluatie_akkoord_zorgaanbieder_datum,delete_request_date,delete_request_by,delete_request_message",
+            "rol_restrictions": "4,6,8"
+        }
+    },
+    {
+        "model": "organizations.organization",
+        "pk": 4,
+        "fields": {
+            "name": "Zorgaanbieder",
+            "name_abbreviation": "zorg",
+            "federation_type": 2,
+            "main_email": "test@test.nl",
+            "field_restrictions": "",
+            "rol_restrictions": "5,6,8,9"
+        }
+    },
+    {
+        "model": "organizations.federation",
+        "pk": 1,
+        "fields": {
+            "name": "Wonen (gemeente)",
+            "federation_id": "adw",
+            "name_abbreviation": null,
+            "name_form_validation_team": null,
+            "main_email": "",
+            "organization": 2
+        }
+    },
+    {
+        "model": "organizations.federation",
+        "pk": 2,
+        "fields": {
+            "name": "Woningcorpo huisjeboompjebeestje",
+            "federation_id": "Woningcorpo",
+            "name_abbreviation": "Woni",
+            "name_form_validation_team": null,
+            "main_email": "",
+            "organization": 3
+        }
+    },
+    {
+        "model": "organizations.federation",
+        "pk": 3,
+        "fields": {
+            "name": "Zorgaanbieder het leven duurt maar even",
+            "federation_id": "Zorg",
+            "name_abbreviation": "Zorg",
+            "name_form_validation_team": null,
+            "main_email": "",
+            "organization": 4
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "password": "",
+            "last_login": "2025-02-04T10:59:17.010Z",
+            "is_superuser": true,
+            "username": "name@email.com",
+            "first_name": "",
+            "last_name": "",
+            "email": "name@email.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2025-01-31T08:51:07.752Z",
+            "user_type": "6",
+            "federation": null,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 5,
+        "fields": {
+            "password": "",
+            "last_login": "2025-02-04T10:58:28.648Z",
+            "is_superuser": false,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-02-04T09:56:01Z",
+            "user_type": "7",
+            "federation": null,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 6,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$VoQPNDYaC12In9tqzf2Jfj$JjlmV7dS3oW8stAm1Aifh4WNxLLzVBaf5wDBk3r7rYU=",
+            "last_login": "2025-02-05T09:38:03.684Z",
+            "is_superuser": false,
+            "username": "zorgmedewerker",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-02-04T10:17:53Z",
+            "user_type": "5",
+            "federation": 3,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 7,
+        "fields": {
+            "password": "",
+            "last_login": "2025-02-04T11:07:22.006Z",
+            "is_superuser": false,
+            "username": "gemeentemedewerker",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-02-04T10:22:04Z",
+            "user_type": "1,2,8,9",
+            "federation": 1,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 8,
+        "fields": {
+            "password": "",
+            "last_login": "2025-02-04T11:01:21Z",
+            "is_superuser": false,
+            "username": "corporatiemedewerker",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-02-04T11:00:53Z",
+            "user_type": "4",
+            "federation": 2,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 9,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$MLyeb9FhwBHpBdms5Xokmx$rwmhtC1FVhRc6qzVp1+ijIo0/degTV5sMtkfaq9V57I=",
+            "last_login": "2025-02-05T08:20:35.555Z",
+            "is_superuser": true,
+            "username": "nino",
+            "first_name": "",
+            "last_name": "",
+            "email": "nino@test.nl",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2025-02-05T08:20:29.573Z",
+            "user_type": "6",
+            "federation": null,
+            "meta": null,
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 1,
+        "fields": {
+            "name": "Aanvraag urgentie o.V. met kinderen",
+            "document_type": "form",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 2,
+        "fields": {
+            "name": "Aanvraag urgentie o.V. zonder kinderen",
+            "document_type": "form",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 3,
+        "fields": {
+            "name": "Handleiding omslagroute",
+            "document_type": "document",
+            "description": "Uitgebreide handleiding van het proces van de Omslagroute.."
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 4,
+        "fields": {
+            "name": "Inrichtingsgeld niet-WPI-klanten",
+            "document_type": "form",
+            "description": "Middels dit formulier kan inrichtingsgeld worden aangevraagd bij het WPI.\r\nDoelgroep: Mensen die nog niet WPI bekend zijn\r\nBron: WPI"
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 5,
+        "fields": {
+            "name": "Inrichtingsgeld WPI klanten",
+            "document_type": "form",
+            "description": "Middels dit formulier kan inrichtingsgeld worden aangevraagd bij het WPI.\r\nDoelgroep: Mensen die bij WPI bekend zijn\r\nBron: WPI"
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 6,
+        "fields": {
+            "name": "Integraal Trajectplan Gezinnen",
+            "document_type": "checklist",
+            "description": "Middels dit document kan een Integraal Trajecplan worden opgezet.\r\nDoelgroep: gezinnen\r\nBron: GGD"
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 7,
+        "fields": {
+            "name": "Kennismaking: Supplement Wonen en goed huurderschap",
+            "document_type": "form",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 8,
+        "fields": {
+            "name": "Stappenplan Aanbieding nieuwe woning",
+            "document_type": "document",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 9,
+        "fields": {
+            "name": "(Tijdelijke) afmelding Omslagroute",
+            "document_type": "form",
+            "description": "Wanneer de cliënt tijdelijk of definitief wordt afgemeld voor de Omslagroute"
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 10,
+        "fields": {
+            "name": "Voordracht voor Omklap",
+            "document_type": "form",
+            "description": "Voordragen voor Omklap"
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 11,
+        "fields": {
+            "name": "Werkblad Aanvraag Omklap",
+            "document_type": "document",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 12,
+        "fields": {
+            "name": "Werkblad Woning op eigen naam",
+            "document_type": "document",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 13,
+        "fields": {
+            "name": "Werkblad Zorg na Omklap regelen",
+            "document_type": "form",
+            "description": ""
+        }
+    },
+    {
+        "model": "documents.document",
+        "pk": 14,
+        "fields": {
+            "name": "Woonevaluatie",
+            "document_type": "form",
+            "description": "Minimaal één keer per jaar1organiseert de persoonlijk begeleider een woonevaluatiegesprek in de woning van de cliënt. De persoonlijk begeleider en de contactpersoon van de woningcorporatie hebben telefonisch vooroverleg en informeren elkaar over de stand van zaken. \r\n\r\nDe zorgaanbieder maakt een gespreksverslag en vult het evaluatieformulier in en bewaart dit bij het begeleidingsplan. De contactpersoon van de woningcorporatie ontvangt een kopie van het evaluatieformulier (rekening houdend met privacyregelgeving)."
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 1,
+        "fields": {
+            "name": "Onderzoek voorafgaand aan Omslagroute",
+            "description": "Mensen kunnen direct instromen in de Omslagroute of doorstromen vanuit een andere vorm van zorg met verblijf. In alle gevallen wordt een onderzoek verricht om te bepalen waar mensen het beste op hun plek zijn. Bij instroom wordt het onderzoek gedaan door de Centrale Toegang. Bij doorstroom wordt het onderzoek gedaan door de zorgaanbieder waar de cliënt zich op dat moment bevindt.\r\n\r\nAls onderdeel van het onderzoek wordt het \"Stappenplan Wonen\":https://www.amsterdam.nl/sociaaldomein/zorgprofessionals/wmo-documenten/maatschappelijke/ doorlopen.\r\n\r\nDe zorgaanbieder formuleert ook gepersonaliseerde doelen, zodat de cliënt een urgentie onder voorwaarden kan krijgen.\r\n\r\nHet doel van het onderzoek is het perspectief van een cliënt te bepalen. Daarbij wordt gelet op de mogelijkheden, de beperkingen en het netwerk van de cliënt.\r\n\r\nIndien de cliënt betere kansen heeft in een andere gemeente, dan volgt zo nodig warme overdracht naar die andere gemeente.\r\n \r\nDownload de \"Zelfredzaamheidsmatrix\":https://www.zelfredzaamheidmatrix.nl/",
+            "order": 0,
+            "form": null,
+            "documents": [
+                6
+            ],
+            "organizations": [
+                2,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 2,
+        "fields": {
+            "name": "Aanvraag urgentie onder voorwaarden",
+            "description": "Uit de onderzoeksfase blijkt dat de client perspectief heeft op zelfstandig wonen met begeleiding. Er worden gepersonaliseerde doelen opgesteld die zijn gekoppeld aan de urgentievoorwaarden. Vervolgens wordt het formulier Aanvraag urgentie onder voorwaarden ingevuld. Ook het formulier Omslag MOBW mag worden gebruikt.\r\n\r\nGa naar het digitale formulier om je aanvraag eenvoudig bij de Gemeente Amsterdam - Wonen in te dienen: \"Inloggen bij Omslagroute\":https://omslagroute.amsterdam.nl/oidc/authenticate/\r\n\r\nDe directie Wonen van de gemeente toetst de ‘aanvraag urgentie onder voorwaarden’. Bij akkoord geeft zij de urgentie onder voorwaarden af en meldt de cliënt aan voor matching met een  passende woning. Dit houdt in dat de gegevens van de cliënt in WoningNet worden gezet voor actieve bemiddeling.",
+            "order": 1,
+            "form": "aanvraag-omslag-en-urgentie",
+            "documents": [
+                1,
+                2
+            ],
+            "organizations": [
+                2,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 3,
+        "fields": {
+            "name": "Intake zorgaanbieder",
+            "description": "De persoonlijk begeleider van de Zorgaanbieder houdt een intake met de cliënt en stelt samen met hem een persoonlijk begeleidingsplan op. In het plan vertalen zij de gepersonaliseerde doelen die bij de Centrale Toegang zijn vastgesteld, naar concrete en meetbare begeleidingsdoelen.",
+            "order": 2,
+            "form": null,
+            "documents": [],
+            "organizations": [
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 4,
+        "fields": {
+            "name": "Match met passende woning",
+            "description": "De woningcorporatie heeft contact met de zorgaanbieder over het matchen van de cliënt aan een woning. Dit proces verloopt volgens de ‘Tien werkafspraken thuis in de wijk’ [link naar de tien werkafspraken]. Het huurcontract komt op naam van de zorgaanbieder. Waar mogelijk wordt rekening gehouden met de voorkeur van de cliënt. De cliënt krijgt een eenmalig woningaanbod dat hij niet mag weigeren.",
+            "order": 3,
+            "form": "TESTTEST",
+            "documents": [
+                4,
+                5,
+                9
+            ],
+            "organizations": [
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 5,
+        "fields": {
+            "name": "Kennismaking woningcorporatie",
+            "description": "Binnen zes weken na de verhuizing heeft de persoonlijk begeleider contact met de woningcorporatie en plant hij een kennismakingsgesprek met de woningcorporatie en de cliënt. Dit gesprek vindt plaats op de woning. Tijdens dit gesprek delen zij de woondoelen en maken zij afspraken over wonen en goed huurderschap.",
+            "order": 1,
+            "form": "kennismaking-woningcorporatie",
+            "documents": [
+                7
+            ],
+            "organizations": [
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 6,
+        "fields": {
+            "name": "Evaluatie wonen",
+            "description": "De persoonlijk begeleider en de cliënt evalueren regelmatig de begeleidingsdoelen. Voorafgaand vraagt de persoonlijk begeleider bij alle betrokken partijen informatie op over de voortgang van de client. De persoonlijk begeleider, de woningcorporatie en de cliënt komen minimaal eens per jaar bij elkaar voor het woonevaluatiegesprek. In dit gesprek bespreken zij het wonen en de gepersonaliseerde doelen rond het wonen.",
+            "order": 5,
+            "form": "evaluatie-wonen",
+            "documents": [
+                9,
+                14
+            ],
+            "organizations": [
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 7,
+        "fields": {
+            "name": "Regel zorg na Omklap",
+            "description": "Als uit de evaluatie blijkt dat alle gepersonaliseerde doelen zijn behaald, is de cliënt in principe in staat om het huurcontract op eigen naam te krijgen. De persoonlijk begeleider en de client bespreken welke zorg of ondersteuning er daarna nog nodig is. De persoonlijk begeleider maakt hierover afspraken met hulpverleners.",
+            "order": 6,
+            "form": null,
+            "documents": [
+                13
+            ],
+            "organizations": [
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 8,
+        "fields": {
+            "name": "Aanvraag voordracht omklap",
+            "description": "Als uit de evaluatie blijkt dat alle gepersonaliseerde doelen zijn behaald, is de cliënt in principe in staat om het huurcontract op eigen naam te krijgen. De begeleider bereidt de voordracht voor Omklap voor. De onafhankelijke derde van de zorgaanbieder beoordeelt de voordracht en de onderliggende stukken. De zorgaanbieder stuurt de voordracht naar de directie Wonen van de gemeente. Deze toetst de voordracht. \r\n\r\nGa naar het digitale formulier om je aanvraag eenvoudig bij de Gemeente Amsterdam - Wonen in te dienen: \"Inloggen bij Omslagroute\":https://omslagroute.amsterdam.nl/oidc/authenticate/\r\n\r\nBETROKKEN INSTANTIES naast Zorgaanbieder en Wonen:\r\n•\tAndere betrokken hulpverleners: Jeugdbescherming, Reclassering, behandelaar, dagbesteding etc.\r\n•\tOverige instanties: WPI, Fibu, Meldpunt Zorg en Woonoverlast, etc.",
+            "order": 7,
+            "form": "aanvraag-omklap",
+            "documents": [
+                10,
+                11
+            ],
+            "organizations": [
+                2,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 9,
+        "fields": {
+            "name": "Omklap: woning op eigen naam",
+            "description": "Als de directie Wonen akkoord gaat met de voordracht voor Omklap , verleent zij een definitieve urgentie. De directie Wonen informeert de woningcorporatie. De corporatie zet binnen 4 tot 6 weken het huurcontract op naam van de cliënt.",
+            "order": 8,
+            "form": null,
+            "documents": [
+                12
+            ],
+            "organizations": [
+                2,
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "model": "timeline.moment",
+        "pk": 10,
+        "fields": {
+            "name": "Afsluiting Zorg met verblijf",
+            "description": "Wanneer de woning op naam van de cliënt staat, eindigt meestal ook het traject Zorg met verblijf. De zorgaanbieder informeert de veldregisseur van de GGD zodat deze het traject in Trajectus kan afsluiten.\r\nSoms blijft de zorgaanbieder de cliënt nog enige tijd lichte ondersteuning bieden. In dat geval volgt de uitstroom uit Zorg met verblijf pas na het einde van deze periode.",
+            "order": 9,
+            "form": null,
+            "documents": [],
+            "organizations": [
+                2,
+                4
+            ]
+        }
+    },
+    {
+        "model": "profiles.profile",
+        "pk": 2,
+        "fields": {
+            "user": 6,
+            "cases": [
+                3,
+                1,
+                2
+            ]
+        }
+    },
+    {
+        "model": "profiles.profile",
+        "pk": 3,
+        "fields": {
+            "user": 7,
+            "cases": []
+        }
+    },
+    {
+        "model": "profiles.profile",
+        "pk": 4,
+        "fields": {
+            "user": 8,
+            "cases": []
+        }
+    }
+]

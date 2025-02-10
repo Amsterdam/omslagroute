@@ -399,3 +399,14 @@ if AZURE_CONTAINER:
 
     # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
     AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
+
+
+ALLOWED_FILE_EXTENSIONS = [".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".xlsx", ".xls", ".doc"]
+ALLOWED_FILE_TYPES = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain",
+    "image/png",
+    "image/jpeg",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ]
