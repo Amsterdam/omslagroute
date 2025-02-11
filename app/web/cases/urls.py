@@ -36,4 +36,7 @@ urlpatterns = [
 
     path('<int:case_pk>/download-bijlage/<int:document_pk>', download_document, name='download_case_document'),
     path('<int:case_pk>/bekijk-bijlage/<int:document_pk>', view_document, name='view_case_document'),
+
+    path("zoek-adres/", search_adres, name="zoek-adres"),
+    path("zoek-stadsdeel/", search_stadsdeel, name="zoek-stadsdeel"),
 ]

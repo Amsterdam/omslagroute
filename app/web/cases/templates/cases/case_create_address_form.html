@@ -1,89 +1,79 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %} - Cliënt adres aanmaken{% endblock %}
 
 {% block breadcrumb %}
-    <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
-        <ol class="breadcrumb-list">
-            <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
-            <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
-            <li class="breadcrumb-step"><a href="{% url 'case' object.id %}">{{ object.client_name }}</a></li>
-            <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt adres aanmaken</li>
-        </ol>
-    </nav>
+<nav class="breadcrumb screen-only" aria-label="Kruimelpad">
+    <ol class="breadcrumb-list">
+        <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
+        <li class="breadcrumb-step"><a href="{% url 'case' object.id %}">{{ object.client_name }}</a></li>
+        <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt adres aanmaken</li>
+    </ol>
+</nav>
 {% endblock %}
 
 {% block main %}
-    <h2>Cli&euml;nt adres aanpassen</h2>
-    <form method="post" class="form--limited-width">
-        {% csrf_token %}
+<h2>Cli&euml;nt adres aanpassen</h2>
+<form method="post" class="form--limited-width">
+    {% csrf_token %}
 
-        <fieldset class="section section--step section--incomplete">
+    <fieldset class="section section--step section--incomplete">
 
-            <legend>
-                <h3 class="section--step__title">
-                    Wat is het adres van de omslagwoning voor {{ form.instance.client_name }}?
-                </h3>
-            </legend>
+        <legend>
+            <h3 class="section--step__title">
+                Wat is het adres van de omslagwoning voor {{ form.instance.client_name }}?
+            </h3>
+        </legend>
 
-            <div class="section sub-section">
-                <div class="form-field form-field--textinput">
-                    <label for="{{ form.adres_straatnaam.id_for_label }}">{{ form.adres_straatnaam.label }} *</label>
-                    {{ form.adres_straatnaam }}
+        <div class="section sub-section">
+            <div class="form-field form-field--textinput">
+                <label for="id_adres_zoeken">Zoek adres</label>
+                <div class="input-wrapper">
+                    <input type="text" id="id_adres_zoeken" placeholder="Voer adres in..." autocomplete="off">
+                    <span id="clear-search" class="clear-icon">&times;</span>
                 </div>
-                <div class="flex-container">
-                    <div class="flex-item u-margin-bottom">
-                        <div class="form-field form-field--textinput u-padding-right-2x">
-                            <label for="{{ form.adres_huisnummer.id_for_label }}">{{ form.adres_huisnummer.label }} *</label>
-                            {{ form.adres_huisnummer }}
-                        </div>
-                    </div>
-                    <div class="flex-item">
-                        <div class="form-field form-field--textinput">
-                            <label for="{{ form.adres_toevoeging.id_for_label }}">{{ form.adres_toevoeging.label }}</label>
-                            {{ form.adres_toevoeging }}
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-container">
-                    <div class="flex-item u-margin-bottom">
-                        <div class="form-field form-field--textinput u-padding-right-2x">
-                            <label for="{{ form.adres_postcode.id_for_label }}">{{ form.adres_postcode.label }} *</label>
-                            {{ form.adres_postcode }}
-                        </div>
-                    </div>
-                    <div class="flex-item">
-                        <div class="form-field form-field--textinput">
-                            <label for="{{ form.adres_plaatsnaam.id_for_label }}">{{ form.adres_plaatsnaam.label }} *</label>
-                            {{ form.adres_plaatsnaam }}
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-container">
-                    <div class="flex-item">
-                        <div class="form-field form-field--selectinput">
-                            <label for="{{ form.woningcorporatie.id_for_label }}">{{ form.woningcorporatie.label }} *</label>
-                            {{ form.woningcorporatie }}
-                        </div>
+                <div id="adres-suggesties" class="suggesties-container"></div>
+            </div>
+            {{ form.adres_straatnaam }}
+            {{ form.adres_huisnummer }}
+            {{ form.adres_toevoeging }}
+            {{ form.adres_postcode }}
+            {{ form.adres_plaatsnaam }}
+            {{ form.adres_stadsdeel }}
+
+            <div class="flex-container">
+                <div class="flex-item">
+                    <div class="form-field form-field--selectinput">
+                        <label for="{{ form.woningcorporatie.id_for_label }}">{{ form.woningcorporatie.label }}
+                            *</label>
+                        {{ form.woningcorporatie }}
                     </div>
                 </div>
             </div>
-        </fieldset>
+        </div>
+    </fieldset>
 
-        {% if request.GET.next %}
-        <div class="form-navigation">
-            <a href="{% url 'case' object.id %}" class="button button--secondary">Annuleren</a>
-            <span></span>
-            <button class=" button--next" type="submit">
-                <span class="value">Volgende</span>
-                <div class="arrow"></div>
-            </button>
-        </div>
-        {% else %}
-        <div class="form-field form-field--buttons screen-only u-margin-top-3x">
-            <a href="{% url 'cases_by_profile' %}" class="button button--secondary">Annuleren</a>
-            <input type="submit" value="Opslaan" class="button button--primary">
-        </div>
-        {% endif %}
-    </form>
+    {% if request.GET.next %}
+    <div class="form-navigation">
+        <a href="{% url 'case' object.id %}" class="button button--secondary">Annuleren</a>
+        <span></span>
+        <button class=" button--next" type="submit">
+            <span class="value">Volgende</span>
+            <div class="arrow"></div>
+        </button>
+    </div>
+    {% else %}
+    <div class="form-field form-field--buttons screen-only u-margin-top-3x">
+        <a href="{% url 'cases_by_profile' %}" class="button button--secondary">Annuleren</a>
+        <input type="submit" value="Opslaan" class="button button--primary">
+    </div>
+    {% endif %}
+</form>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "js/search-address.js" %}"></script>
 {% endblock %}

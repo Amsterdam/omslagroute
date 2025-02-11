@@ -224,7 +224,7 @@
                     <th>Stap in omslagroute</th>
                     <th>Organisatie type</th>
                     <th>Status</th>
-                    <th>Status datum</th>
+                    <th>Statusdatum</th>
                     <th>Status door</th>
                 </tr>
             </thead>
@@ -341,7 +341,7 @@
                         </td>
                         <td>
                             {% if case_status and request.user.federation.organization.federation_type == moment.form|form_federation_type %}
-                                <span class="show-on-mobile">Status datum:</span>
+                                <span class="show-on-mobile">Statusdatum:</span>
                                 <span class="u-font-size-small">{{ case_status.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}</span>
                             {% endif %}
                             </td>
