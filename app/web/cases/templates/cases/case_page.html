@@ -368,8 +368,6 @@
 {{ block.super }}
 
 {% if request.user|is_wonen_medewerker and not object.delete_request_date %}
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
  <script src="{% static "bundles/case.js" %}"></script>
 {% endif %}
 {% endblock %}
