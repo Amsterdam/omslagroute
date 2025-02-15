@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from web.core.models import PrintableModel
 from web.forms.statics import FORMS_CHOICES
 
+
 class Moment(PrintableModel):
     textile_fields = (
         'description'

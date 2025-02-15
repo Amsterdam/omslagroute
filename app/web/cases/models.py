@@ -511,6 +511,12 @@ class CaseBase(PrintableModel):
         blank=True,
         null=True,
     )
+    # Match met passende woning
+    match_woning_informatie_delen = models.BooleanField(
+        verbose_name=_('Ik deel als zorgaanbieder deze informatie met de woningcorporatie.'),
+        blank=True,
+        null=True,
+    )
 
     # Kennismaking wooncorporatie
     kennismaking_woningcorporatie_datum_woonevaluatiegesprek = models.DateField(
