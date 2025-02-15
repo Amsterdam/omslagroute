@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .statics import DOCUMENT_TYPE_LIST, DOCUMENT_TYPE_DICT
-
+from web.core.utils import validate_uploaded_file
 
 class DocumentVersion(models.Model):
     document = models.ForeignKey(
@@ -14,7 +14,8 @@ class DocumentVersion(models.Model):
     )
     uploaded_file = models.FileField(
         verbose_name=_('Selecteer een bestand'),
-        upload_to='uploads'
+        upload_to='uploads',
+        validators=[validate_uploaded_file],
     )
     uploaded = models.DateTimeField(
         verbose_name=_('Initieel opgeslagen datum/tijd'),

@@ -53,7 +53,8 @@
         </div>
 
             <strong class="u-margin-bottom-half">Voeg hieronder de bijlage toe</strong>
-            <div class='alert-box'><strong>Let op: </strong><ul><li>Medische gegevens mogen niet bij de aanvraag meegestuurd worden</li><li>Voor kopie ID geldt: verberg altijd het BSN-nummer</li></ul></div>
+            <div class='alert-box'><strong>Let op: </strong><ul><li>Medische gegevens mogen niet bij de aanvraag meegestuurd worden</li><li>Voor kopie ID geldt: verberg altijd het BSN-nummer</li><li>De volgende bestandstypes zijn toegestaan: pdf, docx, png, jpg, jpeg, xlsx</li><li>Het bestand mag niet groter zijn dan 20 MB
+            </li></ul></div>
             {% if form.uploaded_file.help_text %}
                 <div class="help-text">{{ form.uploaded_file.help_text|safe }}</div>
             {% endif %}

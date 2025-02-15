@@ -164,10 +164,12 @@ class DocumentVersionFormSetCreate(UserPassesTestMixin, CreateView):
         context = self.get_context_data()
         documentversionformset = context['documentversionformset']
         with transaction.atomic():
-            self.object = form.save()
             if documentversionformset.is_valid():
+                self.object = form.save()
                 documentversionformset.instance = self.object
                 documentversionformset.save()
+            else:
+                return super().form_invalid(form)
 
         messages.add_message(self.request, messages.INFO, "Het document '%s' is aangemaakt" % self.object.name)
         return super().form_valid(form)

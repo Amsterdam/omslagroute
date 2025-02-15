@@ -85,7 +85,7 @@ pyparsing==3.0.7
 python-dateutil==2.8.2
 python-http-client==3.3.7
 python-keystoneclient==4.4.0
-python-magic==0.4.25
+python-magic==0.4.27
 python-swiftclient==3.13.1
 pytz==2023.3
 PyYAML==6.0.1

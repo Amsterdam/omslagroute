@@ -30,7 +30,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.template.loader import render_to_string
 from web.organizations.models import Federation
-from django.http import Http404
+from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
@@ -53,9 +53,9 @@ from operator import or_
 from django.utils import timezone
 from django.http.response import HttpResponse
 import mimetypes
+import magic
 import requests
 from django.http import JsonResponse
-
 
 logger = logging.getLogger(__name__)
 
@@ -1674,17 +1674,15 @@ def serve_document(document, disposition_type):
     """
     with default_storage.open(document.uploaded_file.name, "rb") as file:
         file_data = file.read()
+    mime = magic.Magic(mime=True)
+    file_mime_type = mime.from_buffer(file_data)
+    if file_mime_type not in settings.ALLOWED_FILE_TYPES:
+        raise HttpResponseNotAllowed()
 
-    # Guess the MIME type of the file
-    content_type = (
-        mimetypes.guess_type(document.uploaded_file.name)[0]
-        or "application/octet-stream"
-    )
+    content_type = mimetypes.guess_type(document.uploaded_file.name)[0] or 'application/octet-stream'
 
     response = HttpResponse(file_data, content_type=content_type)
-    response["Content-Disposition"] = (
-        f'{disposition_type}; filename="{document.uploaded_file.name}"'
-    )
+    response['Content-Disposition'] = f'{disposition_type}; filename="{document.uploaded_file.name}"'
 
     return response
 

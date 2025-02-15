@@ -1,6 +1,7 @@
 import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from web.core.utils import validate_uploaded_file
 from .statics import *
 from web.core.models import PrintableModel
 from web.forms.forms import BaseGenericForm
@@ -11,7 +12,7 @@ from django.utils.safestring import mark_safe
 import locale
 from datetime import timedelta
 from django.utils import timezone
-# from django.conf import settings
+from django.conf import settings
 from django.core.files.storage import default_storage
 from constance import config
 from .managers import *
@@ -1291,7 +1292,8 @@ class Document(models.Model):
     )
     uploaded_file = models.FileField(
         verbose_name=_('Selecteer een bestand'),
-        upload_to=get_upload_path
+        upload_to=get_upload_path,
+        validators=[validate_uploaded_file],
     )
     uploaded = models.DateTimeField(
         verbose_name=_('Initieel opgeslagen datum/tijd'),

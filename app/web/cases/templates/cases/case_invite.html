@@ -60,7 +60,7 @@
             {{ wizard.form }}
         {% endif %}
 
-        <a style="visibility: hidden;" href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
+        <a href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
 
         <div class="form-field form-field--buttons screen-only u-margin-top-2x">
             {% if wizard.steps.prev %}
@@ -86,14 +86,14 @@
             <li>{{ u.username }}{% if request.user.federation != u.federation %}({% if u.federation %}{{u.federation}}{% else %}Geen organisatie{% endif %}){% endif %}</li>
             {% endfor %}
         </ul>
-        <a style="visibility: hidden;" href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
+        <a href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
         <div class="form-field form-field--buttons screen-only u-margin-top-2x">
             <a data-handler="modal-close" href="#" class="button button--primary">Sluiten</a>
         </div>
     
     {% elif not unlinked_users and not linked_users %}
         <p>Je bent momenteel de enige persoonlijk begeleider op de omslagroute site.</p>
-        <a style="visibility: hidden;" href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
+        <a href="{% url 'case_invite_users_federation' instance.id %}">Samenwerken met iemand van een andere organisatie</a>
         <div class="form-field form-field--buttons screen-only u-margin-top-2x">
             <a data-handler="modal-close" href="#" class="button button--primary">Sluiten</a>
         </div>
