@@ -3,6 +3,7 @@
 // ********************
 
 $navigation-height: 2.75rem;
+$site-max-width: 75rem;
 
 * {
     box-sizing: border-box;
@@ -61,7 +62,7 @@ body {
 .site-header {
     background-color: $primary-white;
     margin: 0 auto;
-    max-width: 60rem;
+    max-width: $site-max-width;
 }
 
     .site-header-wrapper {
@@ -125,7 +126,7 @@ body {
 }
 
 .site-main {
-    max-width: 60rem;
+    max-width: $site-max-width;
     margin: 0 auto;
     padding-bottom: 2rem;
 }
@@ -147,7 +148,7 @@ footer {
         width: 100%;
     }
     section {
-        max-width: 60rem;
+        max-width: $site-max-width;
         margin: 0 auto;
     }
 }

@@ -40,10 +40,10 @@
         <thead>
             <tr>
                 <th width="150">Cliënt</th>
-                <th>Laatste opgeslagen</th>
+                <th>Laatst gewijzigd</th>
                 <th>Stap in omslagroute</th>
                 <th>Status</th>
-                <th>Status datum</th>
+                <th>Statusdatum</th>
                 <th>Status door</th>
             </tr>
         </thead>
@@ -57,7 +57,7 @@
                         <a href="{% url 'case' object.id %}" class="show-active">{{ object.client_name }}</a>
 
                     </td>
-                    <td class="help-text">
+                    <td>
                         <span class="show-on-mobile">Laatste opgeslagen:</span>
                         {{ object.saved|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                     </td>
@@ -66,26 +66,31 @@
                         {% if case_status_list and case_status_list.0.form %}
                         <a href="{% url 'update_case' object.id case_status_list.0.form %}">{{ case_status_list.0.form|form_verbose }}</a>
                         {% else %}
-                        <span class="u-text-color-grey4">Er is nog geen aanvraag verstuurd voor deze cliënt</span>
+                        <span>Er is nog geen aanvraag verstuurd voor deze cliënt</span>
                         {% endif %}
                     </td>
                     <td>
                         <span class="show-on-mobile">Status:</span>
                         {% if case_status_list and case_status_list.0.form %}
-                        <span class="label {% if case_status_list.0.status == 2 %}label--status-disapproved{% elif case_status_list.0.status == 3 %}label--status-approved{% elif case_status_list.0.status == 4 %}label--status-pending{% endif %}">
-                            {% if case_status_list.0.status == 1 and not case_status_list.0.is_first_of_statustype %}Opnieuw {% endif %}{{ case_status_list.0.status|status_verbose }}
+                        <span
+                            class="label {% if case_status_list.0.status == 2 %}label--status-disapproved{% elif case_status_list.0.status == 3 %}label--status-approved{% elif case_status_list.0.status == 4 %}label--status-pending{% endif %}">
+                            {% if case_status_list.0.status == 1 and not case_status_list.0.is_first_of_statustype %}
+                            Opnieuw {{ case_status_list.0.status|status_verbose|lower }}
+                            {% else %}
+                            {{ case_status_list.0.status|status_verbose }}
+                            {% endif %}
                         </span>
                         {% else %}
                         {% endif %}
                     </td>
-                    <td class="help-text">
-                        <span class="show-on-mobile">Status datum:</span>
+                    <td>
+                        <span class="show-on-mobile">Statusdatum:</span>
                         {% if case_status_list and case_status_list.0.form %}
                         {{ case_status_list.0.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
                         {% else %}
                         {% endif %}
                     </td>
-                    <td class="help-text">
+                    <td>
                         <span class="show-on-mobile">Status door:</span>
                         {% if case_status_list and case_status_list.0.form %}
                         {{ case_status_list.0.profile.user.username }}

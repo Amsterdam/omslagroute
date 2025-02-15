@@ -1,0 +1,57 @@
+.suggesties-container {
+    border: 0.063rem solid #767676;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: inherit;
+    font-size: inherit;
+    border: .063rem solid $neutral-grey4;
+    color: $primary-black;
+    min-width: 4.375rem;
+    max-width: 38.75rem;
+    width: 100%;
+    display: none;
+}
+
+.suggesties-container.active {
+    display: block;
+}
+
+.suggestie {
+    padding: .5rem .938rem;
+    cursor: pointer;
+}
+
+.suggestie:hover {
+    background-color: #f0f0f0;
+}
+
+.form-field {
+    position: relative;
+    display: inline-block;
+    width: 100%; /* Ensures it takes full width */
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+
+/* Style the clear button */
+.clear-icon {
+    position: absolute;
+    right: 3rem; /* Adjust spacing */
+    top: calc(50% - .625rem);
+    cursor: pointer;
+    font-size: 18px;
+    display: none; /* Initially hidden */
+    background: white; /* Ensures it doesn’t overlap with input text */
+    padding: 0 5px;
+}
+
+/* Show the clear button when input has text */
+.input-wrapper input:not(:placeholder-shown) + .clear-icon {
+    display: block;
+}

@@ -485,6 +485,12 @@ class CaseBase(PrintableModel):
         blank=True,
         null=True,
     )
+    adres_stadsdeel = models.CharField(
+        verbose_name=_('Stadsdeel'),
+        max_length=100,
+        blank=True,
+        null=True,
+    )
     adres_wijziging_reden = models.TextField(
         verbose_name=_('Waarom wijzig je dit adres?'),
         blank=True,
@@ -1067,6 +1073,7 @@ class Case(CaseBase):
                 'adres_toevoeging',
                 'adres_postcode',
                 'adres_plaatsnaam',
+                'adres_stadsdeel',
                 'adres_wijziging_reden',
                 'woningcorporatie',
                 output_field=models.TextField()

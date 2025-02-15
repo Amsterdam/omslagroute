@@ -14,9 +14,9 @@
 
 {% block main %}
 <section class="section section--mijn-clienten">
-    <div class="flex-container u-margin-bottom-3x">
+    <div class="flex-container">
         <div class="flex-item">
-            <h2 class="u-margin-bottom-4x">Aanvragen</h2>
+            <h2>Aanvragen</h2>
         </div>
         {% if request.user|is_wonen_medewerker %}
         <div class="flex-item u-text-align--right">
@@ -54,10 +54,14 @@
         <thead>
             <tr>
                 <th width="200">Cliënt</th>
+                {% if request.user|is_woningcorporatie_medewerker %}
+                    <th>Adres</th>
+                    <th>Stadsdeel</th>
+                {% endif %}
                 <th>Stap in omslagroute</th>
                 <th>Aanvraag door</th>
                 <th>Status</th>
-                <th><span class="sr-only">Laatste statuswijziging</span></th>
+                <th>Statusdatum</th>
             </tr>
         </thead>
         <tbody>
@@ -67,6 +71,10 @@
                         <span class="show-on-mobile">Naam:</span>
                         <a href="{% url 'case' object.case.id  %}">{{ object.case.client_name }}</a>
                     </td>
+                    {% if request.user|is_woningcorporatie_medewerker %}
+                        <td>{{ object.case.adres_straatnaam }} {{ object.case.adres_huisnummer }}{% if object.case.adres_toevoeging %} {{ object.case.adres_toevoeging }}{% endif %}, {{ object.case.adres_postcode }}</td>
+                        <td>{{ object.case.adres_stadsdeel|default:"" }}</td>
+                    {% endif %}
                     <td>
                         <span class="show-on-mobile">Stap in omslagroute:</span>
 

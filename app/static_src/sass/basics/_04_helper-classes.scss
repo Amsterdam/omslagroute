@@ -50,7 +50,7 @@
 
 .show-on-mobile {
     display: block;
-    font-weight: 500;
+    font-weight: bold;
     @media screen and (min-width: $tablets) {
         display: none;
     }
