@@ -28,19 +28,33 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block breadcrumb %}
-    {% if mode == 'page' %}
-        <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
-            <ol class="breadcrumb-list">
-                <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
-                <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
-                <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt aanmaken</li>
-            </ol>
-        </nav>
-    {% endif %}
+{% if mode == 'page' %}
+<nav class="breadcrumb screen-only" aria-label="Kruimelpad">
+    <ol class="breadcrumb-list">
+        <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
+        <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt aanmaken</li>
+    </ol>
+</nav>
+{% endif %}
 {% endblock %}
 
 {% block main %}
-<h2>{{ title }}</h2>
+{% if request.GET.iframe_content %}
+<div class="content-container">
+    <button data-handler="modal-close" class="button button--close">
+        <svg width="20" height="20" title="Sluit venster">
+            <use href="#close" xlink:href="#close" width="20" height="20"></use>
+        </svg>
+        <span class="sr-only">Sluit venster</span>
+    </button>
+    {% endif %}
+
+    <h2>{{ title }}</h2>
+
+    {% if request.GET.iframe_content %}
+    <hr class="" />
+    {% endif %}
 
     <form method="post">
         {% csrf_token %}
@@ -56,9 +70,13 @@
             <input type="submit" value="Opslaan" class="button button--primary">
         </div>
     </form>
+    {% if request.GET.iframe_content %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block js %}
-	{{ block.super }}
-	<script type="text/javascript" src="{% static "js/caseform.js" %}"></script>
+{{ block.super }}
+<script type="text/javascript" src="{% static "js/caseform.js" %}"></script>
 {% endblock %}

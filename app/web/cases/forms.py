@@ -280,6 +280,7 @@ class CaseAddressUpdateForm(forms.ModelForm):
             "adres_toevoeging",
             "adres_postcode",
             "adres_plaatsnaam",
+            "adres_stadsdeel",
             "woningcorporatie",
             "woningcorporatie_medewerker",
         ]
@@ -290,7 +291,16 @@ class CaseAddressUpdateForm(forms.ModelForm):
         self.fields["adres_huisnummer"].required = True
         self.fields["adres_postcode"].required = True
         self.fields["adres_plaatsnaam"].required = True
+        self.fields["adres_stadsdeel"].required = True
         self.fields["woningcorporatie"].required = True
+
+        self.fields["adres_straatnaam"].widget.attrs["hidden"] = True
+        self.fields["adres_huisnummer"].widget.attrs["hidden"] = True
+        self.fields["adres_toevoeging"].widget.attrs["hidden"] = True
+        self.fields["adres_postcode"].widget.attrs["hidden"] = True
+        self.fields["adres_plaatsnaam"].widget.attrs["hidden"] = True
+        self.fields["adres_stadsdeel"].widget.attrs["hidden"] = True
+
         self.fields["woningcorporatie"].queryset = self.fields[
             "woningcorporatie"
         ].queryset.filter(

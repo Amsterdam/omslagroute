@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %} - Cliënt adres aanpassen{% endblock %}
 
@@ -27,21 +28,21 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    {% if not request.GET.iframe_content %}
-    <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
-        <ol class="breadcrumb-list">
-            <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
-            <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
-            <li class="breadcrumb-step"><a href="{% url 'case' object.id %}">{{ object.client_name }}</a></li>
-            <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt adres aanpassen</li>
-        </ol>
-    </nav>
-    {% endif %}
+{% if not request.GET.iframe_content %}
+<nav class="breadcrumb screen-only" aria-label="Kruimelpad">
+    <ol class="breadcrumb-list">
+        <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-step"><a href="{% url 'cases_by_profile' %}">Mijn cli&euml;nten</a></li>
+        <li class="breadcrumb-step"><a href="{% url 'case' object.id %}">{{ object.client_name }}</a></li>
+        <li class="breadcrumb-step sr-only" aria-current="location">Cli&euml;nt adres aanpassen</li>
+    </ol>
+</nav>
+{% endif %}
 {% endblock %}
 
 {% block main %}
-    {% if request.GET.iframe_content %}
-    <div class="content-container">
+{% if request.GET.iframe_content %}
+<div class="content-container">
     <button data-handler="modal-close" class="button button--close">
         <svg width="20" height="20" title="Sluit venster">
             <use href="#close" xlink:href="#close" width="20" height="20"></use>
@@ -50,7 +51,8 @@
     </button>
     {% endif %}
     <h2>Cli&euml;nt adres aanpassen</h2>
-    {% if request.GET.iframe_content %}<hr class="" />{% endif %}
+    {% if request.GET.iframe_content %}
+    <hr class="" />{% endif %}
     <form method="post" class="form--limited-width">
         {% csrf_token %}
 
@@ -58,8 +60,9 @@
             <header>
                 <h2 class="h3">Huidige woning</h2>
             </header>
-            <p>{{ object.adres_straatnaam }} {{ object.adres_huisnummer }}{% if object.adres_toevoeging %}, {{ object.adres_toevoeging }}{% endif %}<br/>
-            {{ object.adres_postcode }} {{ object.adres_plaatsnaam }}</p>
+            <p>{{ object.adres_straatnaam }} {{ object.adres_huisnummer }}{% if object.adres_toevoeging %}, {{
+                object.adres_toevoeging }}{% endif %}<br />
+                {{ object.adres_postcode }} {{ object.adres_plaatsnaam }}</p>
         </div>
 
         <fieldset class="section section--step section--incomplete">
@@ -72,42 +75,26 @@
 
             <div class="section sub-section">
                 <div class="form-field form-field--textinput">
-                    <label for="{{ form.adres_straatnaam.id_for_label }}">{{ form.adres_straatnaam.label }} *</label>
-                    {{ form.adres_straatnaam }}
+                    <label for="id_adres_zoeken">Zoek adres</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="id_adres_zoeken" placeholder="Voer adres in..." autocomplete="off">
+                        <span id="clear-search" class="clear-icon">&times;</span>
+                    </div>
+                    <div id="adres-suggesties" class="suggesties-container"></div>
                 </div>
-                <div class="flex-container">
-                    <div class="flex-item u-margin-bottom">
-                        <div class="form-field form-field--textinput u-padding-right-2x">
-                            <label for="{{ form.adres_huisnummer.id_for_label }}">{{ form.adres_huisnummer.label }} *</label>
-                            {{ form.adres_huisnummer }}
-                        </div>
-                    </div>
-                    <div class="flex-item">
-                        <div class="form-field form-field--textinput">
-                            <label for="{{ form.adres_toevoeging.id_for_label }}">{{ form.adres_toevoeging.label }}</label>
-                            {{ form.adres_toevoeging }}
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-container">
-                    <div class="flex-item u-margin-bottom">
-                        <div class="form-field form-field--textinput u-padding-right-2x">
-                            <label for="{{ form.adres_postcode.id_for_label }}">{{ form.adres_postcode.label }} *</label>
-                            {{ form.adres_postcode }}
-                        </div>
-                    </div>
-                    <div class="flex-item">
-                        <div class="form-field form-field--textinput">
-                            <label for="{{ form.adres_plaatsnaam.id_for_label }}">{{ form.adres_plaatsnaam.label }} *</label>
-                            {{ form.adres_plaatsnaam }}
-                        </div>
-                    </div>
-                </div>
+                {{ form.adres_straatnaam }}
+                {{ form.adres_huisnummer }}
+                {{ form.adres_toevoeging }}
+                {{ form.adres_postcode }}
+                {{ form.adres_plaatsnaam }}
+                {{ form.adres_stadsdeel }}
+
 
                 <div class="flex-container">
                     <div class="flex-item">
                         <div class="form-field form-field--selectinput">
-                            <label for="{{ form.woningcorporatie.id_for_label }}">{{ form.woningcorporatie.label }} *</label>
+                            <label for="{{ form.woningcorporatie.id_for_label }}">{{ form.woningcorporatie.label }}
+                                *</label>
                             {{ form.woningcorporatie }}
                         </div>
                     </div>
@@ -130,7 +117,8 @@
             </button>
         </div>
         {% else %}
-        <div class="form-field form-field--buttons screen-only {% if not request.GET.iframe_content %}u-margin-top-3x {% else %} u-margin-top-none {% endif %}">
+        <div
+            class="form-field form-field--buttons screen-only {% if not request.GET.iframe_content %}u-margin-top-3x {% else %} u-margin-top-none {% endif %}">
             {% if not request.GET.iframe_content %}
             <a href="{% url 'cases_by_profile' %}" class="button button--secondary">Annuleren</a>
             {% else %}
@@ -140,6 +128,13 @@
         </div>
         {% endif %}
     </form>
-    {% if request.GET.iframe_content %}</div>{% endif %}
+    {% if request.GET.iframe_content %}
+</div>
+{% endif %}
 
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript" src="{% static "js/search-address.js" %}"></script>
 {% endblock %}
