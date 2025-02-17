@@ -1711,12 +1711,16 @@ def view_document(request, case_pk, document_pk):
     return serve_document(document, "inline")
 
 
+@user_passes_test(
+    auth_test,
+    user_type=[BEGELEIDER, PB_FEDERATIE_BEHEERDER],
+)
 def search_adres(request):
     query = request.GET.get("query", "")
     if not query:
         return JsonResponse({"results": []})
 
-    url = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/free"
+    url = "https://api.pdok.nl/bzk/locatieserver/search/v3_1/suggest"
     params = {
         "q": query,
         "fq": "gemeentenaam:(amsterdam) AND (type:adres) AND (adrestype: hoofdadres)",
@@ -1733,6 +1737,10 @@ def search_adres(request):
         return JsonResponse({"results": []}, status=400)
 
 
+@user_passes_test(
+    auth_test,
+    user_type=[BEGELEIDER, PB_FEDERATIE_BEHEERDER],
+)
 def search_stadsdeel(request):
     nummeraanduiding_id = request.GET.get("nummeraanduidingid", "")
     if not nummeraanduiding_id:
