@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 document.getElementById("id_adres_straatnaam").value = adres.straatnaam;
                                 document.getElementById("id_adres_huisnummer").value = adres.huisnummer;
                                 document.getElementById("id_adres_toevoeging").value = `${ adres.huisletter ?? "" }${adres.huisnummertoevoeging ?? ""}`;
-                                document.getElementById("id_adres_postcode").value = `${ adres?.postcode ?? "" }`;
+                                document.getElementById("id_adres_postcode").value = `${ adres?.postcode ?? "onbekend" }`;
                                 document.getElementById("id_adres_plaatsnaam").value = adres.woonplaatsnaam;
                                 suggestiesContainer.innerHTML = "";
                                 suggestiesContainer.classList.remove("active");
