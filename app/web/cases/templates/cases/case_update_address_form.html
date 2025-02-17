@@ -60,8 +60,7 @@
             <header>
                 <h2 class="h3">Huidige woning</h2>
             </header>
-            <p>{{ object.adres_straatnaam }} {{ object.adres_huisnummer }}{% if object.adres_toevoeging %}, {{
-                object.adres_toevoeging }}{% endif %}<br />
+            <p>{{ object.adres_straatnaam }} {{ object.adres_huisnummer }}{% if object.adres_toevoeging %}, {{ object.adres_toevoeging }}{% endif %}<br />
                 {{ object.adres_postcode }} {{ object.adres_plaatsnaam }}</p>
         </div>
 
@@ -69,7 +68,7 @@
 
             <legend>
                 <h3 class="section--step__title">
-                    Wat is het adres van de omslagwoning voor {{ form.instance.client_name }}?
+                    Wat is het adres van de omslagwoning voor <strong>{{ form.instance.client_name }}</strong>?
                 </h3>
             </legend>
 
