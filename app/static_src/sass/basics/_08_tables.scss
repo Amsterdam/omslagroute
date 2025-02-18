@@ -189,6 +189,11 @@ table table {
         tr {
             display: table-row;
             background-color: transparent;
+
+            th:not(:first-child) {
+                padding-left: 0;
+                padding-right: 0.7rem;
+            }
         }
     }
     tbody {

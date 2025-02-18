@@ -2315,6 +2315,19 @@ KENNISMAKING_WONINGCORPORATIE = [
             },
         ],
     },
+    {
+        "title": "Bijlagen",
+        "description": "<strong>Nodige bijlagen bij match met passende woning</strong><ul><li>kopie ID</li><li>Inkomensverklaring</li></ul><p><strong>Indien partner in zelfde woning zal wonen:</strong></p><ul><li>kopie ID partner (geen rijbewijs)</li><li>Inkomensverklaring partner</li></ul><p><strong>Let op: </strong>Medische gegevens mogen niet bij de aanvraag meegestuurd worden</p>",
+        "section_list": [
+            {
+                "title": "",
+                "description": "",
+                "fields": [
+                    "document_list",
+                ],
+            },
+        ],
+    },
 ]
 
 FORMS = (
@@ -2644,7 +2657,7 @@ FORMS = (
                 ),
             },
             "addres_required": True,
-            "bijlages": False,
+            "bijlages": True,
             "no_history": [
                 "kennismaking_wooncorporatie_goed_huurderschap",
                 "kennismaking_wooncorporatie_moment_volgend_gesprek",

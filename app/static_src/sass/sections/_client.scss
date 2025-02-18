@@ -564,3 +564,13 @@
         vertical-align: baseline !important;
     }
 }
+
+.status-wrapper{
+    display: flex;
+    gap: 0.3rem;
+    
+    .status-text {
+        display: flex;
+        flex-direction: column;
+    }
+}

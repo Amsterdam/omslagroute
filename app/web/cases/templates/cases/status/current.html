@@ -1,16 +1,18 @@
 {% load client_status_tags tz %}
 {% if object %}
-{% include object.status|status_template %}
-<span>
-{% if object.case_form_is_opnieuw_ingediend %}
-    Opnieuw ingediend
-{% else %}
-    {{ object.status|status_verbose }}
-{% endif %}
- <small>({{ object.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }})</small>
- </span>
-{% else %}
-<span class="u-font-size-small">
-    Nog niet ingediend
+<span class="status-wrapper">
+    {% include object.status|status_template %}
+    <span class="status-text">
+        {% if object.case_form_is_opnieuw_ingediend %}
+        Opnieuw ingediend
+        {% else %}
+        {{ object.status|status_verbose }}
+        {% endif %}
+        <small>({{ object.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }})</small>
+    </span>
+    {% else %}
+    <span>
+        Nog niet ingediend
+    </span>
+    {% endif %}
 </span>
-{% endif %}
