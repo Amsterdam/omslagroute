@@ -8,12 +8,12 @@
             {{ document.name }}
         </a>
     </span>
-    <small>
+    <span>
         {{ document.extension }}
-    </small>
-    <small>
+    </span>
+    <span>
         {{ document.uploaded|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}
-    </small>
+    </span>
 </div>
 
 </label>{% endif %}

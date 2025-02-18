@@ -136,7 +136,7 @@ class CaseGenericModelForm(GenericModelForm):
         super().__init__(*args, **kwargs)
         self.fields["document_list"] = forms.ModelMultipleChoiceField(
             label=_(
-                "Vink de bijlagen aan die je bij de aanvraag mee wilt sturen naar de afdeling Wonen van de Gemeente Amsterdam"
+                "Vink de bijlagen aan die je bij de aanvraag mee wilt sturen."
             ),
             queryset=Document.objects.filter(case=kwargs.get("instance")),
             widget=CheckboxSelectMultipleDocument(
