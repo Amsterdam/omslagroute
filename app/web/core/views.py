@@ -1,3 +1,5 @@
+import openpyxl
+from openpyxl.styles import Font
 from django.views.generic import TemplateView, RedirectView
 import os
 import sys
@@ -11,6 +13,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .utils import *
 from django.contrib.auth.decorators import user_passes_test
+from web.users.auth import user_passes_test as custom_user_passes_test
 from django.core.management import call_command
 from django.http import HttpResponse
 from web.users.statics import BEHEERDER
@@ -206,6 +209,170 @@ class DataView(UserPassesTestMixin, TemplateView):
             'prev_month': prev_month,
         })
         return super().get_context_data(**kwargs)
+
+
+@custom_user_passes_test(
+    auth_test,
+    user_type=[BEHEERDER],
+)
+def export_excel(request):
+    current_datetime = timezone.now()
+    month = current_datetime.strftime("%m")
+    year = current_datetime.strftime("%Y")
+    monthrange = calendar.monthrange(int(year), int(month))
+
+    try:
+        monthrange = calendar.monthrange(
+            int(request.GET.get("jaar")), int(request.GET.get("maand"))
+        )
+        month = request.GET.get("maand")
+        year = request.GET.get("jaar")
+    except (ValueError, TypeError) as e:
+        print(f"querystring params wrong format: {e}")
+
+    zorginstelling_list = Federation.objects.filter(
+        organization__federation_type=FEDERATION_TYPE_ZORGINSTELLING,
+    )
+    all_cases = Case.objects.all()
+
+    start_month_naive = datetime(year=int(year), month=int(month), day=1)
+    start_month = timezone.make_aware(start_month_naive)
+    end_month_naive = datetime(
+        year=int(year), month=int(month), day=monthrange[1]
+    ) + timedelta(days=1)
+    end_month = timezone.make_aware(end_month_naive)
+
+    casestatus_period = CaseStatus.objects.filter(
+        created__gt=start_month,
+        created__lte=end_month,
+    )
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Zorginstellingen analytics"
+
+    # Coulmn width
+    ws.column_dimensions["A"].width = 40
+    ws.column_dimensions["B"].width = 15
+    ws.column_dimensions["C"].width = 10
+    ws.column_dimensions["D"].width = 10
+
+    ws.append(["", "Status", "Totaal", start_month.strftime("%b %Y")])
+
+    for zorginstelling in zorginstelling_list:
+        case_list = all_cases.filter(
+            profile__user__federation=zorginstelling,
+        )
+        case_list_period = case_list.filter(
+            created__gt=start_month,
+            created__lte=end_month,
+        )
+        casestatus_list = CaseStatus.objects.filter(
+            case__in=case_list,
+        )
+        urgentie = casestatus_list.filter(
+            form=CASE_VERSION_FORM_URGENTIE,
+        )
+        omklap = casestatus_list.filter(
+            form=CASE_VERSION_FORM_OMKLAP,
+        )
+        urgentie_ingediend = (
+            urgentie.filter(
+                status=CASE_STATUS_INGEDIEND,
+            )
+            .order_by("case__id", "created")
+            .distinct("case__id")
+        )
+        urgentie_goedgekeurd = (
+            urgentie.filter(
+                status=CASE_STATUS_GOEDGEKEURD,
+            )
+            .order_by("case__id", "-created")
+            .distinct("case__id")
+        )
+        omklap_ingediend = (
+            omklap.filter(
+                status=CASE_STATUS_INGEDIEND,
+            )
+            .order_by("case__id", "created")
+            .distinct("case__id")
+        )
+        omklap_goedgekeurd = (
+            omklap.filter(
+                status=CASE_STATUS_GOEDGEKEURD,
+            )
+            .order_by("case__id", "-created")
+            .distinct("case__id")
+        )
+        urgentie_ingediend_period = casestatus_period.filter(
+            id__in=urgentie_ingediend.values_list("id", flat=True)
+        )
+        urgentie_goedgekeurd_period = casestatus_period.filter(
+            id__in=urgentie_goedgekeurd.values_list("id", flat=True)
+        )
+        omklap_ingediend_period = casestatus_period.filter(
+            id__in=omklap_ingediend.values_list("id", flat=True)
+        )
+        omklap_goedgekeurd_period = casestatus_period.filter(
+            id__in=omklap_goedgekeurd.values_list("id", flat=True)
+        )
+        user_list = User.objects.filter(
+            federation=zorginstelling,
+        )
+
+        # Sort and distinct
+        case_list = case_list.order_by("id", "created").distinct("id")
+        case_list_period = case_list_period.order_by("id", "created").distinct("id")
+        # Name zorginstelling as bold title
+        ws.append([zorginstelling.name])
+        ws.cell(row=ws.max_row, column=1).font = Font(bold=True)
+        # Number of employees in Omslagroute
+        ws.append(["Aantal omslagroute medewerkers", "", user_list.count()])
+        ws.append(
+            ["Cliënten aangemaakt", "", case_list.count(), case_list_period.count()]
+        )
+        ws.append(
+            [
+                "Aanvraag Urgentie onder voorwaarden",
+                "Ingediend",
+                urgentie_ingediend.count(),
+                urgentie_ingediend_period.count(),
+            ]
+        )
+        ws.append(
+            [
+                "",
+                "Goedgekeurd",
+                urgentie_goedgekeurd.count(),
+                urgentie_goedgekeurd_period.count(),
+            ]
+        )
+        ws.append(
+            [
+                "Aanvraag Voordracht omklap",
+                "Ingediend",
+                omklap_ingediend.count(),
+                omklap_ingediend_period.count(),
+            ]
+        )
+        ws.append(
+            [
+                "",
+                "Goedgekeurd",
+                omklap_goedgekeurd.count(),
+                omklap_goedgekeurd_period.count(),
+            ]
+        )
+        # Empty row
+        ws.append([])
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="omslagroute-data.xlsx"'
+    wb.save(response)
+
+    return response
 
 
 @user_passes_test(lambda u: u.is_superuser)
