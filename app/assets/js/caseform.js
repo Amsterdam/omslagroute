@@ -10,7 +10,12 @@ function setPartnerFieldsVisible(isVisible){
 function updateCaseForm(elem){
     setPartnerFieldsVisible(elem.value == 1);
 }
+
+
 window.onload = function() {
-    var elem = document.getElementById('id_partner_check');
-    setPartnerFieldsVisible(elem.value == 1);
+    var partnerCheck = document.getElementById('id_partner_check');
+    partnerCheck.addEventListener("change", function () {
+        updateCaseForm(this);
+    });
+    setPartnerFieldsVisible(partnerCheck.value == 1);
 }
