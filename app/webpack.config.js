@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
   return {
     context: __dirname,
     mode: isProduction ? 'production' : 'development',
-
+    devtool: 'cheap-module-source-map', 
     entry: {
       'case-status': './assets/js/case-status',
       'case': './assets/js/case',
