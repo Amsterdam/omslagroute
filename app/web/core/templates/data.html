@@ -14,16 +14,14 @@
             <h1>Analytics</h1>
         </div>
         <div class="flex-item u-clearfix">
-
             <div class="screen-only">
-                <a href="#" id="download-excel-link" class="button button--secondary">
-                    <svg class="u-margin-right" width="20" height="20" >
-                        <use href="#download" xlink:href="#download"  width="20" height="20"></use>
+                <a href="{% url 'export_excel' %}?{{ request.GET.urlencode }}" class="button button--secondary">
+                    <svg class="u-margin-right" width="20" height="20">
+                        <use href="#download" xlink:href="#download" width="20" height="20"></use>
                     </svg>
                     Download Excel
                 </a>
             </div>
-
         </div>
     </div>
 </section>
@@ -95,24 +93,5 @@
         {% endfor %}
     </tbody>
 </table>
-
-{% endblock %}
-
-{% block js %}
-<script type="text/javascript" src="{% static "js/tableToExcel.js" %}"></script>
-{{ block.super }}
-<script>
-
-var link = document.getElementById("download-excel-link");
-link.addEventListener('click', function(e){
-    e.preventDefault();
-    TableToExcel.convert(document.getElementById("excel-data"), {
-    name: "omslagroute-data.xlsx",
-    sheet: {
-        name: "Zorginstellingen analytics"
-    }
-    });
-});
-</script>
 
 {% endblock %}

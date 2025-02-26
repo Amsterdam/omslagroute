@@ -23,7 +23,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta http-equiv="Content-Security-Policy" content="
+          script-src 'self';
+          script-src-attr ;
+          form-action 'self';
+          upgrade-insecure-requests;
+          style-src 'self' 'unsafe-inline' https://fast.fonts.net https://www.amsterdam.nl/;
+          img-src 'self' data: https://www.amsterdam.nl;
+        ">
     <title>Omslagroute {% block title %} - Homepage{% endblock %}</title>
     <meta name="description" content="De centrale plek voor informatie over de Omslagroute. De Omslagroute is sinds november 2019 het werkproces voor de in- en doorstroom naar zelfstandig wonen met begeleiding in de wijk en de Omklap naar een huurcontract op naam van de cliënt. Zorgaanbieders, woningcorporaties en gemeente werken daarbij samen."/>
 
