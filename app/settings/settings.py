@@ -27,7 +27,6 @@ INSTALLED_APPS = (
     'rest_framework',            # utilities for rest apis
     'rest_framework.authtoken',  # TODO: remove once all user management is done using Grip
     'django_filters',            # for filtering rest endpoints
-    'drf_yasg',                  # for generating real Swagger/OpenAPI 2.0 specifications
     'constance',
     'constance.backends.database',  # for dynamic configurations in admin
     'mozilla_django_oidc',       # for authentication
