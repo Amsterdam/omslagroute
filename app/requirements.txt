@@ -27,6 +27,7 @@ python-swiftclient>=4.6.0,<5.0.0
 requests>=2.32.3,<3.0.0
 textile>=4.0.3,<5.0.0
 
+django-storages
 
 # debtcollector==2.5.0
 # decorator==5.1.1
