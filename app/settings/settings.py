@@ -391,13 +391,17 @@ BAG_API_SEARCH_URL = 'https://api.data.amsterdam.nl/atlas/search/adres/'
 
 AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
 
+print("----------------> CHECK IF AZURE CONTAINER: ")
 if AZURE_CONTAINER:
+    print("----------------> AZURE CONTAINER is here")
     AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
     DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
     THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
 
     # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
     AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
+else:
+    print("----------------> AZURE CONTAINER is NOT here")
 
 
 ALLOWED_FILE_EXTENSIONS = [".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".xlsx", ".xls", ".doc"]
