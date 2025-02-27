@@ -27,7 +27,6 @@ INSTALLED_APPS = (
     'rest_framework',            # utilities for rest apis
     'rest_framework.authtoken',  # TODO: remove once all user management is done using Grip
     'django_filters',            # for filtering rest endpoints
-    'drf_yasg',                  # for generating real Swagger/OpenAPI 2.0 specifications
     'constance',
     'constance.backends.database',  # for dynamic configurations in admin
     'mozilla_django_oidc',       # for authentication
@@ -394,11 +393,20 @@ AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
 
 if AZURE_CONTAINER:
     AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
-    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
-    THUMBNAIL_DEFAULT_STORAGE = "storages.backends.azure_storage.AzureStorage"
-
-    # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
-    AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
+    # DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "token_credential": WorkloadIdentityCredential(),
+                "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
+                "azure_container": AZURE_CONTAINER,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 
 ALLOWED_FILE_EXTENSIONS = [".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".xlsx", ".xls", ".doc"]
