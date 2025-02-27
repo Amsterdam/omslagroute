@@ -402,15 +402,15 @@ if AZURE_CONTAINER:
                 "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
                 "azure_container": AZURE_CONTAINER,
             },
-            "staticfiles": {
-                "BACKEND": "storages.backends.azure_storage.AzureStorage",
-                "OPTIONS": {
-                    "token_credential": WorkloadIdentityCredential(),
-                    "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
-                    "azure_container": AZURE_CONTAINER,
-                },
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "token_credential": WorkloadIdentityCredential(),
+                "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
+                "azure_container": AZURE_CONTAINER,
             },
-        }
+        },
     }
 
 
