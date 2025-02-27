@@ -396,6 +396,9 @@ if AZURE_CONTAINER:
     # DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
     STORAGES = {
         "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
     }
 
     # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
