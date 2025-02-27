@@ -395,14 +395,23 @@ if AZURE_CONTAINER:
     AZURE_TOKEN_CREDENTIAL = WorkloadIdentityCredential()
     # DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
     STORAGES = {
-        "default": {"BACKEND": "storages.backends.azure_storage.AzureStorage"},
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
+        "default": {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "token_credential": WorkloadIdentityCredential(),
+                "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
+                "azure_container": AZURE_CONTAINER,
+            },
+            "staticfiles": {
+                "BACKEND": "storages.backends.azure_storage.AzureStorage",
+                "OPTIONS": {
+                    "token_credential": WorkloadIdentityCredential(),
+                    "account_name": os.getenv("AZURE_ACCOUNT_NAME"),
+                    "azure_container": AZURE_CONTAINER,
+                },
+            },
+        }
     }
-
-    # AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING")
-    AZURE_ACCOUNT_NAME =  os.getenv("AZURE_ACCOUNT_NAME")
 
 
 ALLOWED_FILE_EXTENSIONS = [".pdf", ".docx", ".txt", ".png", ".jpg", ".jpeg", ".xlsx", ".xls", ".doc"]
