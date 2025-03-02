@@ -3,6 +3,7 @@
 // This is styling for the filter-organisations functionality.
 // Some classes are set in the filter-organisations.js file
 // ********************
+@use "../basics/02_colors" as *;
 
 .tag-list {
     margin-top: .625rem;

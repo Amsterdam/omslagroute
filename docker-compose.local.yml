@@ -51,8 +51,8 @@ services:
     command: bash -c "
       cd /app &&
       npm install &&
-      npm rebuild node-sass &&
-      ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass &&
+      npm rebuild &&
+      ./node_modules/.bin/sass static_src/sass:./assets/bundles/ &&
       ./node_modules/.bin/webpack --config webpack.config.js &&
       python ./manage.py collectstatic --noinput &&
       python ./manage.py migrate --noinput &&
