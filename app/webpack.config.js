@@ -36,7 +36,7 @@ module.exports = (env, argv) => {
         {
           test: /\.(scss|css)$/,
           use: [
-              "vue-style-loader",
+              "style-loader",
               "css-loader",
               "sass-loader"
           ]

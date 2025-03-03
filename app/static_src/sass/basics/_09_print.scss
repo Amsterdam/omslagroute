@@ -1,6 +1,9 @@
 // ********************
 // PRINT STYLESHEET
 // ********************    
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
 
 @media print {
 

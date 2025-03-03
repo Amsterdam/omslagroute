@@ -41,7 +41,8 @@ docker-compose -f docker-compose.local.yml build
 Start watching static files changes scss:
 
 ```bash
-docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass --watch
+docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/sass --watch static_src/sass:./assets/bundles/
+
 ```
 
 Start watching static files changes js, vue:

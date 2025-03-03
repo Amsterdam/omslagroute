@@ -2,6 +2,9 @@
 // TABLES
 // See https://designsystem.amsterdam.nl/7awj1hc9f/p/1408ad-tables
 // ********************
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
 
 table {
     width: 100%;

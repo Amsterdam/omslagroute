@@ -1,3 +1,6 @@
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
+
 .container-button--feedback {
   z-index: 100;
   right: 0;

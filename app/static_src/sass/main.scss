@@ -3,36 +3,7 @@
 // * I added numbering to the files where the import order of it matters
 // ********************    
 
-@import
-    "basics/01_fonts",
-    "basics/02_colors",
-    "basics/03_mediaqueries",
-    "basics/04_helper-classes",
-    "basics/05_typography",
-    "basics/06_site-layout",
-    "basics/07_forms",
-    "basics/08_tables",
-    "basics/09_print",
-    // "basics/10_visual-debugging", 
+@use "basics" as *;
+@use "components" as *;
+@use "sections" as *;
 
-    "sections/login",
-    "sections/documents",
-    "sections/timeline",
-    "sections/organisations",
-    "sections/client",
-
-    // COMPONENTS
-    "components/elements",
-    "components/buttons",
-    "components/details",
-    "components/icons",
-    "components/breadcrumb",
-    "components/site-navigation",
-    "components/tags",
-    "components/site-navigation",
-    "components/alert",
-    "components/modal",
-    "components/pagination",
-    "components/footer",
-    "components/prompt",
-    "components/suggestions";
