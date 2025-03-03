@@ -1753,4 +1753,5 @@ def search_stadsdeel(request):
         response.raise_for_status()
         return JsonResponse(response.json())
     except requests.exceptions.RequestException as e:
+        logger.error(f"Request error stadsdeel: {e}")
         return JsonResponse({"error": "Error searching stadsdeel"}, status=400)
