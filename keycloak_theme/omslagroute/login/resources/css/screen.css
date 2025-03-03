@@ -72,3 +72,7 @@ a.pf-c-button:link {
 a.pf-c-button:hover {
     color: #fff !important;
 }
+.pf-c-button.pf-m-control {
+    border: 1px solid #666666 !important;
+    border-bottom: none !important;
+}
