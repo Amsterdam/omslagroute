@@ -1,10 +1,30 @@
+.login-pf-page .card-pf {
+    max-width: 385px !important;
+    width: 100% !important;
+}
+.login-pf-page .login-pf-social {
+    margin-top: 20px
+}
+.login-pf-page .login-pf-social-link {
+    margin-bottom: 15px;
+    margin-right: 0;
+    width: 100% !important;
+    flex-basis: 100% !important;
+}
+.login-pf-page .form-control {
+    max-width: 305px !important;
+    width: 100% !important;
+}
 .login-pf-page .login-pf-social-link a {
-    padding: 7px 0 0;
-    height: 44px;
+    padding: 7px;
+    height: 50px;
     border: 2px solid black;
     text-decoration: none;
     background-color: transparent;
     color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .login-pf-page .login-pf-social-link a:hover {
     border: 2px solid #084897;
@@ -33,7 +53,7 @@
     order: 2;
 }
 .login-pf-page #kc-form-wrapper:before {
-    content: 'Als je organisatie er niet bij staat, log dan in met het formulier hieronder.';
+    content: 'Alleen medewerkers van de gemeente Amsterdam kunnen inloggen met het formulier hieronder.';
     display: inline-block;
     margin-bottom: 20px;
 }
@@ -41,20 +61,14 @@
     display: flex;
     flex-direction: column;
 }
-.login-pf-page .login-pf-social {
-    margin-top: 20px
+.login-pf-page .login-pf-social-section {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    border-left: none !important;
 }
-.login-pf-page .login-pf-social-link {
-    margin-bottom: 15px;
-    margin-right: 0;
-    width: 100% !important;
-    flex-basis: 100% !important;
+a.pf-c-button:link {
+    color: #084897 !important;
 }
-.login-pf-page .form-control {
-    max-width: 305px !important;
-    width: 100% !important;
-}
-.login-pf-page .card-pf {
-    max-width: 385px !important;
-    width: 100% !important;
+a.pf-c-button:hover {
+    color: #fff !important;
 }
