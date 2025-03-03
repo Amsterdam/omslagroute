@@ -3,6 +3,9 @@
 // 
 // ALSO SEE https://designsystem.amsterdam.nl/7awj1hc9f/p/35ca97-breadcrumbs
 // ********************
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
+
 
 .breadcrumb {
     margin-bottom: 2.813rem; 

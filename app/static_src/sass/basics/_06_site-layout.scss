@@ -1,6 +1,9 @@
 // ********************
 // SITE LAYOUT AND STYLING OF SITE HEADER, NAVIGATION, MAIN AND FOOTER
 // ********************
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
 
 $navigation-height: 2.75rem;
 $site-max-width: 75rem;

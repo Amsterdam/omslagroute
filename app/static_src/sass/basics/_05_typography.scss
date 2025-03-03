@@ -2,6 +2,9 @@
 // TYPOGRAPHY
 // And margins of default html elements
 // ********************
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
 
 $max-text-width: 40.625rem;
 

@@ -1,3 +1,6 @@
+@use "sass:color";
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
 // ********************
 // BUTTONS
 //
@@ -222,8 +225,8 @@ button.text-link {
     &:hover,
     &:focus,
     &:active {
-        background-color: darken($support-valid, 10);
-        border-color: darken($support-valid, 10);
+        background-color: color.adjust($support-valid, $lightness: -10%);
+        border-color: color.adjust($support-valid, $lightness: -10%);
         color: $primary-white;
     }
 }
@@ -240,8 +243,8 @@ button.text-link {
     &:hover,
     &:focus,
     &:active {
-        background-color: darken($support-invalid, 10);
-        border-color: darken($support-invalid, 10);
+        background-color: color.adjust($support-invalid, $lightness: -10%);
+        border-color: color.adjust($support-invalid, $lightness: -10%);
         color: $primary-white;
     }
 }
@@ -259,8 +262,8 @@ button.text-link {
     &:hover,
     &:focus,
     &:active {
-        background-color: darken($supplement-orange, 10);
-        border-color: darken($supplement-orange, 10);
+        background-color: color.adjust($supplement-orange, $lightness: -10%);
+        border-color: color.adjust($supplement-orange, $lightness: -10%);
         color: $primary-white;
     }
 

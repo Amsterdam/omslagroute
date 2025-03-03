@@ -1,3 +1,7 @@
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
+@use "../basics/04_helper-classes" as *;
+
 .section--client{
 
     .section-details-client {

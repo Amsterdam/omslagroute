@@ -1,6 +1,10 @@
 // ********************
 // THE TIMELINE SCREEN
 // ********************
+@use "sass:math";
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
+@use "../basics/06_site-layout" as *;
 
 $toplevel-moment: 1.5rem;
 $sublevel-moment: 1rem;
@@ -54,8 +58,8 @@ $padding-left: 1.875rem;
 
     .dot--large {
         background-color: $neutral-grey4;
-        width: ($toplevel-moment/ 2);
-        height: ($toplevel-moment / 2);
+        width: math.div($toplevel-moment, 2);
+        height: math.div($toplevel-moment, 2);
         left: 1rem;
         top: 1.25rem;
         @media all and (min-width: $tablets) {
@@ -76,13 +80,13 @@ $padding-left: 1.875rem;
         line-height: $sublevel-moment;
         font-size: .8rem;
         left: calc(
-            #{$padding-left / 2} +
-            #{$timeline-width  / 2} +
-            #{$sublevel-moment  / 4}
+            #{math.div($padding-left, 2)} +
+            #{math.div($timeline-width, 2)} +
+            #{math.div($sublevel-moment, 4)}
         );
         top: calc(
-            #{$toplevel-moment / 2} +
-            #{$sublevel-moment  / 4}
+            #{math.div($toplevel-moment, 2)} +
+            #{math.div($sublevel-moment, 4)}
         );
     }
 

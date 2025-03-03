@@ -2,6 +2,9 @@
 // ALERT MESSAGES
 // Shows in the .site-navigation element and inline in timeline screen
 // ********************   
+@use "../basics/02_colors" as *;
+@use "../basics/03_mediaqueries" as *; 
+@use "../basics/06_site-layout" as *;
 
 @keyframes fadeInAndOut {
     0% {

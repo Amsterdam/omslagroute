@@ -1,6 +1,11 @@
 // ********************
 // GENERAL FORM ELEMENTS
 // ********************
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
+@use "04_helper-classes" as *;
+@use "05_typography" as *;
 
 .form--limited-width {
     max-width: 43rem;

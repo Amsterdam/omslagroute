@@ -1,6 +1,9 @@
 // ********************
 // GENERAL LAYOUT SETTINGS/HELPER CLASSES
 // ********************
+@use "01_fonts" as *;
+@use "02_colors" as *;
+@use "03_mediaqueries" as *; 
 
 .svg-sprite {
     display: none;

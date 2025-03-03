@@ -67,11 +67,12 @@ WORKDIR /app
 
 RUN npm install
 
-# Rebuild node-sass to overwrite local changes depending on Docker node environment.
-RUN npm rebuild node-sass
+RUN npm rebuild
 
 COPY requirements.txt /app/
-RUN ./node_modules/.bin/node-sass -o ./assets/bundles/ static_src/sass
+
+RUN ./node_modules/.bin/sass static_src/sass:./assets/bundles/
+
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
 RUN pip install --no-cache-dir -r requirements.txt
