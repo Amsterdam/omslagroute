@@ -342,13 +342,13 @@
                         <td>
                             {% if case_status and request.user.federation.organization.federation_type == moment.form|form_federation_type %}
                                 <span class="show-on-mobile">Statusdatum:</span>
-                                <span class="u-font-size-small">{{ case_status.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}</span>
+                                <span>{{ case_status.created|timezone:FRONTEND_TIMEZONE|date:DATE_FORMAT }}</span>
                             {% endif %}
                             </td>
                             <td>
                             {% if case_status and request.user.federation.organization.federation_type == moment.form|form_federation_type %}
                                 <span class="show-on-mobile">Status door:</span>
-                                <span class="u-font-size-small">{{ case_status.profile.user.username }}</span>
+                                <span>{{ case_status.profile.user.username }}</span>
                             {% endif %}
                             </td>
                         {% endif %}
