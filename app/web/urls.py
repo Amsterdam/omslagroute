@@ -6,10 +6,9 @@ from django.contrib import admin
 from web.core.views import *
 from web.health.views import health_default, health_db
 from web.users.views import generic_logout, generic_login
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
-from django.views.generic import RedirectView
 
 
 urlpatterns = (
@@ -38,6 +37,9 @@ urlpatterns = (
         path("uitloggen/", generic_logout, name="uitloggen"),
         path("api/", include(router.urls)),
         path("admin/", admin.site.urls),
+        path(
+            "favicon.ico", RedirectView.as_view(url="/static/images/favicon.ico", permanent=True)
+        ),
     ]
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
