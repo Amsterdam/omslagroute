@@ -37,7 +37,11 @@ RUN apt-get update && apt-get install -y \
   ca-certificates \
   locales \
   tzdata \
-  libmagic1
+  libmagic1 \
+  wget \
+  curl \
+  netcat-openbsd \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY ./certificates/adp_rootca.crt /usr/local/share/ca-certificates/adp_rootca.crt
 RUN chmod 644 /usr/local/share/ca-certificates/adp_rootca.crt \
