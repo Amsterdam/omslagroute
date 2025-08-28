@@ -1,9 +1,10 @@
-ARG NODE_VERSION=20
-ARG PYTHON_VERSION=3.12
+ARG NODE_VERSION=22
+ARG PYTHON_VERSION=3.13
+ARG POETRY_VERSION=2.1.4
 
-FROM node:${NODE_VERSION}-bullseye AS node
+FROM node:${NODE_VERSION}-trixie-slim AS node
 
-FROM python:${PYTHON_VERSION}-bullseye
+FROM python:${PYTHON_VERSION}-slim-trixie
 
 # Copy necessary Node.js binaries from the Node.js image
 COPY --from=node /usr/lib /usr/lib
@@ -17,7 +18,9 @@ RUN node -v && npm -v
 # Add user and set environment variables
 RUN adduser --system datapunt
 RUN adduser datapunt sudo
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED 1 \
+  POETRY_VIRTUALENVS_CREATE=false \
+  POETRY_VERSION=${POETRY_VERSION} \
 
 # Set build-time environment variables
 ARG COMMIT_HASH
@@ -27,9 +30,14 @@ ENV COMMIT_HASH=${COMMIT_HASH} \
     BRANCH_NAME=${BRANCH_NAME} \
     INVENTORY=${INVENTORY}
 
-# update
-RUN apt-get update
-RUN apt-get install libpq-dev build-essential ca-certificates -y
+# Update and install dependencies
+RUN apt-get update && apt-get install -y \
+  libpq-dev \
+  build-essential \
+  ca-certificates \
+  locales \
+  tzdata \
+  libmagic1
 
 COPY ./certificates/adp_rootca.crt /usr/local/share/ca-certificates/adp_rootca.crt
 RUN chmod 644 /usr/local/share/ca-certificates/adp_rootca.crt \
@@ -37,11 +45,6 @@ RUN chmod 644 /usr/local/share/ca-certificates/adp_rootca.crt \
 
 RUN pip install --upgrade pip && \
   pip install --no-cache-dir uwsgi
-RUN apt install libmagic1 -y
-RUN apt-get -y install locales
-
-# install nginx
-RUN apt-get install -y nginx
 
 RUN mkdir -p /static
 RUN mkdir -p /static/images
@@ -67,12 +70,9 @@ WORKDIR /app
 
 RUN npm install
 
-RUN npm rebuild
-
 COPY requirements.txt /app/
 
 RUN ./node_modules/.bin/sass static_src/sass:./assets/bundles/
-
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
 
 RUN pip install --no-cache-dir -r requirements.txt
