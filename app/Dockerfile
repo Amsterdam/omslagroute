@@ -18,9 +18,9 @@ RUN node -v && npm -v
 # Add user and set environment variables
 RUN adduser --system datapunt
 RUN adduser datapunt sudo
-ENV PYTHONUNBUFFERED 1 \
+ENV PYTHONUNBUFFERED=1 \
   POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_VERSION=${POETRY_VERSION} \
+  POETRY_VERSION=2.1.4
 
 # Set build-time environment variables
 ARG COMMIT_HASH
@@ -74,12 +74,12 @@ WORKDIR /app
 
 RUN npm install
 
-COPY requirements.txt /app/
+RUN pip install "poetry==$POETRY_VERSION"
+COPY pyproject.toml poetry.lock /app/
+RUN poetry install --no-interaction --no-ansi --no-root
 
 RUN ./node_modules/.bin/sass static_src/sass:./assets/bundles/
 RUN ./node_modules/.bin/webpack --config webpack.config.js --mode production
-
-RUN pip install --no-cache-dir -r requirements.txt
 
 RUN export REQUEST_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
