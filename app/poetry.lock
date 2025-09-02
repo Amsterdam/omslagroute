@@ -526,7 +526,7 @@ django = ">=1.4"
 type = "git"
 url = "https://github.com/remyvdwereld/django-multiselectfield.git"
 reference = "HEAD"
-resolved_reference = "08e79d82714c08e939a049c97743920fb952f187"
+resolved_reference = "0215da06d84e738b0283ec5bc3ccf95455f20136"
 
 [[package]]
 name = "django-ranged-response"
