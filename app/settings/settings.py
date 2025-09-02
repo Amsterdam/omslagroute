@@ -286,7 +286,6 @@ if os.environ.get("IAM_URL"):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'opencensus.ext.django.middleware.OpencensusMiddleware',
     )
     LOGIN_URL_NAME = 'oidc_authentication_callback'
     LOGOUT_URL_NAME = 'oidc_logout'
