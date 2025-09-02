@@ -6,6 +6,8 @@ FROM node:${NODE_VERSION}-trixie-slim AS node
 
 FROM python:${PYTHON_VERSION}-slim-trixie
 
+ARG POETRY_VERSION
+
 # Copy necessary Node.js binaries from the Node.js image
 COPY --from=node /usr/lib /usr/lib
 COPY --from=node /usr/local/lib /usr/local/lib
@@ -20,7 +22,7 @@ RUN adduser --system datapunt
 RUN adduser datapunt sudo
 ENV PYTHONUNBUFFERED=1 \
   POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_VERSION=2.1.4
+  POETRY_VERSION=${POETRY_VERSION}
 
 # Set build-time environment variables
 ARG COMMIT_HASH
