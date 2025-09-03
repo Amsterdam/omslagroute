@@ -40,6 +40,10 @@ urlpatterns = (
         path(
             "favicon.ico", RedirectView.as_view(url="/static/images/favicon.ico", permanent=True)
         ),
+        path(
+            ".well-known/security.txt",
+            RedirectView.as_view(url="https://www.amsterdam.nl/.well-known/security.txt"),
+        ),
     ]
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
