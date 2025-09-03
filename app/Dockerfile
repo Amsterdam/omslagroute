@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y \
   ca-certificates \
   locales \
   tzdata \
+  media-types \
   libmagic1 \
   wget \
   curl \
