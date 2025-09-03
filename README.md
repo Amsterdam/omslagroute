@@ -62,6 +62,32 @@ To add a basic setup for your local environment run the following command to imp
 docker exec -it salmagundi_wonen_omslagroute python manage.py loaddata fixtures.json
 ```
 
+## Dependency management & upgrading
+This project uses [Poetry](https://python-poetry.org/docs/cli/) for dependency management. You can either manage this locally on your CLI, or do it inside the backend container.
+
+To check for outdated dependencies, run:
+
+```sh
+poetry show --outdated
+```
+
+To upgrade all packages to their latests version constraints and and create a new lockfile, run:
+
+
+```sh
+poetry update
+```
+
+> Note: this means that when `~=1.10` is specified, the package will upgrade to `1.x.x`, but will not upgrade to `2.x.x`.
+
+To upgrade individual packages to major versions, run:
+
+```sh
+poetry add <package>@latest
+```
+
+> Note: always read changelogs for breaking changes.
+
 # Styling resources
 
 The city of Amsterdam has developed a [design system](https://designsystem.amsterdam.nl/7awj1hc9f/p/39359e-design-system). Not all patterns have been built, they are built as soon as they become applicable. Ask colleagues through the OIS Slack #frontend channel.
