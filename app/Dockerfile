@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y \
   wget \
   curl \
   netcat-openbsd \
+  locales \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./certificates/adp_rootca.crt /usr/local/share/ca-certificates/adp_rootca.crt
