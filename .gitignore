@@ -22,5 +22,7 @@ node_modules
 app/assets/bundles/*
 webpack-stats.json
 *.env
+.env.local
 /.history
 *db.sqlite3
+docker-compose.override.yml
