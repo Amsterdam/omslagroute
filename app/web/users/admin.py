@@ -1,6 +1,8 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse
+
+from .statics import WONEN
 from .models import User
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import mark_safe
@@ -10,9 +12,9 @@ from django.shortcuts import render
 from django.utils import timezone
 from openpyxl import Workbook
 
-
 @admin.action(description="Geselecteerde gebruikers exporteren inclusief rollen")
 def export_selected_users_to_excel(modeladmin, request, queryset):
+    queryset= queryset.filter(user_type__contains=WONEN)
     wb = Workbook()
     wb_sheet = wb.active
     wb_sheet.title = "Gebruikers inclusief rollen"
