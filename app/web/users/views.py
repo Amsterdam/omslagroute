@@ -68,8 +68,7 @@ class UserList(UserPassesTestMixin, TemplateView):
         # Create a Q object for user_type__contains filter
         filter_q = Q()
         for item in filter_list:
-            filter_q |= Q(user_type__contains=item)
-
+            filter_q |= Q(user_type__contains=item) & Q(is_active=True)
         # Apply search filtering
         if search:
             search_q = Q()
@@ -143,7 +142,7 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
 
         search = self.request.GET.get('search', '')
 
-        federation_q = Q(federation=federation)
+        federation_q = Q(federation=federation, is_active=True)
 
         # Create a Q object for user_type__contains filter
         filter_q = Q()

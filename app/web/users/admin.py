@@ -42,6 +42,16 @@ def export_selected_users_to_excel(modeladmin, request, queryset):
     wb.save(response)
     return response
 
+
+@admin.action(description="Geselecteerde gebruikers deactiveren")
+def disable_selected_users(modeladmin, request, queryset):
+    updated = queryset.update(is_active=False)
+    messages.success(
+        request,
+        f"{updated} gebruikers zijn gedeactiveerd."
+    )
+
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = (
@@ -50,6 +60,7 @@ class CustomUserAdmin(UserAdmin):
         "profile_link",
         "is_staff",
         "is_superuser",
+        "is_active",
         "user_type_names",
         "federation",
         "date_joined",
@@ -79,7 +90,7 @@ class CustomUserAdmin(UserAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     list_filter = ("user_type", "federation", "is_staff", "is_superuser", "is_active")
-    actions = ["change_federation_action", export_selected_users_to_excel]
+    actions = ["change_federation_action", export_selected_users_to_excel, disable_selected_users]
 
     def profile_link(self, obj):
         url = reverse(
