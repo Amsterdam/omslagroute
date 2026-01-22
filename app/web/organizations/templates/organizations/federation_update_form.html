@@ -45,7 +45,7 @@
         {% endif %}
         {% endif %}
 
-        {% if form.instance.user_list.all and request.user|is_beheerder %}
+        {% if active_users and request.user|is_beheerder %}
         <h3 class="u-margin-top-4x">Gebruikers in deze organisatie</h3>
         <table class="case-list">
             <thead>
@@ -56,7 +56,7 @@
                 <th>Actie</th>
             </thead>
             <tbody>
-                {% for user in form.instance.user_list.all %}
+                {% for user in active_users  %}
                 <tr>
                     <td>
                         {{ user.username }}
