@@ -39,7 +39,6 @@ class FederationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        print(self.fields.keys())
         # Only BEHEERDER can change Name, federation_id and Organization(type)
         if BEHEERDER not in user.user_type_values:
             del self.fields['federation_id']
