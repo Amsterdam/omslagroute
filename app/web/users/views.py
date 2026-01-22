@@ -350,8 +350,10 @@ class UserDelete(UserPassesTestMixin, DeleteView):
         return auth_test(self.request.user, BEHEERDER)
 
     def post(self, request, *args, **kwargs):
-        # Never delete a profile, this will trigger a cascading effect.
-        return super().delete(request, *args, **kwargs)
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return HttpResponseRedirect(self.success_url)
 
 
 class UserFederationDelete(UserPassesTestMixin, DeleteView):
@@ -392,8 +394,10 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
                 # There is no other profile with this case
                 # Add this case to current user
                 self.request.user.profile.cases.add(profile_case)
-
-        return super().delete(request, *args, **kwargs)
+        
+        deleted_user.is_active = False
+        deleted_user.save()
+        return HttpResponseRedirect(self.success_url)
 
 
 class OIDCAuthenticationRequestView(DatapuntOIDCAuthenticationRequestView):
