@@ -68,8 +68,7 @@ class UserList(UserPassesTestMixin, TemplateView):
         # Create a Q object for user_type__contains filter
         filter_q = Q()
         for item in filter_list:
-            filter_q |= Q(user_type__contains=item)
-
+            filter_q |= Q(user_type__contains=item) & Q(is_active=True)
         # Apply search filtering
         if search:
             search_q = Q()
@@ -143,7 +142,7 @@ class FederationUserList(UserPassesTestMixin, TemplateView):
 
         search = self.request.GET.get('search', '')
 
-        federation_q = Q(federation=federation)
+        federation_q = Q(federation=federation, is_active=True)
 
         # Create a Q object for user_type__contains filter
         filter_q = Q()
@@ -351,8 +350,10 @@ class UserDelete(UserPassesTestMixin, DeleteView):
         return auth_test(self.request.user, BEHEERDER)
 
     def post(self, request, *args, **kwargs):
-        # Never delete a profile, this will trigger a cascading effect.
-        return super().delete(request, *args, **kwargs)
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return HttpResponseRedirect(self.success_url)
 
 
 class UserFederationDelete(UserPassesTestMixin, DeleteView):
@@ -393,8 +394,10 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
                 # There is no other profile with this case
                 # Add this case to current user
                 self.request.user.profile.cases.add(profile_case)
-
-        return super().delete(request, *args, **kwargs)
+        
+        deleted_user.is_active = False
+        deleted_user.save()
+        return HttpResponseRedirect(self.success_url)
 
 
 class OIDCAuthenticationRequestView(DatapuntOIDCAuthenticationRequestView):

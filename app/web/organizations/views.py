@@ -67,6 +67,11 @@ class FederationUpdateView(UserPassesTestMixin, UpdateView):
     template_name_suffix = '_update_form'
     success_url = reverse_lazy('federation_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["active_users"] = self.object.user_list.filter(is_active=True)
+        return context
+
     def get_success_url(self):
         if any(user_type in [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER] for user_type in self.request.user.user_type_values):
             return reverse('home')
