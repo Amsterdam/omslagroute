@@ -86,6 +86,15 @@ To upgrade individual packages to major versions, run:
 poetry add <package>@latest
 ```
 
+Upgrade a specific package to an exact version
+
+To install a specific version:
+
+```sh
+poetry add <package>@<version>
+poetry add django@5.2.11
+```
+
 > Note: always read changelogs for breaking changes.
 
 # Styling resources
