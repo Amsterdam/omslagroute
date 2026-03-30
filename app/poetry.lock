@@ -1512,14 +1512,14 @@ files = [
 
 [[package]]
 name = "python-swiftclient"
-version = "4.9.0"
+version = "4.10.0"
 description = "OpenStack Object Storage API Client Library"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "python_swiftclient-4.9.0-py3-none-any.whl", hash = "sha256:0a53fd2fe27843108f39a1ff9e75dac253eeafb4c7e9e59d373263573f17665d"},
-    {file = "python_swiftclient-4.9.0.tar.gz", hash = "sha256:9e207b82ec31786f10db8fef6e205681c24997a0b600d28a194f9d15a90ed772"},
+    {file = "python_swiftclient-4.10.0-py3-none-any.whl", hash = "sha256:6fb8187b736b63c1bc306aba203314510244cdf731dc54031d1cc5d5962e78e6"},
+    {file = "python_swiftclient-4.10.0.tar.gz", hash = "sha256:981891abc7fb355b266e823df3ecb80e5c267c57934fb5094bb102ddaf7e51be"},
 ]
 
 [package.dependencies]
@@ -1527,7 +1527,7 @@ requests = ">=2.4.0"
 
 [package.extras]
 keystone = ["python-keystoneclient (>=0.7.0)"]
-test = ["coverage (>=4.0,!=4.4)", "hacking (>=3.2.0,<6.2.0)", "keystoneauth1 (>=3.4.0)", "openstacksdk (>=0.11.0)", "python-keystoneclient (>=0.7.0)", "stestr (>=2.0.0,!=3.0.0)"]
+test = ["coverage (>=4.0,!=4.4)", "hacking (>=3.2.0,<6.2.0)", "keystoneauth1 (>=3.4.0)", "openstacksdk (>=0.11.0)", "python-keystoneclient (>=0.7.0)", "python-openstackclient (>=3.12.0)", "stestr (>=2.0.0,!=3.0.0)"]
 
 [[package]]
 name = "regex"
