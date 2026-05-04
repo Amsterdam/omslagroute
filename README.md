@@ -62,7 +62,10 @@ To add a basic setup for your local environment run the following command to imp
 docker exec -it salmagundi_wonen_omslagroute python manage.py loaddata fixtures.json
 ```
 
-## Dependency management & upgrading
+# Dependency management & upgrading
+
+## Backend (Poetry)
+
 This project uses [Poetry](https://python-poetry.org/docs/cli/) for dependency management. You can either manage this locally on your CLI, or do it inside the backend container.
 
 To check for outdated dependencies, run:
@@ -96,6 +99,69 @@ poetry add django@5.2.11
 ```
 
 > Note: always read changelogs for breaking changes.
+
+## Frontend (npm)
+
+The frontend uses npm for dependency management.
+
+To check for outdated dependencies, run:
+
+```sh
+npm outdated
+```
+
+This will show:
+
+* current installed version
+* wanted version (based on your package.json constraints)
+* latest available version
+
+To update all packages within the defined version ranges in `package.json`, run:
+
+```sh
+npm update
+```
+
+> Note: this only updates packages to the highest version allowed by the version ranges in `package.json`.
+
+To upgrade a package to the latest version (including major versions), run:
+
+```sh
+npm install <package>@latest
+```
+
+Example:
+
+```sh
+npm install react@latest
+```
+
+To install a specific version:
+
+```sh
+npm install <package>@<version>
+```
+
+Example:
+
+```sh
+npm install react@18.2.0
+```
+
+### Updating version constraints
+
+If you want to both upgrade a package and update the version constraint in `package.json`, reinstall it with the desired version (e.g. `@latest`).
+
+### Clean install
+
+If you run into issues after updates, it's often useful to reinstall dependencies:
+
+```sh
+rm -rf node_modules package-lock.json
+npm install
+```
+
+> Note: always review changelogs for breaking changes, especially when upgrading across major versions.
 
 # Styling resources
 
