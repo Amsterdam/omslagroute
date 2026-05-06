@@ -61,6 +61,18 @@ logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 20
 
+STADSDELEN = [
+    "Centrum",
+    "Nieuw-West",
+    "Noord",
+    "Oost",
+    "Weesp",
+    "West",
+    "Westpoort",
+    "Zuid",
+    "Zuidoost",
+]
+
 
 class UserCaseList(UserPassesTestMixin, ListView):
     model = Case
@@ -207,7 +219,9 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
         ).exclude(status=CASE_STATUS_AFGESLOTEN)
 
         search = self.request.GET.get("search")
+        stadsdeel = self.request.GET.get("stadsdeel")
 
+        # SEARCH FILTER
         if search:
             # Initialize an empty queryset to store the filtered results
             filtered_queryset = casestatus_list.none()
@@ -240,6 +254,10 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
 
             # Remove double items
             casestatus_list = filtered_queryset.distinct()
+
+        # STADSDEEL FILTER
+        if stadsdeel:
+            casestatus_list = casestatus_list.filter(case__adres_stadsdeel=stadsdeel)
 
         qs = casestatus_list.exclude(
             status=CASE_STATUS_INGEDIEND,
@@ -332,6 +350,7 @@ class UserCaseListAll(UserPassesTestMixin, TemplateView):
                 "search": search,
                 "search_params": search_params,
                 "form": form,
+                "stadsdelen": STADSDELEN,
                 "case_archive_list": Case.objects.filter(
                     delete_request_date__isnull=False
                 ),
@@ -1679,10 +1698,15 @@ def serve_document(document, disposition_type):
     if file_mime_type not in settings.ALLOWED_FILE_TYPES:
         raise HttpResponseNotAllowed()
 
-    content_type = mimetypes.guess_type(document.uploaded_file.name)[0] or 'application/octet-stream'
+    content_type = (
+        mimetypes.guess_type(document.uploaded_file.name)[0]
+        or "application/octet-stream"
+    )
 
     response = HttpResponse(file_data, content_type=content_type)
-    response['Content-Disposition'] = f'{disposition_type}; filename="{document.uploaded_file.name}"'
+    response["Content-Disposition"] = (
+        f'{disposition_type}; filename="{document.uploaded_file.name}"'
+    )
 
     return response
 

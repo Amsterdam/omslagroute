@@ -1,110 +1,126 @@
 {% extends 'base.html' %}
 {% load static client_status_tags i18n tz auth_tags %}
-
-{% block title %} - Alle cli&euml;nten{% endblock %}
-
+{% block title %}- Alle cli&euml;nten{% endblock %}
 {% block breadcrumb %}
     <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
         <ol class="breadcrumb-list">
-            <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-step">
+                <a href="{% url 'home' %}">Home</a>
+            </li>
             <li class="breadcrumb-step sr-only" aria-current="location">Alle cli&euml;nten</li>
         </ol>
     </nav>
 {% endblock %}
-
 {% block main %}
-<section class="section section--mijn-clienten">
-    <div class="flex-container">
-        <div class="flex-item">
-            <h2>Aanvragen</h2>
-        </div>
-        {% if request.user|is_wonen_medewerker %}
-        <div class="flex-item u-text-align--right">
-            <div class="form-field form-field--buttons screen-only">
-                <a href="{% url 'case_archive' %}" class="button button--secondary">
-                    Archief ({{case_archive_list|length}})
-                </a>
+    <section class="section section--mijn-clienten">
+        <div class="flex-container">
+            <div class="flex-item">
+                <h2>Aanvragen</h2>
             </div>
+            {% if request.user|is_wonen_medewerker %}
+                <div class="flex-item u-text-align--right">
+                    <div class="form-field form-field--buttons screen-only">
+                        <a href="{% url 'case_archive' %}" class="button button--secondary">Archief ({{ case_archive_list|length }})</a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
-    <form method="get" class="u-margin-bottom-2x">
-        <div class="form-field">
-            <div class="help-text">Zoek cliënten op Voornaam, Achternaam, E-mailadres en/of Geboortedatum (dd-mm-jjjj).</div>
-            {{ form.f }}
-            {{ form.search }}
-        </div>
-        <a href="{% url 'case_list' %}" class="button button--secondary">Filters wissen</a>
-        <button type="submit">Filter</button>
-    </form>
-
-    <div class="tab-list-container">
-        <ul class="u-list-style-none tab-list">
-            <li class="list-label">
-                <span>Status:</span>
-            </li>
-            {% for tab in tabs %}
-            <li class="tab{% if request.GET.f|stringformat:"s" == forloop.counter0|stringformat:"s" %} selected{% elif request.GET.f == None and forloop.counter0|stringformat:"s" == "0" %} selected{% endif %}">
-                <a href="./?f={{ forloop.counter0 }}{% if search != "" %}&search={{ search|default:"" }}{% endif %}" role="button" class="button button--tertiary">{{ tab.title }} ({{ tab.queryset|length }})</a>
-            </li>
-            {% endfor%}
-        </ul>
-    </div>
-    <table class="case-list">
-        <thead>
-            <tr>
-                <th width="200">Cliënt</th>
-                {% if request.user|is_woningcorporatie_medewerker %}
-                    <th>Adres</th>
-                    <th>Stadsdeel</th>
-                {% endif %}
-                <th>Stap in omslagroute</th>
-                <th>Aanvraag door</th>
-                <th>Status</th>
-                <th>Statusdatum</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for object in object_list %}
-                <tr>
-                    <td>
-                        <span class="show-on-mobile">Naam:</span>
-                        <a href="{% url 'case' object.case.id  %}">{{ object.case.client_name }}</a>
-                    </td>
+        <form method="get" class="u-margin-bottom-2x">
+            <div class="form-field--filters">
+                <div class="form-field--search">
+                    <div class="help-text">Zoek op naam, e-mail of geboortedatum (dd-mm-jjjj)</div>
+                    {{ form.f }}
+                    {{ form.search }}
+                </div>
+                <div class="form-field--align-bottom">
                     {% if request.user|is_woningcorporatie_medewerker %}
-                        <td>{{ object.case.adres_straatnaam }} {{ object.case.adres_huisnummer }}{% if object.case.adres_toevoeging %} {{ object.case.adres_toevoeging }}{% endif %}, {{ object.case.adres_postcode }}</td>
-                        <td>{{ object.case.adres_stadsdeel|default:"" }}</td>
+                        <select name="stadsdeel"
+                                onchange="this.form.submit()"
+                                aria-label="Stadsdeel filter (wordt direct toegepast)"
+                                class="filter-stadsdeel-select">
+                            <option value="">Alle stadsdelen</option>
+                            {% for sd in stadsdelen %}
+                                <option value="{{ sd }}"
+                                        {% if request.GET.stadsdeel == sd %}selected{% endif %}>{{ sd }}</option>
+                            {% endfor %}
+                        </select>
                     {% endif %}
-                    <td>
-                        <span class="show-on-mobile">Stap in omslagroute:</span>
-
-                        {% if object.form|form_list_versions and not object.is_most_recent %}
-                        <a href="{% url 'case_version' object.case_version.id %}">{{ object.form|form_verbose }} (Ter inzage)</a>
-                        {% else %}
-                        <a href="{% url 'case_version_form' object.case.id object.form %}">{{ object.form|form_verbose }}</a>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="show-on-mobile">Aanvraag door:</span>
-                        {{ object.profile.user.username }}
-                    </td>
-                    <td>
-                        <span class="show-on-mobile">Status:</span>
-                        <span class="label {% if object.status == 2 or object.status == 6 %}label--status-disapproved{% elif object.status == 3 or object.status == 7 %}label--status-approved{% elif object.status == 4 or object.status == 8 %}label--status-pending{% endif %}">
-                            {% if object.status == 1 and not object.is_first_of_statustype %}Opnieuw {% endif %}{{ object.status|status_verbose }}
-                        </span>
-                        {% if object.status != 1 and object.case_form_is_opnieuw_ingediend %}
-                        <span class="label u-font-size-small u-margin-top-half">
-                            Opnieuw ingediend
-                        </span>
-                        {% endif %}
-
-                    </td>
-                    <td class="u-no-wrap">{{ object.created|timezone:FRONTEND_TIMEZONE|date:"j b Y H:i" }}</td>
+                </div>
+                <div class="form-field--align-bottom">
+                    {% if request.GET.search or request.GET.stadsdeel %}
+                        <a href="{% url 'case_list' %}" class="button button--secondary">Filters wissen</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+        <div class="tab-list-container">
+            <ul class="u-list-style-none tab-list">
+                <li class="list-label">
+                    <span>Status:</span>
+                </li>
+                {% for tab in tabs %}
+                    <li class="tab{% if request.GET.f|stringformat:"s" == forloop.counter0|stringformat:"s" %} selected{% elif request.GET.f == None and forloop.counter0|stringformat:"s" == "0" %} selected{% endif %}">
+                        <a href="./?f={{ forloop.counter0 }}{% if search != "" %}&search={{ search|default:"" }}{% endif %}"
+                            role="button"
+                            class="button button--tertiary">{{ tab.title }} ({{ tab.queryset|length }})</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <table class="case-list">
+            <thead>
+                <tr>
+                    <th width="200">Cliënt</th>
+                    {% if request.user|is_woningcorporatie_medewerker %}
+                        <th>Adres</th>
+                        <th>Stadsdeel</th>
+                    {% endif %}
+                    <th>Stap in omslagroute</th>
+                    <th>Aanvraag door</th>
+                    <th>Status</th>
+                    <th>Statusdatum</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% include 'core/pagination.html' with object_list=object_list filter_params=filter_params %}
-</section>
+            </thead>
+            <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>
+                            <span class="show-on-mobile">Naam:</span>
+                            <a href="{% url 'case' object.case.id %}">{{ object.case.client_name }}</a>
+                        </td>
+                        {% if request.user|is_woningcorporatie_medewerker %}
+                            <td>
+                                {{ object.case.adres_straatnaam }} {{ object.case.adres_huisnummer }}{% if object.case.adres_toevoeging %}{{ object.case.adres_toevoeging }}{% endif %}, {{ object.case.adres_postcode }}
+                            </td>
+                            <td>{{ object.case.adres_stadsdeel|default:"" }}</td>
+                        {% endif %}
+                        <td>
+                            <span class="show-on-mobile">Stap in omslagroute:</span>
+                            {% if object.form|form_list_versions and not object.is_most_recent %}
+                                <a href="{% url 'case_version' object.case_version.id %}">{{ object.form|form_verbose }} (Ter inzage)</a>
+                            {% else %}
+                                <a href="{% url 'case_version_form' object.case.id object.form %}">{{ object.form|form_verbose }}</a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="show-on-mobile">Aanvraag door:</span>
+                            {{ object.profile.user.username }}
+                        </td>
+                        <td>
+                            <span class="show-on-mobile">Status:</span>
+                            <span class="label {% if object.status == 2 or object.status == 6 %}label--status-disapproved{% elif object.status == 3 or object.status == 7 %}label--status-approved{% elif object.status == 4 or object.status == 8 %}label--status-pending{% endif %}">
+                                {% if object.status == 1 and not object.is_first_of_statustype %}Opnieuw{% endif %}
+                                {{ object.status|status_verbose }}
+                            </span>
+                            {% if object.status != 1 and object.case_form_is_opnieuw_ingediend %}
+                                <span class="label u-font-size-small u-margin-top-half">Opnieuw ingediend</span>
+                            {% endif %}
+                        </td>
+                        <td class="u-no-wrap">{{ object.created|timezone:FRONTEND_TIMEZONE|date:"j b Y H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'core/pagination.html' with object_list=object_list filter_params=filter_params %}
+    </section>
 {% endblock %}
