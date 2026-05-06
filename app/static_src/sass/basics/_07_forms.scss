@@ -945,7 +945,7 @@ select {
     }
  }
 
- .form-field-error-message {
+.form-field-error-message {
     margin: -1.5rem 0 2.5rem;
     color: $primary-red;
     display: none;
@@ -957,7 +957,7 @@ select {
      }
  }
 
- .form-navigation {
+.form-navigation {
     align-items: center;
     background-color: $neutral-grey1;
     display: flex;
@@ -965,9 +965,30 @@ select {
     justify-content: space-between;
     padding: 0 16px;
     margin-top: 28px;
- }
+}
 
- .button-span-svg {
+.button-span-svg {
     display: inline-flex;
     margin-right: .3rem;
- }
+}
+
+.form-field--filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.form-field--search {
+    min-width: 24rem;
+}
+
+.form-field--align-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.filter-stadsdeel-select {
+    min-width: 12rem;
+    height: 47px;
+}
