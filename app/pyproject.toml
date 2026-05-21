@@ -31,7 +31,7 @@ dependencies = [
     "python-magic>=0.4.27,<1.0.0",
     "python-swiftclient>=4.6.0,<5.0.0",
     "requests>=2.32.3,<3.0.0",
-    "textile>=4.0.3,<5.0.0",
+    "textile>=4.0.4,<5.0.0",
 ]
 
 [tool.poetry]
