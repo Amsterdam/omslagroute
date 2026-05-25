@@ -8,7 +8,7 @@ requires-python = "~=3.13"
 
 dependencies = [
     "applicationinsights>=0.11.10,<1.0.0",
-    "azure-core>=1.29.3,<2.0.0",
+    "azure-core>=1.41.0,<2.0.0",
     "azure-identity>=1.20.0,<2.0.0",
     "azure-monitor-opentelemetry>=1.7.0,<2.0.0",
     "azure-storage-blob>=12.19.0,<13.0.0",
