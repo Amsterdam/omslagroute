@@ -3,8 +3,17 @@ from django import forms
 from .utils import *
 from .widgets import *
 from web.cases.statics import *
+import re
+from django.core.exceptions import ValidationError
 
-# from web.cases.models import Document
+
+def validate_telefoonnummer(value):
+    if value and not re.match(r"^\+?[0-9\s\-]{7,15}$", value):
+        raise ValidationError(
+            _(
+                'Voer een geldig telefoonnummer in (alleen cijfers, optioneel met "+" voor internationale nummers).'
+            )
+        )
 
 
 FIELDS = (
@@ -403,6 +412,16 @@ FIELDS = (
         forms.CharField(
             label=_("Persoonlijk begeleider"),
             required=False,
+        ),
+        {"step_required": True},
+    ),
+    (
+        "persoonlijk_begeleider_telefoonnummer",
+        forms.CharField(
+            label=_("Telefoonnummer"),
+            widget=forms.TextInput(attrs={"placeholder": " "}),
+            required=True,
+            validators=[validate_telefoonnummer],
         ),
         {"step_required": True},
     ),
@@ -1278,6 +1297,16 @@ FIELDS = (
         {"step_required": True},
     ),
     (
+        "woonevaluatie_akkoord_zorgaanbieder_telefoonnummer",
+        forms.CharField(
+            label=_("Telefoonnummer"),
+            widget=forms.TextInput(attrs={"placeholder": " "}),
+            required=True,
+            validators=[validate_telefoonnummer],
+        ),
+        {"step_required": True},
+    ),
+    (
         "woonevaluatie_akkoord_zorgaanbieder_datum",
         forms.DateField(
             label=_("Datum"),
@@ -1576,6 +1605,16 @@ FIELDS = (
         {"step_required": True},
     ),
     (
+        "kennismaking_wooncorporatie_akkoord_zorgaanbieder_telefoonnummer",
+        forms.CharField(
+            label=_("Telefoonnummer"),
+            widget=forms.TextInput(attrs={"placeholder": " "}),
+            required=True,
+            validators=[validate_telefoonnummer],
+        ),
+        {"step_required": True},
+    ),
+    (
         "kennismaking_wooncorporatie_akkoord_zorgaanbieder_datum",
         forms.DateField(
             label=_("Datum"),
@@ -1774,6 +1813,7 @@ OMKLAP_AANVRAAG = [
                 "fields": [
                     "organisatie",
                     "persoonlijk_begeleider",
+                    "persoonlijk_begeleider_telefoonnummer",
                     "start_zelfstandig_wonen",
                     "datum_voordracht",
                 ],
@@ -2114,6 +2154,7 @@ EVALUATIE_WONEN = [
                 "fields": [
                     "woonevaluatie_akkoord_zorgaanbieder",
                     "woonevaluatie_akkoord_zorgaanbieder_naam",
+                    "woonevaluatie_akkoord_zorgaanbieder_telefoonnummer",
                     "woonevaluatie_akkoord_zorgaanbieder_datum",
                 ],
             },
@@ -2310,6 +2351,7 @@ KENNISMAKING_WONINGCORPORATIE = [
                 "fields": [
                     "kennismaking_wooncorporatie_akkoord_zorgaanbieder",
                     "kennismaking_wooncorporatie_akkoord_zorgaanbieder_naam",
+                    "kennismaking_wooncorporatie_akkoord_zorgaanbieder_telefoonnummer",
                     "kennismaking_wooncorporatie_akkoord_zorgaanbieder_datum",
                 ],
             },
@@ -2594,6 +2636,7 @@ FORMS = (
                 "woonevaluatie_akkoord_bewoner_datum",
                 "woonevaluatie_akkoord_zorgaanbieder",
                 "woonevaluatie_akkoord_zorgaanbieder_naam",
+                "woonevaluatie_akkoord_zorgaanbieder_telefoonnummer",
                 "woonevaluatie_akkoord_zorgaanbieder_datum",
             ],
         },
@@ -2666,6 +2709,7 @@ FORMS = (
                 "kennismaking_wooncorporatie_akkoord_bewoner_datum",
                 "kennismaking_wooncorporatie_akkoord_zorgaanbieder",
                 "kennismaking_wooncorporatie_akkoord_zorgaanbieder_naam",
+                "kennismaking_wooncorporatie_akkoord_zorgaanbieder_telefoonnummer",
                 "kennismaking_wooncorporatie_akkoord_zorgaanbieder_datum",
             ],
         },
