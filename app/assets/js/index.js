@@ -80,8 +80,8 @@ if (document.addEventListener) {
   );
 }
 
-Array.prototype.sortOnData = function (key) {
-  this.sort(function (a, b) {
+function sortOnData(items, key) {
+  items.sort(function (a, b) {
     if (a.dataset[key] < b.dataset[key]) {
       return -1;
     } else if (a.dataset[key] > b.dataset[key]) {
@@ -89,7 +89,7 @@ Array.prototype.sortOnData = function (key) {
     }
     return 0;
   });
-};
+}
 
 !(function (w, d) {
   var handlers = {
@@ -782,7 +782,7 @@ Array.prototype.sortOnData = function (key) {
           var items = Array.prototype.slice.call(
             momentElem.parentNode.children
           );
-          items.sortOnData("order");
+          sortOnData(items, "order");
           var index = items.indexOf(momentElem),
             currentOrder = momentElem.dataset.order,
             nextElem = items[index + direction];
@@ -914,37 +914,6 @@ Array.prototype.sortOnData = function (key) {
       request.send(options.data);
       return request;
     },
-    throttle: function (func, wait, options) {
-      var context, args, result;
-      var timeout = null;
-      var previous = 0;
-      if (!options) options = {};
-      var later = function () {
-        previous = options.leading === false ? 0 : Date.now();
-        timeout = null;
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
-      };
-      return function () {
-        var now = Date.now();
-        if (!previous && options.leading === false) previous = now;
-        var remaining = wait - (now - previous);
-        context = this;
-        args = arguments;
-        if (remaining <= 0 || remaining > wait) {
-          if (timeout) {
-            clearTimeout(timeout);
-            timeout = null;
-          }
-          previous = now;
-          result = func.apply(context, args);
-          if (!timeout) context = args = null;
-        } else if (!timeout && options.trailing !== false) {
-          timeout = setTimeout(later, remaining);
-        }
-        return result;
-      };
-    },
     debounce: function (callback, delay, timeoutKey) {
       var lastClick = helpers.debounceTimeout[timeoutKey] || 0;
       if (lastClick >= Date.now() - delay) return;
@@ -1004,7 +973,7 @@ Array.prototype.sortOnData = function (key) {
         }
       }
       for (var attrname2 in obj2) {
-        if (obj1.hasOwnProperty(attrname1)) {
+        if (obj2.hasOwnProperty(attrname2)) {
           obj3[attrname2] = obj2[attrname2];
         }
       }
