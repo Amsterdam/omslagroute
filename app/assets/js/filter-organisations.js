@@ -40,7 +40,7 @@ button.blur();
 
             // if this was the last organisation filter to be toggled off, 
             // turn off filtering mode
-            if (selectedTags == false) {
+            if (selectedTags.length === 0) {
                 stepsContainer.classList.remove("section--timeline--filtering");
             }
 

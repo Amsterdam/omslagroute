@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             optie.textContent = adres.weergavenaam;
 
                             optie.addEventListener("click", function () {
-                                document.getElementById("id_adres_zoeken").value = adres.weergavenaam;
+                                inputField.value = adres.weergavenaam;
                                 document.getElementById("id_adres_straatnaam").value = adres.straatnaam;
                                 document.getElementById("id_adres_huisnummer").value = adres.huisnummer;
                                 document.getElementById("id_adres_toevoeging").value = `${ adres.huisletter ?? "" }${adres.huisnummertoevoeging ?? ""}`;
