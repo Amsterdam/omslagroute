@@ -25,8 +25,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Omslagroute {% block title %} - Homepage{% endblock %}</title>
     <meta name="description" content="De centrale plek voor informatie over de Omslagroute. De Omslagroute is sinds november 2019 het werkproces voor de in- en doorstroom naar zelfstandig wonen met begeleiding in de wijk en de Omklap naar een huurcontract op naam van de cliënt. Zorgaanbieders, woningcorporaties en gemeente werken daarbij samen."/>
-    <link rel="stylesheet" type="text/css" href="{% static 'bundles/main.css' %}?v={{ SOURCE_COMMIT }}">
-    <link rel="icon" href="https://www.amsterdam.nl/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'bundles/main.css' %}?v={{ SOURCE_COMMIT }}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <style>
         .no-js .modal,
         .no-js .modal-inner,
@@ -35,7 +35,6 @@
             display: none;
         }
     </style>
-    <link type="text/css" rel="stylesheet" href="https://fast.fonts.net/t/1.css?apiType=css&amp;projectid=3680cf49-2b05-4b8a-af28-fa9e27d2bed0">
 
 </head>
 <body>
@@ -195,11 +194,8 @@
     <div class="js-spinner-container"><div class="js-spinner"></div></div>
 </div>
 {% block js %}
-<script type="text/javascript" src="{% static "js/details-element-polyfill.js" %}"></script>
-<script type="text/javascript" src="{% static "js/sticky-navigation-polyfill.js" %}"></script>
-<script type="text/javascript" src="{% static "js/includes-polyfill.js" %}"></script>
-<script type="text/javascript" src="{% static "js/filter-organisations.js" %}"></script>
-<script type="text/javascript" src="{% static "js/index.js" %}?v={{ SOURCE_COMMIT }}"></script>
+<script src="{% static "js/filter-organisations.js" %}"></script>
+<script src="{% static "js/index.js" %}?v={{ SOURCE_COMMIT }}"></script>
 {% endblock %}
 </body>
 </html>

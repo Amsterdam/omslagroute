@@ -121,13 +121,12 @@ LANGUAGE_CODE = 'nl-nl'
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-USE_L10N = True
-# USE_TZ = True
+USE_TZ = True
 FRONTEND_TIMEZONE = 'Europe/Amsterdam'
 DATE_FORMAT = 'd-m-Y H:i'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.0/howto/static-files/
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = os.environ.get('DJANGO_STATIC_URL', '/static/')
 STATIC_ROOT = os.path.normpath(join(os.path.dirname(BASE_DIR), 'static'))
 
