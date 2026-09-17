@@ -9,7 +9,7 @@ HELM_ARGS = manifests/chart \
 	--set image.tag=${VERSION}
 
 REGISTRY ?= 127.0.0.1:5001
-REPOSITORY ?= salmagundi/wonen-omslagroute
+REPOSITORY ?= ams-woon/omslagroute
 VERSION ?= latest
 CHART_VERSION ?= 1.9.1
 
