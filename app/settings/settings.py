@@ -2,7 +2,6 @@ import os
 from os.path import join
 from datetime import timedelta
 # flake8: noqa
-from keycloak_oidc.default_settings import *
 from .azure_settings import Azure
 
 from azure.identity import WorkloadIdentityCredential
@@ -29,7 +28,6 @@ INSTALLED_APPS = (
     'mozilla_django_oidc',       # for authentication
     'webpack_loader',
     'multiselectfield',
-    'keycloak_oidc',
     'corsheaders',
     'captcha',                  # captcha for feedback form
     'web.core',
@@ -221,6 +219,8 @@ SESSION_COOKIE_AGE = 60 * 60  # 60 minutes
 LOGIN_URL = '/#login'
 LOGIN_URL_NAME = 'inloggen'
 LOGOUT_URL_NAME = 'uitloggen'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 SWAGGER_SETTINGS = {
     'LOGIN_URL': '/admin/login/',
@@ -249,6 +249,11 @@ CONSTANCE_CONFIG = {
 
 OIDC_RP_CLIENT_ID = os.environ.get('IAM_CLIENT_ID')
 OIDC_RP_CLIENT_SECRET = os.environ.get('IAM_CLIENT_SECRET')
+
+OIDC_RP_SIGN_ALGO = 'RS256'
+OIDC_USERNAME_ALGO = 'web.users.oidc.generate_username'
+OIDC_OP_LOGOUT_URL_METHOD = 'web.users.oidc.oidc_op_logout'
+ALLOW_LOGOUT_GET_METHOD = True
 
 OIDC_FEDERATION_KEY = os.environ.get('OIDC_FEDERATION_KEY', 'federation')
 OIDC_FEDERATION_DEFAULT = 'onbekend'

@@ -17,10 +17,10 @@ from mozilla_django_oidc.utils import absolutify
 
 
 LOGGER = logging.getLogger(__name__)
-from mozilla_django_oidc.middleware import SessionRefresh as DatapuntSessionRefresh
+from mozilla_django_oidc.middleware import SessionRefresh as MozillaSessionRefresh
 
 
-class SessionRefresh(DatapuntSessionRefresh):
+class SessionRefresh(MozillaSessionRefresh):
     def process_request(self, request):
         if not self.is_refreshable_url(request):
             LOGGER.debug('request is not refreshable')

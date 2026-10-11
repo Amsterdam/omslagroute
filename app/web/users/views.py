@@ -9,7 +9,7 @@ from .forms import *
 from django.urls import reverse_lazy, reverse
 from web.users.auth import auth_test
 from .statics import *
-from mozilla_django_oidc.views import OIDCAuthenticationRequestView as DatapuntOIDCAuthenticationRequestView
+from mozilla_django_oidc.views import OIDCAuthenticationRequestView as MozillaOIDCAuthenticationRequestView
 from django.core.paginator import Paginator
 from mozilla_django_oidc.utils import absolutify
 from web.cases.models import Case
@@ -400,7 +400,7 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
         return HttpResponseRedirect(self.success_url)
 
 
-class OIDCAuthenticationRequestView(DatapuntOIDCAuthenticationRequestView):
+class OIDCAuthenticationRequestView(MozillaOIDCAuthenticationRequestView):
     def get(self, request):
         """OIDC client authentication initialization HTTP endpoint"""
         state = get_random_string(self.get_settings('OIDC_STATE_SIZE', 32))
