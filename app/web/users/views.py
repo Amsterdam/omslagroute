@@ -8,12 +8,13 @@ from .models import *
 from .forms import *
 from django.urls import reverse_lazy, reverse
 from web.users.auth import auth_test
+from web.users.utils import deactivate_user, get_cases_only_linked_to_user
 from .statics import *
 from mozilla_django_oidc.views import OIDCAuthenticationRequestView as DatapuntOIDCAuthenticationRequestView
 from django.core.paginator import Paginator
 from mozilla_django_oidc.utils import absolutify
 from web.cases.models import Case
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -337,12 +338,8 @@ class UserDelete(UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        cases = Case.objects.all()
-        cases = cases.annotate(num_profiles=Count('profile'))
-        cases = cases.filter(num_profiles=1)
-        cases = cases.filter(profile=self.object.profile)
         kwargs.update({
-            'cases': cases,
+            'cases': get_cases_only_linked_to_user(self.object),
         })
         return kwargs
 
@@ -350,9 +347,7 @@ class UserDelete(UserPassesTestMixin, DeleteView):
         return auth_test(self.request.user, BEHEERDER)
 
     def post(self, request, *args, **kwargs):
-        user = self.get_object()
-        user.is_active = False
-        user.save()
+        deactivate_user(self.get_object())
         return HttpResponseRedirect(self.success_url)
 
 
@@ -363,12 +358,8 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        cases = Case.objects.all()
-        cases = cases.annotate(num_profiles=Count('profile'))
-        cases = cases.filter(num_profiles=1)
-        cases = cases.filter(profile=self.object.profile)
         kwargs.update({
-            'cases': cases,
+            'cases': get_cases_only_linked_to_user(self.object),
         })
         return kwargs
 
@@ -381,22 +372,8 @@ class UserFederationDelete(UserPassesTestMixin, DeleteView):
         return auth_test(self.request.user, [PB_FEDERATIE_BEHEERDER, FEDERATIE_BEHEERDER, WONEN])
 
     def post(self, request, *args, **kwargs):
-        # Get user who will be deleted
-        deleted_user = self.get_object()
-        # Get all cases from the deleted user's profile
-        deleted_user_profile_cases = deleted_user.profile.cases.all()
-
-        # Loop through all cases in profile
-        for profile_case in deleted_user_profile_cases:
-            # Check if case exists in other profiles
-            profiles_with_case_count = Profile.objects.filter(cases=profile_case).count()
-            if profiles_with_case_count <= 1:
-                # There is no other profile with this case
-                # Add this case to current user
-                self.request.user.profile.cases.add(profile_case)
-        
-        deleted_user.is_active = False
-        deleted_user.save()
+        # Cases only linked to the deleted user are handed over to the current user
+        deactivate_user(self.get_object(), new_owner=self.request.user)
         return HttpResponseRedirect(self.success_url)
 
 

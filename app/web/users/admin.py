@@ -4,6 +4,8 @@ from django.http import HttpResponse
 
 from .statics import WONEN
 from .models import User
+from .utils import remove_cases_linked_to_other_users
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import mark_safe
 from django.urls import reverse
@@ -52,6 +54,26 @@ def disable_selected_users(modeladmin, request, queryset):
     )
 
 
+@admin.action(description="Cliëntkoppelingen van inactieve gebruikers opschonen")
+def clean_up_cases_of_inactive_users(modeladmin, request, queryset):
+    users = queryset.filter(is_active=False, profile__isnull=False)
+    removed = 0
+    remaining = []
+    with transaction.atomic():
+        for user in users:
+            removed += remove_cases_linked_to_other_users(user)
+            case_ids = user.profile.cases.order_by("id").values_list("id", flat=True)
+            if case_ids:
+                remaining.append("%s: cliënt id %s" % (user.username, ", ".join(str(i) for i in case_ids)))
+    messages.success(
+        request,
+        f"{removed} cliëntkoppelingen van {users.count()} inactieve gebruikers zijn verwijderd."
+    )
+    if remaining:
+        for message in remaining:
+            messages.warning(request, "Geen andere actieve gebruiker, niet losgekoppeld bij %s" % message)
+
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = (
@@ -90,7 +112,7 @@ class CustomUserAdmin(UserAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
     list_filter = ("user_type", "federation", "is_staff", "is_superuser", "is_active")
-    actions = ["change_federation_action", export_selected_users_to_excel, disable_selected_users]
+    actions = ["change_federation_action", export_selected_users_to_excel, disable_selected_users, clean_up_cases_of_inactive_users]
 
     def profile_link(self, obj):
         url = reverse(

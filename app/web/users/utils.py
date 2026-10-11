@@ -1,4 +1,5 @@
 from .models import User
+from django.db import transaction
 import re
 
 
@@ -39,3 +40,46 @@ def get_woningcorporatie_medewerkers_email_list(case):
     elif case.woningcorporatie and case.woningcorporatie.main_email:
         return case.woningcorporatie.main_email_list
     return []
+
+
+def get_cases_only_linked_to_user(user):
+    # Cases that have no other active user linked, profiles of inactive users don't count
+    from web.cases.models import Case
+    from web.profiles.models import Profile
+    return Case.objects.filter(
+        profile=user.profile,
+    ).exclude(
+        profile__in=Profile.objects.filter(user__is_active=True).exclude(id=user.profile.id),
+    )
+
+
+def remove_cases_linked_to_other_users(user):
+    # Cases only linked to this user stay on the profile, so they don't end up without a profile
+    cases = list(user.profile.cases.exclude(
+        id__in=get_cases_only_linked_to_user(user).values_list('id', flat=True),
+    ))
+    user.profile.cases.remove(*cases)
+    return len(cases)
+
+
+def deactivate_user(user, new_owner=None):
+    """
+    Soft delete: the user is set to inactive and the profile is kept for historical data (case statuses etc.).
+    Cases only linked to this user are handed over to new_owner, all other links to cases are removed.
+    Without new_owner the cases only linked to this user stay on the profile, so they don't end up without a profile.
+    """
+    if new_owner == user:
+        new_owner = None
+
+    with transaction.atomic():
+        profile = getattr(user, 'profile', None)
+        if profile:
+            cases = list(get_cases_only_linked_to_user(user))
+            if new_owner:
+                if cases:
+                    new_owner.profile.cases.add(*cases)
+                profile.cases.clear()
+            else:
+                remove_cases_linked_to_other_users(user)
+        user.is_active = False
+        user.save()

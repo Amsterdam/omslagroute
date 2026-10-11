@@ -1124,6 +1124,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                 Q(user_type__contains=PB_FEDERATIE_BEHEERDER)
                 | Q(user_type__contains=BEGELEIDER),
                 profile__isnull=False,
+                is_active=True,
             )
             .exclude(id=self.request.user.id)
             .order_by("federation", "username")
@@ -1229,6 +1230,7 @@ class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
+            is_active=True,
         ).exclude(id=self.request.user.id)
 
     def get_form_kwargs(self, step=None):
@@ -1329,6 +1331,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
                 Q(user_type__contains=PB_FEDERATIE_BEHEERDER)
                 | Q(user_type__contains=BEGELEIDER),
                 profile__isnull=False,
+                is_active=True,
             )
             .exclude(id=self.request.user.id)
             .order_by("federation", "username")
