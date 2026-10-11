@@ -13,7 +13,6 @@ from .statics import *
 from mozilla_django_oidc.views import OIDCAuthenticationRequestView as DatapuntOIDCAuthenticationRequestView
 from django.core.paginator import Paginator
 from mozilla_django_oidc.utils import absolutify
-from web.cases.models import Case
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
