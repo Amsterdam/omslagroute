@@ -6,7 +6,9 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.shortcuts import resolve_url
 from django.core.exceptions import SuspiciousOperation
-from keycloak_oidc.auth import OIDCAuthenticationBackend as DatapuntOIDCAuthenticationBackend
+from mozilla_django_oidc.auth import (
+    OIDCAuthenticationBackend as MozillaOIDCAuthenticationBackend,
+)
 from mozilla_django_oidc.utils import absolutify
 import logging
 from web.organizations.models import Federation
@@ -18,7 +20,9 @@ from django.urls import reverse
 LOGGER = logging.getLogger(__name__)
 
 
-def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, user_type=None):
+def user_passes_test(
+    test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME, user_type=None
+):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -36,36 +40,43 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
             # use the path as the "next" url.
             login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
             current_scheme, current_netloc = urlparse(path)[:2]
-            if ((not login_scheme or login_scheme == current_scheme) and
-                    (not login_netloc or login_netloc == current_netloc)):
+            if (not login_scheme or login_scheme == current_scheme) and (
+                not login_netloc or login_netloc == current_netloc
+            ):
                 path = request.get_full_path()
             from django.contrib.auth.views import redirect_to_login
-            return redirect_to_login(
-                path, resolved_login_url, redirect_field_name)
+
+            return redirect_to_login(path, resolved_login_url, redirect_field_name)
+
         return _wrapped_view
+
     return decorator
 
 
 def auth_test(user, user_type):
-    if not hasattr(user, 'profile'):
+    if not hasattr(user, "profile"):
         return False
     if isinstance(user_type, list):
-        return hasattr(user, 'user_type_values') and any(role in user.user_type_values for role in user_type)
-    return hasattr(user, 'user_type_values') and user_type in user.user_type_values
+        return hasattr(user, "user_type_values") and any(
+            role in user.user_type_values for role in user_type
+        )
+    return hasattr(user, "user_type_values") and user_type in user.user_type_values
 
 
-class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
+class OIDCAuthenticationBackend(MozillaOIDCAuthenticationBackend):
     def get_userinfo(self, access_token, id_token, payload):
         userinfo = super().get_userinfo(access_token, id_token, payload)
-        userinfo.update({
-            settings.OIDC_FEDERATION_KEY: payload.get(settings.OIDC_FEDERATION_KEY)
-        })
+        userinfo.update(
+            {settings.OIDC_FEDERATION_KEY: payload.get(settings.OIDC_FEDERATION_KEY)}
+        )
         return userinfo
 
     def create_user(self, claims):
         user = super().create_user(claims)
+        user.first_name = claims.get("given_name", "")
+        user.last_name = claims.get("family_name", "")
         user.meta = {
-            'claims': claims,
+            "claims": claims,
         }
         user = self.update_user_federation(user, claims)
         user.save()
@@ -74,24 +85,35 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
         profile.user = user
         profile.save()
 
-        beheerder_recipient_list = list(self.UserModel.objects.beheerders().values_list('username', flat=True))
-        federation = Federation.objects.filter(federation_id=claims.get(settings.OIDC_FEDERATION_KEY)).first()
-        if federation and federation.organization and federation.organization.federation_type:
-            federatie_beheerder_recipient_list = list(self.UserModel.objects.federation_beheerders_by_federation(
-                federation,
-                federation.organization.federation_type
-            ).values_list('username', flat=True))
+        beheerder_recipient_list = list(
+            self.UserModel.objects.beheerders().values_list("username", flat=True)
+        )
+        federation = Federation.objects.filter(
+            federation_id=claims.get(settings.OIDC_FEDERATION_KEY)
+        ).first()
+        if (
+            federation
+            and federation.organization
+            and federation.organization.federation_type
+        ):
+            federatie_beheerder_recipient_list = list(
+                self.UserModel.objects.federation_beheerders_by_federation(
+                    federation, federation.organization.federation_type
+                ).values_list("username", flat=True)
+            )
             if federatie_beheerder_recipient_list:
                 beheerder_recipient_list = federatie_beheerder_recipient_list
 
         if settings.EMAIL_HOST_USER and beheerder_recipient_list:
             current_site = get_current_site(self.request)
             data = {
-                'site': current_site.domain,
-                'url': reverse('update_user', kwargs={'pk': user.id})
+                "site": current_site.domain,
+                "url": reverse("update_user", kwargs={"pk": user.id}),
             }
-            subject = 'Omslagroute - gebruiker aangemaakt'
-            message = render_to_string('users/mail/gebruikers_beheerders_new_user.txt', data)
+            subject = "Omslagroute - gebruiker aangemaakt"
+            message = render_to_string(
+                "users/mail/gebruikers_beheerders_new_user.txt", data
+            )
             from_email = settings.FROM_EMAIL
             to_emails = beheerder_recipient_list
             send_mail(subject, message, from_email, to_emails, fail_silently=False)
@@ -99,17 +121,21 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
         return user
 
     def update_user_federation(self, user, claims):
-        federation_id = claims.get(settings.OIDC_FEDERATION_KEY, settings.OIDC_FEDERATION_DEFAULT)
+        federation_id = claims.get(
+            settings.OIDC_FEDERATION_KEY, settings.OIDC_FEDERATION_DEFAULT
+        )
         user.federation, created = Federation.objects.get_or_create(
             federation_id=federation_id,
-            defaults={'name': federation_id},
+            defaults={"name": federation_id},
         )
         return user
 
     def update_user(self, user, claims):
         user = super().update_user(user, claims)
+        user.first_name = claims.get("given_name", "")
+        user.last_name = claims.get("family_name", "")
         user.meta = {
-            'claims': claims,
+            "claims": claims,
         }
         user.save()
         return user
@@ -117,9 +143,11 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
     def get_or_create_user(self, access_token, id_token, payload):
 
         user = super().get_or_create_user(access_token, id_token, payload)
-        user.meta.update({
-            'payload': payload,
-        })
+        user.meta.update(
+            {
+                "payload": payload,
+            }
+        )
         user.save()
         return user
 
@@ -130,32 +158,30 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
         if not self.request:
             return None
 
-        state = self.request.GET.get('state')
-        code = self.request.GET.get('code')
-        nonce = kwargs.pop('nonce', None)
+        state = self.request.GET.get("state")
+        code = self.request.GET.get("code")
+        nonce = kwargs.pop("nonce", None)
 
         if not code or not state:
             return None
 
-        reverse_url = self.get_settings('OIDC_AUTHENTICATION_CALLBACK_URL',
-                                        'oidc_authentication_callback')
+        reverse_url = self.get_settings(
+            "OIDC_AUTHENTICATION_CALLBACK_URL", "oidc_authentication_callback"
+        )
 
         token_payload = {
-            'client_id': self.OIDC_RP_CLIENT_ID,
-            'client_secret': self.OIDC_RP_CLIENT_SECRET,
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': absolutify(
-                self.request,
-                reverse(reverse_url)
-            ),
+            "client_id": self.OIDC_RP_CLIENT_ID,
+            "client_secret": self.OIDC_RP_CLIENT_SECRET,
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": absolutify(self.request, reverse(reverse_url)),
             # 'redirect_uri': 'https://acc.omslagroute.amsterdam.nl%s' % reverse(reverse_url),
         }
 
         # Get the token
         token_info = self.get_token(token_payload)
-        id_token = token_info.get('id_token')
-        access_token = token_info.get('access_token')
+        id_token = token_info.get("id_token")
+        access_token = token_info.get("access_token")
 
         # Validate the token
         payload = self.verify_token(id_token, nonce=nonce)
@@ -165,7 +191,7 @@ class OIDCAuthenticationBackend(DatapuntOIDCAuthenticationBackend):
             try:
                 return self.get_or_create_user(access_token, id_token, payload)
             except SuspiciousOperation as exc:
-                LOGGER.warning('failed to get or create user: %s', exc)
+                LOGGER.warning("failed to get or create user: %s", exc)
                 return None
 
         return None

@@ -64,7 +64,7 @@ if settings.DEBUG:
 
 if settings.IAM_URL:
     urlpatterns += [
-        re_path(r"^oidc/", include("keycloak_oidc.urls")),
+        re_path(r"^oidc/", include("mozilla_django_oidc.urls")),
         path("inloggen/", OIDCAuthenticationRequestView.as_view(), name="inloggen"),
     ]
 if settings.BRANCH_NAME != "production":
