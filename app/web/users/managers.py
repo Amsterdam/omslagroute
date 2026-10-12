@@ -71,6 +71,7 @@ class UserManager(BaseUserManager):
             user_type__contains=BEGELEIDER,
             federation__organization__federation_type=FEDERATION_TYPE_ZORGINSTELLING,
             profile__cases__in=[case],
+            is_active=True,
         )
         return queryset
 
