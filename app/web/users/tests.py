@@ -6,7 +6,7 @@ from web.organizations.statics import FEDERATION_TYPE_ZORGINSTELLING
 from web.profiles.models import Profile
 from .models import User
 from .statics import BEGELEIDER, BEHEERDER, PB_FEDERATIE_BEHEERDER
-from .utils import deactivate_user, get_cases_only_linked_to_user, remove_cases_linked_to_other_users
+from .utils import deactivate_user, get_cases_only_linked_to_user
 
 
 class DeactivateUserTestCase(TestCase):
@@ -63,10 +63,13 @@ class DeactivateUserTestCase(TestCase):
         self.assertFalse(self.deleted_user.is_active)
         self.assertTrue(Profile.objects.filter(user=self.deleted_user).exists())
 
-    def test_profile_has_no_cases_left(self):
+    def test_profile_keeps_its_cases(self):
         deactivate_user(self.deleted_user, new_owner=self.beheerder)
 
-        self.assertEqual(self.deleted_user.profile.cases.count(), 0)
+        self.assertCountEqual(
+            self.deleted_user.profile.cases.all(),
+            [self.case_only_deleted_user, self.case_shared],
+        )
 
     def test_only_linked_cases_are_handed_over(self):
         deactivate_user(self.deleted_user, new_owner=self.beheerder)
@@ -76,15 +79,14 @@ class DeactivateUserTestCase(TestCase):
             [self.case_beheerder, self.case_only_deleted_user],
         )
         self.assertEqual(list(self.colleague.profile.cases.all()), [self.case_shared])
-        self.assertFalse(Case.objects.filter(profile__isnull=True).exists())
 
     def test_deleted_user_is_not_a_linked_user(self):
         deactivate_user(self.deleted_user, new_owner=self.beheerder)
 
         self.assertEqual(list(self.case_shared.get_linked_users()), [self.colleague])
 
-    def test_deactivated_user_with_cases_is_not_a_linked_user(self):
-        # users deactivated in the admin still have cases in their profile
+    def test_deactivated_user_is_not_a_linked_user(self):
+        # users deactivated in the admin don't hand over their cases
         self.deleted_user.is_active = False
         self.deleted_user.save()
 
@@ -101,20 +103,19 @@ class DeactivateUserTestCase(TestCase):
         case_status.refresh_from_db()
         self.assertEqual(case_status.profile.user, self.deleted_user)
 
-    def test_without_new_owner_only_linked_cases_stay_on_profile(self):
+    def test_without_new_owner_no_cases_are_handed_over(self):
         deactivate_user(self.deleted_user)
 
-        self.assertEqual(
-            list(self.deleted_user.profile.cases.all()),
-            [self.case_only_deleted_user],
-        )
+        self.deleted_user.refresh_from_db()
+        self.assertFalse(self.deleted_user.is_active)
+        self.assertEqual(list(self.beheerder.profile.cases.all()), [self.case_beheerder])
 
     def test_user_can_not_hand_over_cases_to_itself(self):
         deactivate_user(self.deleted_user, new_owner=self.deleted_user)
 
-        self.assertEqual(
-            list(self.deleted_user.profile.cases.all()),
-            [self.case_only_deleted_user],
+        self.assertCountEqual(
+            self.deleted_user.profile.cases.all(),
+            [self.case_only_deleted_user, self.case_shared],
         )
 
     def test_federation_delete_view(self):
@@ -127,8 +128,8 @@ class DeactivateUserTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.deleted_user.refresh_from_db()
         self.assertFalse(self.deleted_user.is_active)
-        self.assertEqual(self.deleted_user.profile.cases.count(), 0)
         self.assertIn(self.case_only_deleted_user, self.beheerder.profile.cases.all())
+        self.assertNotIn(self.case_shared, self.beheerder.profile.cases.all())
 
     def test_delete_view(self):
         beheerder = self.create_user('beheerder-adw@example.com', BEHEERDER, federation=False)
@@ -141,56 +142,18 @@ class DeactivateUserTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.deleted_user.refresh_from_db()
         self.assertFalse(self.deleted_user.is_active)
-        self.assertEqual(
-            list(self.deleted_user.profile.cases.all()),
-            [self.case_only_deleted_user],
-        )
         self.assertEqual(beheerder.profile.cases.count(), 0)
 
-    def test_remove_cases_linked_to_other_users(self):
+    def test_remove_invited_user_hands_over_case_when_only_inactive_users_are_left(self):
         self.deleted_user.is_active = False
         self.deleted_user.save()
+        self.client.force_login(self.beheerder)
 
-        removed = remove_cases_linked_to_other_users(self.deleted_user)
-
-        self.assertEqual(removed, 1)
-        self.assertEqual(
-            list(self.deleted_user.profile.cases.all()),
-            [self.case_only_deleted_user],
+        response = self.client.post(
+            reverse('case_remove_invited_users', kwargs={'pk': self.case_shared.id}),
+            {'user_list': [self.colleague.id]},
         )
-        self.assertEqual(list(self.colleague.profile.cases.all()), [self.case_shared])
-
-    def test_admin_action_only_cleans_up_inactive_users(self):
-        admin = User.objects.create(username='admin@example.com', is_staff=True, is_superuser=True)
-        Profile.objects.create(user=admin)
-        self.client.force_login(admin)
-        inactive_user = self.create_user('pb-d@example.com', BEGELEIDER)
-        inactive_user.profile.cases.add(self.case_shared)
-        inactive_user.is_active = False
-        inactive_user.save()
-
-        response = self.client.post(reverse('admin:users_user_changelist'), {
-            'action': 'clean_up_cases_of_inactive_users',
-            '_selected_action': [inactive_user.id, self.deleted_user.id],
-        })
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(inactive_user.profile.cases.count(), 0)
-        self.assertEqual(self.deleted_user.profile.cases.count(), 2)
-
-    def test_admin_action_lists_cases_that_stay_on_profile(self):
-        admin = User.objects.create(username='admin@example.com', is_staff=True, is_superuser=True)
-        Profile.objects.create(user=admin)
-        self.client.force_login(admin)
-        self.deleted_user.is_active = False
-        self.deleted_user.save()
-
-        response = self.client.post(reverse('admin:users_user_changelist'), {
-            'action': 'clean_up_cases_of_inactive_users',
-            '_selected_action': [self.deleted_user.id],
-        }, follow=True)
-
-        self.assertContains(
-            response,
-            'niet losgekoppeld bij pb-a@example.com: cliënt id %s' % self.case_only_deleted_user.id,
-        )
+        self.assertNotIn(self.case_shared, self.colleague.profile.cases.all())
+        self.assertIn(self.case_shared, self.beheerder.profile.cases.all())

@@ -53,33 +53,19 @@ def get_cases_only_linked_to_user(user):
     )
 
 
-def remove_cases_linked_to_other_users(user):
-    # Cases only linked to this user stay on the profile, so they don't end up without a profile
-    cases = list(user.profile.cases.exclude(
-        id__in=get_cases_only_linked_to_user(user).values_list('id', flat=True),
-    ))
-    user.profile.cases.remove(*cases)
-    return len(cases)
-
-
 def deactivate_user(user, new_owner=None):
     """
-    Soft delete: the user is set to inactive and the profile is kept for historical data (case statuses etc.).
-    Cases only linked to this user are handed over to new_owner, all other links to cases are removed.
-    Without new_owner the cases only linked to this user stay on the profile, so they don't end up without a profile.
+    Soft delete: the user is set to inactive and the profile and its links to cases are kept for historical data.
+    Inactive users are not shown as linked users, so the links don't need to be removed.
+    Cases only linked to this user are handed over to new_owner, so they keep an active user.
     """
     if new_owner == user:
         new_owner = None
 
     with transaction.atomic():
-        profile = getattr(user, 'profile', None)
-        if profile:
+        if new_owner and hasattr(user, 'profile'):
             cases = list(get_cases_only_linked_to_user(user))
-            if new_owner:
-                if cases:
-                    new_owner.profile.cases.add(*cases)
-                profile.cases.clear()
-            else:
-                remove_cases_linked_to_other_users(user)
+            if cases:
+                new_owner.profile.cases.add(*cases)
         user.is_active = False
         user.save()
