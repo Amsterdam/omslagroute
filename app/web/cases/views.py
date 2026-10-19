@@ -1124,6 +1124,7 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                 Q(user_type__contains=PB_FEDERATIE_BEHEERDER)
                 | Q(user_type__contains=BEGELEIDER),
                 profile__isnull=False,
+                is_active=True,
             )
             .exclude(id=self.request.user.id)
             .order_by("federation", "username")
@@ -1229,6 +1230,7 @@ class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
     def get_all_users(self):
         return User.objects.filter(
             profile__isnull=False,
+            is_active=True,
         ).exclude(id=self.request.user.id)
 
     def get_form_kwargs(self, step=None):
@@ -1329,6 +1331,7 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
                 Q(user_type__contains=PB_FEDERATIE_BEHEERDER)
                 | Q(user_type__contains=BEGELEIDER),
                 profile__isnull=False,
+                is_active=True,
             )
             .exclude(id=self.request.user.id)
             .order_by("federation", "username")
@@ -1359,8 +1362,8 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
     def form_valid(self, form):
         case = self.instance
         for user in form.cleaned_data.get("user_list"):
-            # Check if there are other profiles with this case
-            profiles_with_case_count = Profile.objects.filter(cases=case).count()
+            # Check if there are other profiles of active users with this case
+            profiles_with_case_count = Profile.objects.filter(cases=case, user__is_active=True).count()
             # If there is just 1 user or less with this case in his profile, do not remove this case (yet).
             # If you delete this case from this profile, there will no longer be a relation between a user and this case.
             # To prevent a floating case, add this case to the current user (Probably PB & Organisatie beheerder).
