@@ -49,6 +49,7 @@ from web.users.utils import (
     get_zorginstelling_medewerkers_email_list,
     filter_valid_emails,
 )
+from web.organizations.statics import STADSDELEN
 from operator import or_
 from django.utils import timezone
 from django.http.response import HttpResponse
@@ -60,18 +61,6 @@ from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 20
-
-STADSDELEN = [
-    "Centrum",
-    "Nieuw-West",
-    "Noord",
-    "Oost",
-    "Weesp",
-    "West",
-    "Westpoort",
-    "Zuid",
-    "Zuidoost",
-]
 
 
 class UserCaseList(UserPassesTestMixin, ListView):

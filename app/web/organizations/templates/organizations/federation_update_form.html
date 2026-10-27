@@ -37,12 +37,34 @@
         {{ form.as_p }}
         {% if not request.user|is_beheerder %}
         {% if request.user|user_federation_type_is_adw or request.user|user_federation_type_is_woningcorporatie %}
-        <p>Vul e-mailadres(sen) in:<br>alleen deze centrale e-mailadres(sen) ontvangen een notificatie wanneer een formulier wordt ingediend</p>
+        <p>Er zijn centrale en/of stadsdeel e-mailadres(sen) ingesteld:<br>standaard wordt het emailadres per stadsdeel gebruikt voor notificaties. Als er voor een stadsdeel geen adres is ingesteld, gelden de centrale e-mailadres(sen).</p>
 
-        <p>Vul géén e-mailadres(sen) in:<br>alle medewerkers van {{ request.user.federation.name }} met een omslagroute-account, ontvangen een notificatie wanneer een formulier wordt ingediend</p>
+        <p>Géén centrale en/of stadsdeel e-mailadres(sen) ingesteld:<br>alle medewerkers van {{ request.user.federation.name }} met een omslagroute-account, ontvangen een notificatie wanneer een formulier wordt ingediend.</p>
         {% else %}
         <p>Als er e-mailadres(sen) zijn ingevoerd dan worden de status verandering van alle cliënten van deze organisatie ook gestuurd naar deze e-mailadres(sen).</p>
         {% endif %}
+        {% endif %}
+
+        {% if district_email_form %}
+        <h3 class="u-margin-top-3x">E-mailadressen per stadsdeel</h3>
+        <p>Vul per stadsdeel een of meer e-mailadressen in, gescheiden door komma's. Laat het veld leeg als er geen e-mailadres voor dat stadsdeel is.</p>
+        {{ district_email_form.non_field_errors }}
+        <table class="case-list">
+            <thead>
+                <tr>
+                    <th scope="col">Stadsdeel</th>
+                    <th scope="col">E-mailadressen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for field in district_email_form %}
+                <tr>
+                    <th scope="row">{{ field.label_tag }}</th>
+                    <td>{{ field.errors }}{{ field }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
 
         {% if active_users and request.user|is_beheerder %}

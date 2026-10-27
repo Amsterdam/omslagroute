@@ -2,6 +2,8 @@ from django import forms
 from .models import *
 from .statics import *
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from web.users.statics import BEHEERDER
 
 
@@ -51,3 +53,50 @@ class FederationForm(forms.ModelForm):
             del self.fields['name_form_validation_team']
         else:
             self.fields['main_email'].label = 'Controleurs e-mailadres(sen)'
+
+
+class EmailListField(forms.CharField):
+    def clean(self, value):
+        value = super().clean(value)
+        email_field = forms.EmailField()
+        emails = []
+        seen = set()
+        for value in value.split(','):
+            if not value.strip():
+                continue
+            email = email_field.clean(value)
+            if email.casefold() in seen:
+                raise ValidationError(
+                    _('Een e-mailadres kan maar één keer per stadsdeel worden ingesteld.')
+                )
+            seen.add(email.casefold())
+            emails.append(email)
+        return emails
+
+
+class StadsdeelEmailForm(forms.Form):
+    def __init__(self, *args, instance, **kwargs):
+        kwargs.setdefault('prefix', 'district_emails')
+        super().__init__(*args, **kwargs)
+        self.instance = instance
+        existing_emails = {}
+        for district_email in instance.district_emails.all():
+            existing_emails.setdefault(district_email.stadsdeel, []).append(district_email.email)
+
+        for stadsdeel, label in STADSDEEL_CHOICES:
+            self.fields[stadsdeel] = EmailListField(
+                label=label,
+                required=False,
+                initial=', '.join(existing_emails.get(stadsdeel, [])),
+            )
+
+    @transaction.atomic
+    def save(self):
+        if not self.is_valid():
+            raise ValueError('The district email addresses could not be saved because the form is invalid.')
+
+        for stadsdeel, emails in self.cleaned_data.items():
+            district_emails = self.instance.district_emails.filter(stadsdeel=stadsdeel)
+            district_emails.exclude(email__in=emails).delete()
+            for email in emails:
+                self.instance.district_emails.get_or_create(stadsdeel=stadsdeel, email=email)
