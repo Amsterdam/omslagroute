@@ -79,8 +79,8 @@ class Organization(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = _('Organisatie')
-        verbose_name_plural = _('Organisaties')
+        verbose_name = _('Organisatie type')
+        verbose_name_plural = _('Organisatie types')
         ordering = ('name',)
 
 

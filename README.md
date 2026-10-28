@@ -21,6 +21,20 @@ Go to http://localhost:8088/
 For the admin interface:
 http://localhost:8088/admin/
 
+## E-mail (Mailpit)
+Locally, all outgoing e-mail is caught by [Mailpit](https://mailpit.axllent.org/), which is started together with the dev server. No e-mail is sent to real addresses.
+
+View the caught e-mails at: http://localhost:8025/
+
+The mail settings are configured through environment variables (`EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`, `EMAIL_HOST_USER`) in `docker-compose.local.yml`. E-mails are only sent when `EMAIL_HOST_USER` is set.
+
+For an overview of when and to whom e-mails are sent, see [EMAILS.md](EMAILS.md).
+
+To print e-mails to the container logs instead, set:
+```bash
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+```
+
 ## Importing fixtures dump
 The Django project needs some configuration in order to run locally. It's possible to add these manually, but the quickest way is importing using fixtures from the acceptance environment. You can download these automatically at: https://acc.omslagroute.amsterdam.nl/admin/dumpdata. You'll need to be logged in using an admin account first to access this url.
 

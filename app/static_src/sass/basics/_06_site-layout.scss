@@ -128,6 +128,10 @@ body {
     font-weight: bold;
 }
 
+.site-userinfo__federation {
+    color: $neutral-grey4;
+}
+
 .site-main {
     max-width: $site-max-width;
     margin: 0 auto;

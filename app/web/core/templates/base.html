@@ -77,6 +77,9 @@
                         {% else %}
                             <p class="site-userinfo__username">{{ request.user.username }}</p>
                         {% endif %}
+                        {% if request.user.federation %}
+                            <p class="site-userinfo__federation"><small>{{ request.user.federation.name }}</small></p>
+                        {% endif %}
                         <p>
                             {% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder or request.user|is_wonen_medewerker %}
                             <small><a href="{% if request.user|is_begeleider or request.user|is_pb_federatie_beheerder %}{% static "documents/quickguide-zorginstellingen.pdf" %}{% elif request.user|is_wonen_medewerker %}{% static "documents/quickguide-wonen.pdf" %}{% endif %}" target="_blank" rel="noopener noreferrer">Help</a>
