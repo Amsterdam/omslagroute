@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static html_tags %}
 
 {% block title %} - Cliënt adres aanmaken{% endblock %}
 
@@ -35,13 +35,20 @@
                     <span id="clear-search" class="clear-icon">&times;</span>
                 </div>
                 <div id="adres-suggesties" class="suggesties-container"></div>
+                {% if form.non_field_errors %}
+                <ol class="error-text">
+                    {% for error in form.non_field_errors %}
+                    <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                </ol>
+                {% endif %}
             </div>
             {{ form.adres_straatnaam }}
             {{ form.adres_huisnummer }}
             {{ form.adres_toevoeging }}
             {{ form.adres_postcode }}
             {{ form.adres_plaatsnaam }}
-            {{ form.adres_stadsdeel }}
+            {{ form.nummeraanduiding_id }}
 
             <div class="flex-container">
                 <div class="flex-item">
@@ -75,5 +82,5 @@
 
 {% block js %}
 {{ block.super }}
-<script src="{% static "js/search-address.js" %}"></script>
+<script src="{% static_version "js/search-address.js" %}"></script>
 {% endblock %}

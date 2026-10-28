@@ -56,7 +56,7 @@ Ontvangers (`get_woningcorporatie_medewerkers_email_list` in `app/web/users/util
 | Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt terug gedraaid | `CaseDeleteRequestRevokeView` |
 | Cliënt definitief verwijderd | Wonen | Omslagroute - Cliënt definitief verwijderd | `CaseDeleteView` |
 
-Het stadsdeel van de cliënt wordt automatisch ingevuld bij het zoeken op adres (`app/assets/js/search-address.js`). Bij een adreswijziging wordt de mail verstuurd naar het stadsdeel van het nieuwe adres.
+Het stadsdeel van de cliënt wordt bij het opslaan van het adres server-side bepaald op basis van het gekozen adres (`AddressStadsdeelMixin` in `app/web/cases/forms.py`). Bij een adreswijziging wordt de mail verstuurd naar het stadsdeel van het nieuwe adres.
 
 ## Algemeen
 

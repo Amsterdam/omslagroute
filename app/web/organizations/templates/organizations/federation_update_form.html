@@ -34,37 +34,76 @@
     <form method="post">
         {% csrf_token %}
 
+        {% if district_email_form %}
+        {% for field in form %}
+        {% if field.name != 'main_email' %}
+        {{ field.errors }}
+        <p>{{ field.label_tag }} {{ field }}{% if field.help_text %} <span class="helptext">{{ field.help_text }}</span>{% endif %}</p>
+        {% endif %}
+        {% endfor %}
+
+        <h2 class="u-margin-top-3x">E-mailnotificaties</h2>
+        <p>{{ object.name }} krijgt een e-mail over een cliënt die aan {{ object.name }} is gekoppeld als:</p>
+        <ul>
+            <li>een <em>Evaluatie wonen</em>, <em>Match met passende woning</em> of <em>Kennismaking woningcorporatie</em> is ingediend;</li>
+            <li>het adres van de cliënt is gewijzigd;</li>
+            <li>er een verzoek is gedaan om de cliënt te verwijderen of dit verzoek is ingetrokken;</li>
+            <li>de cliënt definitief is verwijderd.</li>
+        </ul>
+
+        <p>Deze e-mails gaan naar:</p>
+        <ol>
+            <li>de e-mailadressen van het stadsdeel waarin het adres van de cliënt ligt;</li>
+            <li>als die er niet zijn: de centrale e-mailadressen;</li>
+            <li>als die er ook niet zijn: alle medewerkers van {{ object.name }} met een omslagroute-account.</li>
+        </ol>
+
+        <fieldset class="section section--step">
+            <legend>
+                <h3 class="section--step__title">Centrale e-mailadressen</h3>
+            </legend>
+            <div class="section sub-section">
+                <p class="u-max-width-none">Worden gebruikt als er geen e-mailadres is ingesteld voor het stadsdeel waarin het adres van de cliënt ligt. Scheid meerdere e-mailadressen met een komma.</p>
+                <label for="{{ form.main_email.id_for_label }}" class="sr-only">Centrale e-mailadressen</label>
+                {{ form.main_email.errors }}
+                {{ form.main_email }}
+            </div>
+        </fieldset>
+
+        <fieldset class="section section--step">
+            <legend>
+                <h3 class="section--step__title">E-mailadressen per stadsdeel (optioneel)</h3>
+            </legend>
+            <div class="section sub-section">
+                <p class="u-max-width-none">Deze e-mailadressen gaan vóór de centrale e-mailadressen. Scheid meerdere e-mailadressen met een komma en laat het veld leeg als er geen e-mailadres voor dat stadsdeel is.</p>
+                {{ district_email_form.non_field_errors }}
+                <table class="table--form">
+                    <thead>
+                        <tr>
+                            <th scope="col">Stadsdeel</th>
+                            <th scope="col">E-mailadressen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for field in district_email_form %}
+                        <tr>
+                            <th scope="row"><label for="{{ field.id_for_label }}">{{ field.label }}</label></th>
+                            <td>{{ field.errors }}{{ field }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+        {% else %}
         {{ form.as_p }}
         {% if not request.user|is_beheerder %}
-        {% if request.user|user_federation_type_is_adw or request.user|user_federation_type_is_woningcorporatie %}
-        <p>Er zijn centrale en/of stadsdeel e-mailadres(sen) ingesteld:<br>standaard wordt het emailadres per stadsdeel gebruikt voor notificaties. Als er voor een stadsdeel geen adres is ingesteld, gelden de centrale e-mailadres(sen).</p>
-
-        <p>Géén centrale en/of stadsdeel e-mailadres(sen) ingesteld:<br>alle medewerkers van {{ request.user.federation.name }} met een omslagroute-account, ontvangen een notificatie wanneer een formulier wordt ingediend.</p>
+        {% if request.user|user_federation_type_is_adw %}
+        <p>Notificaties gaan naar de centrale e-mailadres(sen). Als er geen centrale e-mailadres(sen) zijn ingesteld, ontvangen alle medewerkers van {{ request.user.federation.name }} met een omslagroute-account een notificatie.</p>
         {% else %}
         <p>Als er e-mailadres(sen) zijn ingevoerd dan worden de status verandering van alle cliënten van deze organisatie ook gestuurd naar deze e-mailadres(sen).</p>
         {% endif %}
         {% endif %}
-
-        {% if district_email_form %}
-        <h3 class="u-margin-top-3x">E-mailadressen per stadsdeel</h3>
-        <p>Vul per stadsdeel een of meer e-mailadressen in, gescheiden door komma's. Laat het veld leeg als er geen e-mailadres voor dat stadsdeel is.</p>
-        {{ district_email_form.non_field_errors }}
-        <table class="table--condensed">
-            <thead>
-                <tr>
-                    <th scope="col">Stadsdeel</th>
-                    <th scope="col">E-mailadressen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for field in district_email_form %}
-                <tr>
-                    <th scope="row">{{ field.label_tag }}</th>
-                    <td>{{ field.errors }}{{ field }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
         {% endif %}
 
         {% if active_users and request.user|is_beheerder %}

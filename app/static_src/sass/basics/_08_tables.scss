@@ -248,3 +248,46 @@ table table {
         }
     }
 }
+.table--form {
+    thead {
+        border-bottom: .125rem solid $neutral-grey2;
+    }
+
+    tr:nth-of-type(even) {
+        background-color: transparent;
+    }
+
+    thead th,
+    tbody th,
+    tbody td {
+        padding: .6rem 1rem;
+        vertical-align: middle;
+    }
+
+    tbody {
+        th,
+        td {
+            border-bottom: .063rem solid $neutral-grey2;
+        }
+
+        th {
+            width: 30%;
+
+            @media all and (max-width: $tablets) {
+                width: 100%;
+                padding-bottom: 0;
+                border-bottom: 0;
+            }
+        }
+
+        label {
+            font-weight: normal;
+        }
+
+        [type="text"],
+        [type="email"],
+        textarea {
+            margin-top: 0;
+        }
+    }
+}

@@ -88,6 +88,7 @@ class StadsdeelEmailForm(forms.Form):
                 label=label,
                 required=False,
                 initial=', '.join(existing_emails.get(stadsdeel, [])),
+                widget=forms.Textarea(attrs={'rows': 1}),
             )
 
     @transaction.atomic
