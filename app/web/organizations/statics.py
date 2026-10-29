@@ -7,3 +7,17 @@ FEDERATION_TYPE_CHOICES = (
     (FEDERATION_TYPE_ZORGINSTELLING, 'Zorginstelling',),
     (FEDERATION_TYPE_WONINGCORPORATIE, 'Woningcorporatie',),
 )
+
+STADSDELEN = [
+    'Centrum',
+    'Nieuw-West',
+    'Noord',
+    'Oost',
+    'Weesp',
+    'West',
+    'Westpoort',
+    'Zuid',
+    'Zuidoost',
+]
+
+STADSDEEL_CHOICES = tuple((stadsdeel, stadsdeel) for stadsdeel in STADSDELEN)

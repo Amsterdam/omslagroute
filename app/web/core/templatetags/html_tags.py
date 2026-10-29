@@ -4,6 +4,10 @@ from web.users.auth import auth_test
 register = template.Library()
 from datetime import datetime, date
 from django.utils.html import mark_safe
+from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.templatetags.static import static
+import os
 
 
 @register.filter(name='linebreaks2html')
@@ -70,3 +74,13 @@ def duration(td):
     seconds_str = f'{seconds}s' if seconds and not hours_str else ''
 
     return f'{days_str}{hours_str}{minutes_str}{seconds_str}'
+
+
+@register.simple_tag
+def static_version(path):
+    # Cache buster: the commit hash, or locally the modification time of the file
+    version = settings.SOURCE_COMMIT
+    if not version:
+        file_path = finders.find(path)
+        version = int(os.path.getmtime(file_path)) if file_path else ''
+    return '%s?v=%s' % (static(path), version)

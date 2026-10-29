@@ -35,11 +35,26 @@ def get_zorginstelling_medewerkers_email_list(case):
 
 
 def get_woningcorporatie_medewerkers_email_list(case):
-    if case.woningcorporatie and not case.woningcorporatie.main_email:
-        return list(User.objects.woningcorporatie_medewerkers(case).values_list('username', flat=True))
-    elif case.woningcorporatie and case.woningcorporatie.main_email:
+    if not case.woningcorporatie:
+        return []
+
+    # Find email for district
+    if case.adres_stadsdeel:
+        district_emails = list(
+            case.woningcorporatie.district_emails.filter(
+                stadsdeel=case.adres_stadsdeel,
+            ).values_list('email', flat=True)
+        )
+        if district_emails:
+            return district_emails
+
+    # Fallback to corporation main email
+    if case.woningcorporatie.main_email:
         return case.woningcorporatie.main_email_list
-    return []
+
+    # Fallback to all users of corporation
+    else:
+        return list(User.objects.woningcorporatie_medewerkers(case).values_list('username', flat=True))
 
 
 def get_cases_only_linked_to_user(user):

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 from web.cases.models import Case
@@ -6,7 +7,12 @@ from web.users.models import User
 from web.forms.statics import FORMS_BY_SLUG
 from web.forms.utils import get_sections_fields
 from web.core.utils import validate_email_wrapper
-from .statics import FEDERATION_TYPE_CHOICES, FEDERATION_TYPE_ZORGINSTELLING, FEDERATION_TYPE_WONINGCORPORATIE
+from .statics import (
+    FEDERATION_TYPE_CHOICES,
+    FEDERATION_TYPE_ZORGINSTELLING,
+    FEDERATION_TYPE_WONINGCORPORATIE,
+    STADSDEEL_CHOICES,
+)
 
 
 def get_fields():
@@ -73,8 +79,8 @@ class Organization(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = _('Organisatie')
-        verbose_name_plural = _('Organisaties')
+        verbose_name = _('Organisatie type')
+        verbose_name_plural = _('Organisatie types')
         ordering = ('name',)
 
 
@@ -133,3 +139,36 @@ class Federation(models.Model):
         verbose_name = _('Federatie')
         verbose_name_plural = _('Federaties')
         ordering = ('name',)
+
+
+class StadsdeelEmail(models.Model):
+    federation = models.ForeignKey(
+        Federation,
+        verbose_name=_('Woningcorporatie'),
+        related_name='district_emails',
+        on_delete=models.CASCADE,
+    )
+    stadsdeel = models.CharField(
+        verbose_name=_('Stadsdeel'),
+        max_length=50,
+        choices=STADSDEEL_CHOICES,
+    )
+    email = models.EmailField(
+        verbose_name=_('E-mailadres'),
+    )
+
+    def __str__(self):
+        return f'{self.stadsdeel}: {self.email}'
+
+    class Meta:
+        verbose_name = _('Stadsdeel e-mailadres')
+        verbose_name_plural = _('Stadsdeel e-mailadressen')
+        ordering = ('stadsdeel', 'email')
+        constraints = [
+            models.UniqueConstraint(
+                'federation',
+                'stadsdeel',
+                Lower('email'),
+                name='unique_stadsdeel_email',
+            ),
+        ]

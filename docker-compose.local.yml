@@ -26,6 +26,10 @@ services:
       - DJANGO_ALLOWED_HOSTS=0.0.0.0,localhost,omslagroute.local
       - DJANGO_ROOT_URLCONF=web.urls
       - DJANGO_STATIC_URL=/static/
+      - EMAIL_HOST=mailpit
+      - EMAIL_PORT=1025
+      - EMAIL_USE_TLS=False
+      - EMAIL_HOST_USER=local
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=insecure
       - DATABASE_NAME=omslagroute
@@ -60,6 +64,12 @@ services:
       python ./manage.py runserver 0.0.0.0:8088 --settings settings.settings"
     depends_on:
       - database
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
 
 networks:
   default:

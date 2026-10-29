@@ -10,6 +10,14 @@ from django.views.generic import RedirectView, TemplateView
 from web.users.views import OIDCAuthenticationRequestView
 from .routers import router
 
+ENVIRONMENT_NAMES = {
+    "acc": "Acceptatie",
+    "prd": "Productie",
+}
+
+admin.site.site_header = "Omslagroute"
+admin.site.site_title = "Omslagroute"
+admin.site.index_title = ENVIRONMENT_NAMES.get(settings.APP_ENV, "Lokaal")
 
 urlpatterns = (
     [

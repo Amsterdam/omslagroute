@@ -15,6 +15,8 @@ from web.forms.fields import MultiSelectFormField
 from web.users.models import User
 from web.users.statics import BEGELEIDER, PB_FEDERATIE_BEHEERDER
 from web.organizations.statics import FEDERATION_TYPE_WONINGCORPORATIE
+from django.core.validators import RegexValidator
+from .utils import get_stadsdeel
 
 
 class UserCaseForm(forms.ModelForm):
@@ -221,7 +223,46 @@ class CaseCleanForm(forms.ModelForm):
         fields = []
 
 
-class CaseAddressForm(forms.ModelForm):
+class AddressStadsdeelMixin:
+    """
+    Determines the stadsdeel server side, based on the nummeraanduiding_id of the selected address.
+    """
+
+    address_fields = [
+        "adres_straatnaam",
+        "adres_huisnummer",
+        "adres_toevoeging",
+        "adres_postcode",
+        "adres_plaatsnaam",
+    ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nummeraanduiding_id = cleaned_data.get("nummeraanduiding_id")
+
+        if not nummeraanduiding_id:
+            # Address not changed, keep the current stadsdeel
+            address_changed = any(f in self.changed_data for f in self.address_fields)
+            if self.instance.adres_stadsdeel and not address_changed:
+                return cleaned_data
+            raise forms.ValidationError(_("Kies een adres uit de lijst met suggesties."))
+
+        stadsdeel = get_stadsdeel(nummeraanduiding_id)
+        if not stadsdeel:
+            raise forms.ValidationError(
+                _("Het stadsdeel van dit adres kon niet worden bepaald. Probeer het later opnieuw.")
+            )
+        self.instance.adres_stadsdeel = stadsdeel
+        return cleaned_data
+
+
+class CaseAddressForm(AddressStadsdeelMixin, forms.ModelForm):
+    nummeraanduiding_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r"^\d+$")],
+    )
+
     class Meta:
         model = Case
         fields = [
@@ -230,7 +271,6 @@ class CaseAddressForm(forms.ModelForm):
             "adres_toevoeging",
             "adres_postcode",
             "adres_plaatsnaam",
-            "adres_stadsdeel",
             "woningcorporatie",
             "woningcorporatie_medewerker",
         ]
@@ -242,14 +282,12 @@ class CaseAddressForm(forms.ModelForm):
         self.fields["adres_postcode"].required = True
         self.fields["adres_plaatsnaam"].required = True
         self.fields["woningcorporatie"].required = True
-        self.fields["adres_stadsdeel"].required = True
 
         self.fields["adres_straatnaam"].widget.attrs["hidden"] = True
         self.fields["adres_huisnummer"].widget.attrs["hidden"] = True
         self.fields["adres_toevoeging"].widget.attrs["hidden"] = True
         self.fields["adres_postcode"].widget.attrs["hidden"] = True
         self.fields["adres_plaatsnaam"].widget.attrs["hidden"] = True
-        self.fields["adres_stadsdeel"].widget.attrs["hidden"] = True
 
         self.fields["woningcorporatie"].queryset = self.fields[
             "woningcorporatie"
@@ -258,7 +296,12 @@ class CaseAddressForm(forms.ModelForm):
         )
 
 
-class CaseAddressUpdateForm(forms.ModelForm):
+class CaseAddressUpdateForm(AddressStadsdeelMixin, forms.ModelForm):
+    nummeraanduiding_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+        validators=[RegexValidator(r"^\d+$")],
+    )
     wijziging_reden = forms.CharField(
         label=_("Waarom wijzig je dit adres?"),
         widget=forms.Textarea(
@@ -277,7 +320,6 @@ class CaseAddressUpdateForm(forms.ModelForm):
             "adres_toevoeging",
             "adres_postcode",
             "adres_plaatsnaam",
-            "adres_stadsdeel",
             "woningcorporatie",
             "woningcorporatie_medewerker",
         ]
@@ -288,7 +330,6 @@ class CaseAddressUpdateForm(forms.ModelForm):
         self.fields["adres_huisnummer"].required = True
         self.fields["adres_postcode"].required = True
         self.fields["adres_plaatsnaam"].required = True
-        self.fields["adres_stadsdeel"].required = True
         self.fields["woningcorporatie"].required = True
 
         self.fields["adres_straatnaam"].widget.attrs["hidden"] = True
@@ -296,7 +337,6 @@ class CaseAddressUpdateForm(forms.ModelForm):
         self.fields["adres_toevoeging"].widget.attrs["hidden"] = True
         self.fields["adres_postcode"].widget.attrs["hidden"] = True
         self.fields["adres_plaatsnaam"].widget.attrs["hidden"] = True
-        self.fields["adres_stadsdeel"].widget.attrs["hidden"] = True
 
         self.fields["woningcorporatie"].queryset = self.fields[
             "woningcorporatie"

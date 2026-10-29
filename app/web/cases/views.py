@@ -49,6 +49,7 @@ from web.users.utils import (
     get_zorginstelling_medewerkers_email_list,
     filter_valid_emails,
 )
+from web.organizations.statics import STADSDELEN
 from operator import or_
 from django.utils import timezone
 from django.http.response import HttpResponse
@@ -60,18 +61,6 @@ from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 20
-
-STADSDELEN = [
-    "Centrum",
-    "Nieuw-West",
-    "Noord",
-    "Oost",
-    "Weesp",
-    "West",
-    "Westpoort",
-    "Zuid",
-    "Zuidoost",
-]
 
 
 class UserCaseList(UserPassesTestMixin, ListView):
@@ -1762,23 +1751,3 @@ def search_adres(request):
         return JsonResponse({"results": results})
     except requests.exceptions.RequestException:
         return JsonResponse({"results": []}, status=400)
-
-
-@user_passes_test(
-    auth_test,
-    user_type=[BEGELEIDER, PB_FEDERATIE_BEHEERDER],
-)
-def search_stadsdeel(request):
-    nummeraanduiding_id = request.GET.get("nummeraanduidingid", "")
-    if not nummeraanduiding_id:
-        return JsonResponse({"error": "Missing nummeraanduidingid"}, status=400)
-
-    url = f"https://api.data.amsterdam.nl/v1/benkagg/adresseerbareobjecten/{nummeraanduiding_id}"
-
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        return JsonResponse(response.json())
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request error stadsdeel: {e}")
-        return JsonResponse({"error": "Error searching stadsdeel"}, status=400)

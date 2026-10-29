@@ -105,3 +105,8 @@ def form_federation(case, form):
     elif ft == FEDERATION_TYPE_ADW and federation:
         return federation
     return None
+
+
+@register.filter()
+def other_linked_users_count(case, user):
+    return case.get_linked_users().exclude(id=user.id).count()

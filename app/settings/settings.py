@@ -45,6 +45,7 @@ INSTALLED_APPS = (
 )
 SOURCE_COMMIT = os.environ.get('COMMIT_HASH')
 BRANCH_NAME = os.environ.get('BRANCH_NAME')
+APP_ENV = os.environ.get('APP_ENV')
 
 # https://docs.djangoproject.com/en/2.0/topics/http/middleware/
 MIDDLEWARE = (
@@ -70,12 +71,12 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'local')
 WSGI_APPLICATION = 'wsgi.application'
 
 # Email SMTP
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'prd.mail-relay.secumailer.cloud'
-EMAIL_PORT = 587
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'prd.mail-relay.secumailer.cloud')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 FROM_EMAIL = 'no-reply@amsterdam.nl'
 
 

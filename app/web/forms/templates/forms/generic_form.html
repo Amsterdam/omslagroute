@@ -34,7 +34,7 @@
             </a>
         {% endif %}
             <a href="{% url 'case_invite_users' object.id %}" class="button button--secondary" data-handler="modal" data-contentid="modalInvite">
-                Samenwerken&nbsp;aan&nbsp;deze&nbsp;cliënt&nbsp;({{ object.get_linked_users|length|add:-1 }})
+                Samenwerken&nbsp;aan&nbsp;deze&nbsp;cliënt&nbsp;({{ object|other_linked_users_count:request.user }})
             </a>
         </div>
 
@@ -63,7 +63,7 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if object.get_linked_users|length > 1 %}
+                    {% if object|other_linked_users_count:request.user > 0 %}
                         <li>
 
                             <a href="mailto:{% for user in object.get_linked_users %}{% if request.user.id != user.id %}{{user.username}},{% endif %}{% endfor %}?SUBJECT={{ title }}&BODY=%0D%0D%0A{{request.build_absolute_uri}}%0D%0D%0ALog in op omslagroute.amsterdam.nl om bovenstaande link te openen.">
