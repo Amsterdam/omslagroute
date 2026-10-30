@@ -62,7 +62,7 @@ Het stadsdeel van de cliënt wordt bij het opslaan van het adres server-side bep
 
 - Bij een adreswijziging, een verzoek om te verwijderen en het terugdraaien daarvan krijgt de gebruiker die de actie uitvoert zelf geen e-mail.
 - De e-mails van de cliënt staan in de views in `app/web/cases/views.py` en `app/web/cases/viewsets.py`, de teksten in `app/web/cases/templates/cases/mail/`.
-- Alle e-mails gaan via `send_template_mail` in `app/web/core/mail.py`. Die maakt van één `.txt`-sjabloon een platte tekst- én een HTML-versie, met de opmaak uit `app/web/core/templates/mail/`. Alinea's in een sjabloon worden gescheiden door een lege regel; de knop en de link geef je mee als `button_text` en `button_url`.
+- Alle e-mails gaan via `send_template_mail` in `app/web/core/mail.py`. Die maakt van één `.txt`-sjabloon een platte tekst- én een HTML-versie, met de opmaak uit `app/web/core/templates/mail/`. Alinea's in een sjabloon worden gescheiden door een lege regel; de link geef je mee als `link_text` en `link_url`. De volledige URL staat altijd zichtbaar in de mail, zodat de ontvanger kan zien waar de link naartoe gaat.
 - De opmaak gebruikt geen afbeeldingen of externe bronnen, omdat firewalls en mailfilters die vaak blokkeren. De handtekening volgt de [huisstijl](https://www.amsterdam.nl/stijlweb/middelen/middelen/emailhandtekening/): 'Gemeente Amsterdam' vet en rood (rgb 236/0/0), zonder logo.
 
 ## Overige e-mails

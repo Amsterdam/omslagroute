@@ -33,7 +33,7 @@ class SendTemplateMailTestCase(SimpleTestCase):
         self.assertIn('Gemeente Amsterdam\nOmslagroute', text)
 
     def test_html_loads_nothing_external(self):
-        _, _, html = self.send(button_text='Bekijken', button_url='https://example.com/')
+        _, _, html = self.send(link_text='Bekijken', link_url='https://example.com/')
 
         self.assertNotIn('<img', html)
         self.assertNotIn('<link', html)
@@ -50,29 +50,29 @@ class SendTemplateMailTestCase(SimpleTestCase):
         self.assertNotIn('<b>O', html)
         self.assertIn('&lt;b&gt;O&#x27;Brien&lt;/b&gt;<br>tweede regel', html)
 
-    def test_button_with_fallback_url_and_login_note(self):
-        _, text, html = self.send(button_text='Bekijken', button_url='https://example.com/1/')
+    def test_link_shows_the_url_with_login_note(self):
+        _, text, html = self.send(link_text='Bekijken', link_url='https://example.com/1/')
 
         self.assertIn('Bekijken:\nhttps://example.com/1/', text)
-        self.assertIn('<strong>Bekijken</strong>', html)
-        self.assertIn('Werkt de knop niet?', html)
+        self.assertIn('Bekijken:', html)
+        self.assertIn('<a href="https://example.com/1/"', html)
+        self.assertIn('>https://example.com/1/</a>', html)
         self.assertIn('Je moet ingelogd zijn', html)
         self.assertIn('Je moet ingelogd zijn', text)
 
     def test_login_note_is_optional(self):
         _, text, html = self.send(
-            button_text='Bekijken', button_url='https://example.com/', login_required=False
+            link_text='Bekijken', link_url='https://example.com/', login_required=False
         )
 
         self.assertNotIn('Je moet ingelogd zijn', text)
         self.assertNotIn('Je moet ingelogd zijn', html)
 
-    def test_without_button(self):
+    def test_without_link(self):
         _, text, html = self.send()
 
         self.assertNotIn('Je moet ingelogd zijn', text)
-        self.assertNotIn('Werkt de knop niet?', html)
-        self.assertNotIn('bgcolor="#004699"', html)
+        self.assertNotIn('<a href', html)
 
     def test_all_mail_templates_exist(self):
         for name in (

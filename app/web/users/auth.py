@@ -108,10 +108,10 @@ class OIDCAuthenticationBackend(MozillaOIDCAuthenticationBackend):
             send_template_mail(
                 "Omslagroute - gebruiker aangemaakt",
                 "users/mail/gebruikers_beheerders_new_user.txt",
-                {"site": current_site.domain},
+                {},
                 beheerder_recipient_list,
-                button_text="Gebruiker beheren",
-                button_url="https://%s%s"
+                link_text="Geef deze gebruiker een rol",
+                link_url="https://%s%s"
                 % (current_site.domain, reverse("update_user", kwargs={"pk": user.id})),
             )
 

@@ -59,8 +59,8 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
                         'form_name': form_config.get('title'),
                     },
                     email_adresses,
-                    button_text='Formulier bekijken',
-                    button_url='https://%s%s' % (
+                    link_text='Formulier bekijken',
+                    link_url='https://%s%s' % (
                         current_site.domain,
                         reverse('update_case', kwargs={
                             'pk': serializer.instance.case.id,

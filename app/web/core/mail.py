@@ -17,21 +17,21 @@ def send_template_mail(
     template_name,
     context,
     to_emails,
-    button_text=None,
-    button_url=None,
+    link_text=None,
+    link_url=None,
     login_required=True,
 ):
     """
     Sends the text template as plain text and html. Paragraphs in the template are separated
-    by a blank line, the button is added by the mail layout in mail/base.html and mail/base.txt.
+    by a blank line, the link is added by the mail layout in mail/base.html and mail/base.txt.
     """
     body = render_text(template_name, context)
     layout_context = {
         "subject": subject,
         "body": body,
         "paragraphs": re.split(r"\n\s*\n", body),
-        "button_text": button_text,
-        "button_url": button_url,
+        "link_text": link_text,
+        "link_url": link_url,
         "login_required": login_required,
     }
     message = EmailMultiAlternatives(

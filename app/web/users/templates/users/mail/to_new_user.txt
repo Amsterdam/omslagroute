@@ -4,5 +4,3 @@ Beste gebruiker,
 
 Organisatie: {{ user.federation.name }}
 Rol: {{ user_type }}
-
-Log in op de Omslagroute met de knop rechtsboven op de pagina.

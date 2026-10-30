@@ -571,8 +571,8 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
                     "user": self.request.user,
                 },
                 recipient_list,
-                button_text="Cliëntgegevens bekijken",
-                button_url="https://%s%s"
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
                 % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
             )
 
@@ -626,8 +626,8 @@ class CaseDeleteRequestRevokeView(UserPassesTestMixin, UpdateView):
                     "user": self.request.user,
                 },
                 recipient_list,
-                button_text="Cliëntgegevens bekijken",
-                button_url="https://%s%s"
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
                 % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
             )
 
@@ -909,8 +909,8 @@ class ValidateCaseView(UserPassesTestMixin, RedirectView):
                     "user": self.request.user,
                 },
                 recipient_list,
-                button_text="Formulier bekijken",
-                button_url="https://%s%s"
+                link_text="Formulier bekijken",
+                link_url="https://%s%s"
                 % (
                     current_site.domain,
                     reverse(
@@ -1028,8 +1028,8 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
                         "user": self.request.user,
                     },
                     recipient_list,
-                    button_text="Formulier bekijken",
-                    button_url="https://%s%s"
+                    link_text="Formulier bekijken",
+                    link_url="https://%s%s"
                     % (
                         current_site.domain,
                         reverse(
@@ -1149,8 +1149,8 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                     "cases/mail/invite.txt",
                     context,
                     [invited.username],
-                    button_text="Cliënt bekijken",
-                    button_url="https://%s%s"
+                    link_text="Cliënt bekijken",
+                    link_url="https://%s%s"
                     % (
                         current_site.domain,
                         reverse("case", kwargs={"pk": self.instance.id}),
@@ -1257,8 +1257,8 @@ class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
                 "cases/mail/invite.txt",
                 context,
                 [invited_user.email],
-                button_text="Cliënt bekijken",
-                button_url="https://%s%s"
+                link_text="Cliënt bekijken",
+                link_url="https://%s%s"
                 % (
                     current_site.domain,
                     reverse("case", kwargs={"pk": self.instance.id}),
@@ -1450,8 +1450,8 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
                 "cases/mail/case_address_changed.txt",
                 {"user": self.request.user},
                 recipient_list,
-                button_text="Cliëntgegevens bekijken",
-                button_url="https://%s%s"
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
                 % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
             )
 

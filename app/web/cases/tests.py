@@ -291,13 +291,13 @@ class CaseMailFlowTestCase(TestCase):
         Profile.objects.get_or_create(user=user)
         return user
 
-    def assert_mail(self, subject, button_text=None):
+    def assert_mail(self, subject, link_text=None):
         message = mail.outbox[-1]
         html = message.alternatives[0][0]
         self.assertEqual(message.subject, subject)
         self.assertIn('Gemeente Amsterdam', html)
-        if button_text:
-            self.assertIn('<strong>%s</strong>' % button_text, html)
+        if link_text:
+            self.assertIn('%s:' % link_text, html)
             self.assertIn('https://', message.body)
         else:
             self.assertNotIn('https://', message.body)
@@ -366,7 +366,7 @@ class CaseMailFlowTestCase(TestCase):
         )
 
         self.assertIn('Aanvraag Voordracht omklap, status:', mail.outbox[-1].subject)
-        self.assertIn('<strong>Formulier bekijken</strong>', mail.outbox[-1].alternatives[0][0])
+        self.assertIn('Formulier bekijken:', mail.outbox[-1].alternatives[0][0])
 
     def test_remove_invited_user_has_no_link(self):
         self.client.post(

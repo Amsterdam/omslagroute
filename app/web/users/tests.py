@@ -196,7 +196,7 @@ class UserMailTestCase(TestCase):
         message = mail.outbox[-1]
         self.assertEqual(message.subject, 'Omslagroute - je account is aangemaakt')
         self.assertEqual(message.to, ['nieuw@example.com'])
-        self.assertIn('<strong>Naar de Omslagroute</strong>', message.alternatives[0][0])
+        self.assertIn('Log in op de Omslagroute met de knop rechtsboven op deze pagina:', message.alternatives[0][0])
         self.assertNotIn('Je moet ingelogd zijn', message.body)
 
     @patch('web.users.auth.MozillaOIDCAuthenticationBackend.create_user')
@@ -211,4 +211,4 @@ class UserMailTestCase(TestCase):
         message = mail.outbox[-1]
         self.assertEqual(message.subject, 'Omslagroute - gebruiker aangemaakt')
         self.assertEqual(message.to, ['beheerder@example.com'])
-        self.assertIn('<strong>Gebruiker beheren</strong>', message.alternatives[0][0])
+        self.assertIn('Geef deze gebruiker een rol:', message.alternatives[0][0])

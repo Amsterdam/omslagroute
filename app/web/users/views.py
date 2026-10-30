@@ -282,8 +282,8 @@ class UserCreationView(UserPassesTestMixin, CreateView):
                     'user_type': user.user_type_names,
                 },
                 [user.username],
-                button_text='Naar de Omslagroute',
-                button_url='https://%s' % current_site.domain,
+                link_text='Log in op de Omslagroute met de knop rechtsboven op deze pagina',
+                link_url='https://%s' % current_site.domain,
                 login_required=False,
             )
 
@@ -331,8 +331,8 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
                     'user_type': user.user_type_names,
                 },
                 [user.username],
-                button_text='Naar de Omslagroute',
-                button_url='https://%s' % current_site.domain,
+                link_text='Log in op de Omslagroute met de knop rechtsboven op deze pagina',
+                link_url='https://%s' % current_site.domain,
                 login_required=False,
             )
 
