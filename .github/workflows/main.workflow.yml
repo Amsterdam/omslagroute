@@ -26,6 +26,10 @@ jobs:
         run: docker compose -f docker-compose.local.yml build
       - name: Start images
         run: docker compose -f docker-compose.local.yml up -d
+      - name: Wait for application
+        run: timeout 300 bash -c 'until curl -s -o /dev/null http://localhost:8088; do sleep 5; done'
+      - name: Run tests
+        run: docker compose -f docker-compose.local.yml exec -T omslagroute python manage.py test --noinput --top-level-directory .
 
       - if: ${{ failure() }}
         name: "ON FAILURE: Which containers were running while failing?"
@@ -33,7 +37,7 @@ jobs:
 
       - if: ${{ failure() }}
         name: "ON FAILURE: logs"
-        run: docker logs omslagroute-salmagundi_wonen_omslagroute
+        run: docker logs salmagundi_wonen_omslagroute
 
       - if: ${{ failure() }}
         name: "ON FAILURE: Database logs"
