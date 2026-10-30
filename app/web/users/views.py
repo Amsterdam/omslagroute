@@ -1,8 +1,13 @@
 from django.contrib.auth import logout, login
+from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.views import redirect_to_login
+from django.middleware.csrf import get_token
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 from .models import *
 from .forms import *
@@ -20,6 +25,15 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from urllib.parse import urlencode
 from mozilla_django_oidc.views import get_next_url, get_random_string
+
+
+@never_cache
+@require_GET
+def session_keep_alive(request):
+    if not request.user.is_authenticated:
+        login_url = redirect_to_login(request.GET.get('next', '/'))['Location']
+        return JsonResponse({'login_url': login_url}, status=401)
+    return JsonResponse({'csrf_token': get_token(request)})
 
 
 # legacy dev only

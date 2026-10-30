@@ -217,6 +217,7 @@ CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 60 * 60  # 60 minutes
+SESSION_SAVE_EVERY_REQUEST = True  # 60 minutes of inactivity instead of 60 minutes since the last session write
 LOGIN_URL = '/#login'
 LOGIN_URL_NAME = 'inloggen'
 LOGOUT_URL_NAME = 'uitloggen'
@@ -276,6 +277,7 @@ if os.environ.get("IAM_URL"):
     OIDC_AUTHENTICATE_CLASS = 'web.users.views.OIDCAuthenticationRequestView'
     OIDC_RP_SCOPES = 'profile email openid'
     OIDC_USE_NONCE = False
+    OIDC_EXEMPT_URLS = ['session_keep_alive']
     AUTHENTICATION_BACKENDS = [
         'web.users.auth.OIDCAuthenticationBackend',
     ]

@@ -8,6 +8,7 @@ urlpatterns = [
     path('<int:pk>', UserUpdateView.as_view(), name="update_user"),
     path('organisatie/<int:pk>/', FederationUserUpdateView.as_view(), name="update_federation_user"),
 
+    path('sessie/', session_keep_alive, name='session_keep_alive'),
     path('nieuw/', UserCreationView.as_view(), name="create_user"),
     path('organisatie/nieuw/', UserCreationFederationView.as_view(), name="create_user_federation"),
 

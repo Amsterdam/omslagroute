@@ -316,6 +316,11 @@ function sortOnData(items, key) {
           var data = new FormData(form);
           return data;
         },
+        _showError = function () {
+          helpers.showError(
+            "Niet opgeslagen. Je tekst staat nog op deze pagina. Probeer het opnieuw of vernieuw de pagina nadat je je tekst hebt gekopieerd."
+          );
+        },
         _submit = function (e) {
           e && e.preventDefault();
           var alertLi = document.createElement("li"),
@@ -326,33 +331,55 @@ function sortOnData(items, key) {
           alertLi.classList.add("alert--busy");
           alertLi.innerHTML = savingAlertTmpl;
           alertContainer.appendChild(alertLi);
-          helpers.ajax({
-            type: "POST",
-            url: ".",
-            data: _getData(),
-            callback: function (responseText) {
-              var div = document.createElement("div");
-              div.innerHTML = responseText;
-              var result = div.querySelectorAll(selector),
-                target = d.querySelectorAll(selector);
-              if (result && target) {
-                for (var i = 0; i < target.length; i++) {
-                  target[i].innerHTML = result[i].innerHTML;
-
-                  // IE11 placeholder bug FIX
-                  var els = target[i].querySelectorAll("[placeholder]");
-                  for (var l = 0; l < els.length; l++) {
-                    if (els[l].getAttribute("placeholder") === els[l].value)
-                      els[l].value = "";
+          helpers.refreshSession(
+            function () {
+              helpers.ajax({
+                type: "POST",
+                url: ".",
+                data: _getData(),
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                handleBadRequest: true,
+                callback: function (responseText) {
+                  var div = document.createElement("div");
+                  div.innerHTML = responseText;
+                  var result = div.querySelectorAll(selector),
+                    target = d.querySelectorAll(selector);
+                  if (!target.length || result.length !== target.length) {
+                    _showError();
+                    return;
                   }
-                }
+                  for (var i = 0; i < target.length; i++) {
+                    target[i].innerHTML = result[i].innerHTML;
+
+                    // IE11 placeholder bug FIX
+                    var els = target[i].querySelectorAll("[placeholder]");
+                    for (var l = 0; l < els.length; l++) {
+                      if (els[l].getAttribute("placeholder") === els[l].value)
+                        els[l].value = "";
+                    }
+                  }
+                  _decorate();
+                  helpers.focusFirstError();
+                },
+                error: function (responseText) {
+                  // The save succeeded, only the redirect back to the form
+                  // needs a silent login, which an XHR can't follow.
+                  if (this.status === 403 && responseText.indexOf("refresh_url") !== -1) {
+                    w.location.reload();
+                    return;
+                  }
+                  _showError();
+                },
+              });
+            },
+            function (responseText) {
+              if (this.status === 401) {
+                helpers.showSessionExpired(responseText);
+              } else {
+                _showError();
               }
-              _decorate();
-            },
-            errors: function (responseText) {
-              console.log(responseText);
-            },
-          });
+            }
+          );
         };
       helpers.debounce(_submit, 1000, "ajax-forms-submit");
     },
@@ -361,7 +388,25 @@ function sortOnData(items, key) {
       e.preventDefault();
     },
   };
+  var sessionKeepAliveStarted = false;
   var decorators = {
+    "session-keep-alive": function () {
+      if (sessionKeepAliveStarted) return;
+      sessionKeepAliveStarted = true;
+      var active = false;
+      d.addEventListener("input", function () {
+        active = true;
+      });
+      setInterval(function () {
+        if (!active) return;
+        active = false;
+        helpers.refreshSession(null, function (responseText) {
+          if (this.status === 401) {
+            helpers.showSessionExpired(responseText);
+          }
+        });
+      }, 5 * 60 * 1000);
+    },
     "select-form-option": function () {
       var self = this,
         urlParams = new URLSearchParams(window.location.search),
@@ -902,7 +947,7 @@ function sortOnData(items, key) {
             if (options.callback && typeof options.callback === "function") {
               options.callback.call(request, request.responseText);
             }
-          } else if (request.status === 400) {
+          } else if (request.status === 400 && !options.handleBadRequest) {
             alert("Er ging iets mis.");
           } else {
             if (options.error && typeof options.error === "function") {
@@ -913,6 +958,69 @@ function sortOnData(items, key) {
       };
       request.send(options.data);
       return request;
+    },
+    refreshSession: function (callback, error) {
+      helpers.ajax({
+        url:
+          "/gebruikers/sessie/?next=" + encodeURIComponent(w.location.pathname),
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        callback: function (responseText) {
+          var token = JSON.parse(responseText).csrf_token;
+          _toArray(
+            d.querySelectorAll('input[name="csrfmiddlewaretoken"]')
+          ).forEach(function (input) {
+            input.value = token;
+          });
+          callback && callback();
+        },
+        error: error,
+      });
+    },
+    showError: function (message, link) {
+      var alertContainer = d.querySelector(".alert-container"),
+        alertLi = document.createElement("li"),
+        messageElem = document.createElement("p");
+      alertLi.classList.add("alert");
+      alertLi.classList.add("alert--error");
+      alertLi.classList.add("alert--persistent");
+      messageElem.classList.add("alert__message");
+      messageElem.textContent = message;
+      if (link) {
+        var linkElem = document.createElement("a");
+        linkElem.href = link.url;
+        linkElem.target = "_blank";
+        linkElem.rel = "noopener";
+        linkElem.textContent = link.text;
+        messageElem.appendChild(document.createTextNode(" "));
+        messageElem.appendChild(linkElem);
+      }
+      alertLi.appendChild(messageElem);
+      alertContainer.innerHTML = "";
+      alertContainer.appendChild(alertLi);
+    },
+    focusFirstError: function () {
+      var field = _toArray(d.querySelectorAll(".form-field--error")).filter(
+          function (elem) {
+            return elem.offsetHeight > 0 && !_closest(elem, ".hide-animated");
+          }
+        )[0],
+        target = field || d.querySelector(".generic-form-errors"),
+        input =
+          field &&
+          field.querySelector('input:not([type="hidden"]), textarea, select');
+      if (!target) return;
+      // The form is too long for the smooth scrolling set on the html element.
+      target.scrollIntoView({ behavior: "instant", block: "center" });
+      input && input.focus({ preventScroll: true });
+    },
+    showSessionExpired: function (responseText) {
+      helpers.showError(
+        "Niet opgeslagen: je sessie is verlopen. Sluit dit tabblad niet. Log in via de link, kom terug naar dit tabblad en klik opnieuw op Opslaan.",
+        {
+          url: JSON.parse(responseText).login_url,
+          text: "Opnieuw inloggen (nieuw tabblad)",
+        }
+      );
     },
     debounce: function (callback, delay, timeoutKey) {
       var lastClick = helpers.debounceTimeout[timeoutKey] || 0;
