@@ -25,10 +25,9 @@ from web.forms.statics import FORMS_BY_SLUG, FORMS_SLUG_BY_FEDERATION_TYPE
 from web.forms.views import GenericUpdateFormView, GenericCreateFormView
 from web.forms.utils import get_sections_fields
 import logging
-from django.core.mail import send_mail
+from web.core.mail import send_template_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
-from django.template.loader import render_to_string
 from web.organizations.models import Federation
 from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
@@ -506,38 +505,21 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
 
     def post(self, request, *args, **kwargs):
         case = self.get_object()
-        response = super().delete(request, *args, **kwargs)
-
         recipient_list = list(
             set(
                 get_zorginstelling_medewerkers_email_list(case)
                 + get_woningcorporatie_medewerkers_email_list(case)
             )
         )
+        response = super().delete(request, *args, **kwargs)
 
-        current_site = get_current_site(self.request)
-        body = render_to_string(
-            "cases/mail/case_deleted.txt",
-            {
-                "case": case,
-                "case_url": "https://%s%s"
-                % (
-                    current_site.domain,
-                    reverse(
-                        "case",
-                        kwargs={
-                            "pk": case.id,
-                        },
-                    ),
-                ),
-                "user": self.request.user,
-            },
-        )
         if settings.EMAIL_HOST_USER and recipient_list:
-            subject = ("Omslagroute - Cliënt definitief verwijderd",)
-            from_email = settings.FROM_EMAIL
-            to_emails = recipient_list
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                "Omslagroute - Cliënt definitief verwijderd",
+                "cases/mail/case_deleted.txt",
+                {},
+                recipient_list,
+            )
 
         messages.add_message(
             self.request,
@@ -580,28 +562,19 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
             recipient_list.remove(self.request.user.username)
 
         current_site = get_current_site(self.request)
-        body = render_to_string(
-            "cases/mail/case_delete_request.txt",
-            {
-                "case": case,
-                "case_url": "https://%s%s"
-                % (
-                    current_site.domain,
-                    reverse(
-                        "case",
-                        kwargs={
-                            "pk": case.id,
-                        },
-                    ),
-                ),
-                "user": self.request.user,
-            },
-        )
         if settings.EMAIL_HOST_USER:
-            subject = "Omslagroute - Verzoek verwijderen cliënt"
-            from_email = settings.FROM_EMAIL
-            to_emails = recipient_list
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                "Omslagroute - Verzoek verwijderen cliënt",
+                "cases/mail/case_delete_request.txt",
+                {
+                    "case": case,
+                    "user": self.request.user,
+                },
+                recipient_list,
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
+                % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
+            )
 
         messages.add_message(
             self.request, messages.INFO, "Het verwijder verzoek is verstuurd."
@@ -642,31 +615,21 @@ class CaseDeleteRequestRevokeView(UserPassesTestMixin, UpdateView):
             recipient_list.remove(self.request.user.username)
 
         current_site = get_current_site(self.request)
-        body = render_to_string(
-            "cases/mail/case_delete_request_revoke.txt",
-            {
-                "case": case,
-                "case_url": "https://%s%s"
-                % (
-                    current_site.domain,
-                    reverse(
-                        "case",
-                        kwargs={
-                            "pk": case.id,
-                        },
-                    ),
-                ),
-                "delete_request_revoke_message": form.cleaned_data.get(
-                    "delete_request_revoke_message"
-                ),
-                "user": self.request.user,
-            },
-        )
         if settings.EMAIL_HOST_USER:
-            subject = "Omslagroute - Verzoek verwijderen cliënt terug gedraaid"
-            from_email = settings.FROM_EMAIL
-            to_emails = recipient_list
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                "Omslagroute - Verzoek verwijderen cliënt teruggedraaid",
+                "cases/mail/case_delete_request_revoke.txt",
+                {
+                    "delete_request_revoke_message": form.cleaned_data.get(
+                        "delete_request_revoke_message"
+                    ),
+                    "user": self.request.user,
+                },
+                recipient_list,
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
+                % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
+            )
 
         messages.add_message(
             self.request, messages.INFO, "Het verwijder verzoek is teruggedraaid."
@@ -937,11 +900,17 @@ class ValidateCaseView(UserPassesTestMixin, RedirectView):
         )
         recipient_list = self.request.user.federation.main_email_list
         current_site = get_current_site(self.request)
-        body = render_to_string(
-            "cases/mail/validate_case.txt",
-            {
-                "form_name": form_config.get("title"),
-                "case_url": "https://%s%s"
+        if settings.EMAIL_HOST_USER and recipient_list:
+            send_template_mail(
+                "Omslagroute - %s controleren" % form_config.get("title"),
+                "cases/mail/validate_case.txt",
+                {
+                    "form_name": form_config.get("title"),
+                    "user": self.request.user,
+                },
+                recipient_list,
+                link_text="Formulier bekijken",
+                link_url="https://%s%s"
                 % (
                     current_site.domain,
                     reverse(
@@ -952,14 +921,7 @@ class ValidateCaseView(UserPassesTestMixin, RedirectView):
                         ],
                     ),
                 ),
-                "user": self.request.user,
-            },
-        )
-        if settings.EMAIL_HOST_USER and recipient_list:
-            subject = ("Omslagroute - %s controleren" % form_config.get("title"),)
-            from_email = settings.FROM_EMAIL
-            to_emails = recipient_list
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            )
 
             messages.add_message(
                 self.request,
@@ -1057,11 +1019,17 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
 
         if recipient_list:
             current_site = get_current_site(self.request)
-            body = render_to_string(
-                "cases/mail/case_link.txt",
-                {
-                    "form_name": form_config.get("title"),
-                    "case_url": "https://%s%s"
+            if settings.EMAIL_HOST_USER:
+                send_template_mail(
+                    "Omslagroute - %s ingediend" % form_config.get("title"),
+                    "cases/mail/case_link.txt",
+                    {
+                        "form_name": form_config.get("title"),
+                        "user": self.request.user,
+                    },
+                    recipient_list,
+                    link_text="Formulier bekijken",
+                    link_url="https://%s%s"
                     % (
                         current_site.domain,
                         reverse(
@@ -1072,14 +1040,7 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
                             },
                         ),
                     ),
-                    "user": self.request.user,
-                },
-            )
-            if settings.EMAIL_HOST_USER:
-                subject = "Omslagroute - %s" % form_config.get("title")
-                from_email = settings.FROM_EMAIL
-                to_emails = recipient_list
-                send_mail(subject, body, from_email, to_emails, fail_silently=False)
+                )
 
             messages.add_message(
                 self.request,
@@ -1181,18 +1142,20 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
                         "case": self.instance,
                         "user": self.request.user,
                         "invited": invited,
-                        "case_url": "https://%s%s"
-                        % (
-                            current_site.domain,
-                            reverse("case", kwargs={"pk": self.instance.id}),
-                        ),
                     }
                 )
-                body = render_to_string("cases/mail/invite.txt", context)
-                subject = "Omslagroute - je bent toegevoegd aan een team"
-                from_email = settings.FROM_EMAIL
-                to_emails = [invited.username]
-                send_mail(subject, body, from_email, to_emails, fail_silently=False)
+                send_template_mail(
+                    "Omslagroute - je bent toegevoegd aan een team",
+                    "cases/mail/invite.txt",
+                    context,
+                    [invited.username],
+                    link_text="Cliënt bekijken",
+                    link_url="https://%s%s"
+                    % (
+                        current_site.domain,
+                        reverse("case", kwargs={"pk": self.instance.id}),
+                    ),
+                )
 
         messages.add_message(
             self.request,
@@ -1287,18 +1250,20 @@ class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
                     "case": self.instance,
                     "user": self.request.user,
                     "invited": invited_user,
-                    "case_url": "https://%s%s"
-                    % (
-                        current_site.domain,
-                        reverse("case", kwargs={"pk": self.instance.id}),
-                    ),
                 }
             )
-            body = render_to_string("cases/mail/invite.txt", context)
-            subject = "Omslagroute - je bent toegevoegd aan een team"
-            from_email = settings.FROM_EMAIL
-            to_emails = [invited_user.email]
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                "Omslagroute - je bent toegevoegd aan een team",
+                "cases/mail/invite.txt",
+                context,
+                [invited_user.email],
+                link_text="Cliënt bekijken",
+                link_url="https://%s%s"
+                % (
+                    current_site.domain,
+                    reverse("case", kwargs={"pk": self.instance.id}),
+                ),
+            )
 
         messages.add_message(
             self.request,
@@ -1365,26 +1330,16 @@ class CaseRemoveInvitedUsers(UserPassesTestMixin, FormView):
 
         if settings.EMAIL_HOST_USER:
 
-            current_site = get_current_site(self.request)
             for user in form.cleaned_data.get("user_list"):
-                context = {}
-                context.update(
+                send_template_mail(
+                    "Omslagroute - je bent uit een team verwijderd",
+                    "cases/mail/invated_removed.txt",
                     {
-                        "case": self.instance,
                         "user": self.request.user,
                         "removed_user": user,
-                        "case_url": "https://%s%s"
-                        % (
-                            current_site.domain,
-                            reverse("case", kwargs={"pk": self.instance.id}),
-                        ),
-                    }
+                    },
+                    [user.username],
                 )
-                body = render_to_string("cases/mail/invated_removed.txt", context)
-                subject = "Omslagroute - je bent uit een team verwijderd"
-                from_email = settings.FROM_EMAIL
-                to_emails = [user.username]
-                send_mail(subject, body, from_email, to_emails, fail_silently=False)
 
         messages.add_message(
             self.request,
@@ -1478,13 +1433,6 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
         case.save()
 
         current_site = get_current_site(self.request)
-        context = {
-            "case": case,
-            "user": self.request.user,
-            "case_url": "https://%s%s"
-            % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
-        }
-        body = render_to_string("cases/mail/case_address_changed.txt", context)
 
         recipient_list = list(
             set(
@@ -1497,10 +1445,15 @@ class CaseAddressUpdate(UserPassesTestMixin, UpdateView):
             recipient_list.remove(self.request.user.username)
 
         if settings.EMAIL_HOST_USER:
-            subject = "Omslagroute - Cliënt adres wijziging"
-            from_email = settings.FROM_EMAIL
-            to_emails = recipient_list
-            send_mail(subject, body, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                "Omslagroute - Adres van cliënt gewijzigd",
+                "cases/mail/case_address_changed.txt",
+                {"user": self.request.user},
+                recipient_list,
+                link_text="Cliëntgegevens bekijken",
+                link_url="https://%s%s"
+                % (current_site.domain, reverse("case", kwargs={"pk": case.id})),
+            )
 
         messages.add_message(self.request, messages.INFO, "Het adres is opgeslagen.")
         self.object.create_version(CASE_VERSION_ADDRESS)

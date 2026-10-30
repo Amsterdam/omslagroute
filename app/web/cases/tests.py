@@ -2,20 +2,22 @@ from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.sessions.models import Session
-from django.test import TestCase
+from django.core import mail
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
 from web.cases.forms import CaseAddressForm, CaseAddressUpdateForm
-from web.cases.models import Case
+from web.cases.models import Case, CaseStatus
 from web.organizations.models import Federation, Organization
 from web.organizations.statics import (
+    FEDERATION_TYPE_ADW,
     FEDERATION_TYPE_WONINGCORPORATIE,
     FEDERATION_TYPE_ZORGINSTELLING,
 )
 from web.profiles.models import Profile
 from web.users.models import User
-from web.users.statics import BEGELEIDER
+from web.users.statics import BEGELEIDER, WONEN
 
 
 class AddressStadsdeelTestCase(TestCase):
@@ -248,3 +250,171 @@ class SessionKeepAliveTestCase(TestCase):
         self.assertIn(
             'next=/clienten/1/aanvraag-omklap/', response.json()['login_url']
         )
+
+
+@override_settings(EMAIL_HOST_USER='local')
+class CaseMailFlowTestCase(TestCase):
+    def setUp(self):
+        self.wonen_federation = Federation.objects.create(
+            name='Wonen',
+            federation_id='wonen',
+            organization=Organization.objects.create(
+                name='Wonen', federation_type=FEDERATION_TYPE_ADW
+            ),
+            main_email='wonen@example.com',
+        )
+        self.federation = Federation.objects.create(
+            name='Zorginstelling',
+            federation_id='zorginstelling',
+            organization=Organization.objects.create(
+                name='Zorginstelling', federation_type=FEDERATION_TYPE_ZORGINSTELLING
+            ),
+            main_email='controle@example.com',
+        )
+        self.user = self.create_user('begeleider@example.com', BEGELEIDER, self.federation)
+        self.colleague = self.create_user('collega@example.com', BEGELEIDER, self.federation)
+        self.wonen_user = self.create_user('wonen@example.com', WONEN, self.wonen_federation)
+        self.case = Case.objects.create(
+            adres_straatnaam='Amstel',
+            adres_huisnummer='1',
+            adres_postcode='1011PN',
+            adres_plaatsnaam='Amsterdam',
+        )
+        for user in (self.user, self.colleague):
+            user.profile.cases.add(self.case)
+        self.client.force_login(self.user)
+
+    def create_user(self, username, user_type, federation):
+        user = User.objects.create(
+            username=username, user_type=[str(user_type)], federation=federation
+        )
+        Profile.objects.get_or_create(user=user)
+        return user
+
+    def assert_mail(self, subject, link_text=None):
+        message = mail.outbox[-1]
+        html = message.alternatives[0][0]
+        self.assertEqual(message.subject, subject)
+        self.assertIn('Gemeente Amsterdam', html)
+        if link_text:
+            self.assertIn('%s:' % link_text, html)
+            self.assertIn('https://', message.body)
+        else:
+            self.assertNotIn('https://', message.body)
+
+    def test_case_deleted(self):
+        self.client.force_login(self.wonen_user)
+
+        self.client.post(reverse('delete_case', kwargs={'pk': self.case.id}))
+
+        self.assert_mail('Omslagroute - Cliënt definitief verwijderd')
+        self.assertIn('begeleider@example.com', mail.outbox[-1].to)
+
+    def test_delete_request(self):
+        self.client.post(
+            reverse('delete_request_case', kwargs={'pk': self.case.id}),
+            {'delete_request_message': 'Reden'},
+        )
+
+        self.assert_mail('Omslagroute - Verzoek verwijderen cliënt', 'Cliëntgegevens bekijken')
+        self.assertIn('Reden', mail.outbox[-1].body)
+
+    def test_delete_request_revoke(self):
+        Case.objects.filter(pk=self.case.pk).update(delete_request_date=timezone.now())
+
+        self.client.post(
+            reverse('delete_request_revoke_case', kwargs={'pk': self.case.id}),
+            {'delete_request_revoke_message': 'Toch niet'},
+        )
+
+        self.assert_mail(
+            'Omslagroute - Verzoek verwijderen cliënt teruggedraaid', 'Cliëntgegevens bekijken'
+        )
+        self.assertIn('Toch niet', mail.outbox[-1].body)
+
+    def test_validate_case(self):
+        self.client.get(
+            reverse(
+                'validate_case',
+                kwargs={'pk': self.case.id, 'form_config_slug': 'aanvraag-omklap'},
+            )
+        )
+
+        self.assert_mail('Omslagroute - Aanvraag Voordracht omklap controleren', 'Formulier bekijken')
+
+    def test_send_case(self):
+        self.client.post(
+            reverse(
+                'send_case',
+                kwargs={'pk': self.case.id, 'form_config_slug': 'aanvraag-omklap'},
+            ),
+            {},
+        )
+
+        self.assert_mail('Omslagroute - Aanvraag Voordracht omklap ingediend', 'Formulier bekijken')
+
+    def test_status_change(self):
+        self.client.force_login(self.wonen_user)
+        CaseStatus.objects.create(
+            case=self.case, form='aanvraag-omklap', profile=self.user.profile, status=1
+        )
+
+        self.client.post(
+            '/api/casestatus/',
+            {'case': self.case.id, 'form': 'aanvraag-omklap', 'status': 2},
+            content_type='application/json',
+        )
+
+        self.assertIn('Aanvraag Voordracht omklap, status:', mail.outbox[-1].subject)
+        self.assertIn('Formulier bekijken:', mail.outbox[-1].alternatives[0][0])
+
+    def test_remove_invited_user_has_no_link(self):
+        self.client.post(
+            reverse('case_remove_invited_users', kwargs={'pk': self.case.id}),
+            {'user_list': [self.colleague.id]},
+        )
+
+        self.assert_mail('Omslagroute - je bent uit een team verwijderd')
+        self.assertEqual(mail.outbox[-1].to, ['collega@example.com'])
+
+    @patch('web.cases.forms.get_stadsdeel', return_value='Centrum')
+    def test_address_changed(self, _):
+        woningcorporatie = Federation.objects.create(
+            name='Woningcorporatie',
+            federation_id='woningcorporatie',
+            organization=Organization.objects.create(
+                name='Woningcorporatie', federation_type=FEDERATION_TYPE_WONINGCORPORATIE
+            ),
+        )
+
+        self.client.post(
+            reverse('update_case_address', kwargs={'pk': self.case.id}),
+            {
+                'adres_straatnaam': 'Dam',
+                'adres_huisnummer': '1',
+                'adres_postcode': '1012JS',
+                'adres_plaatsnaam': 'Amsterdam',
+                'nummeraanduiding_id': '1',
+                'woningcorporatie': woningcorporatie.id,
+                'wijziging_reden': 'Verhuisd',
+            },
+        )
+
+        self.assert_mail('Omslagroute - Adres van cliënt gewijzigd', 'Cliëntgegevens bekijken')
+
+    def test_invite(self):
+        url = reverse('case_invite_users', kwargs={'pk': self.case.id})
+        invited = self.create_user('uitgenodigd@example.com', BEGELEIDER, self.federation)
+        self.client.post(
+            url,
+            {'case_invite_users-current_step': '0', '0-user_list': [invited.id]},
+        )
+
+        self.client.post(
+            url,
+            {'case_invite_users-current_step': '1', '1-message': "Kijk je mee?"},
+        )
+
+        self.assert_mail('Omslagroute - je bent toegevoegd aan een team', 'Cliënt bekijken')
+        self.assertEqual(mail.outbox[-1].to, ['uitgenodigd@example.com'])
+        self.assertIn('Kijk je mee?', mail.outbox[-1].body)

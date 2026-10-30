@@ -21,8 +21,7 @@ from mozilla_django_oidc.utils import absolutify
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
+from web.core.mail import send_template_mail
 from urllib.parse import urlencode
 from mozilla_django_oidc.views import get_next_url, get_random_string
 
@@ -274,18 +273,19 @@ class UserCreationView(UserPassesTestMixin, CreateView):
 
         if settings.EMAIL_HOST_USER:
             current_site = get_current_site(self.request)
-            data = {
-                'creator': self.request.user,
-                'user': user,
-                'user_type': user.user_type_names,
-                'url': 'https://%s' % current_site.domain,
-            }
-            subject = 'Omslagroute - je account is aangemaakt'
-            message = render_to_string('users/mail/to_new_user.txt', data)
-            from_email = settings.FROM_EMAIL
-            to_emails = [user.username]
-            # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
-            send_mail(subject, message, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                'Omslagroute - je account is aangemaakt',
+                'users/mail/to_new_user.txt',
+                {
+                    'creator': self.request.user,
+                    'user': user,
+                    'user_type': user.user_type_names,
+                },
+                [user.username],
+                link_text='Log in op de Omslagroute met de knop rechtsboven op deze pagina',
+                link_url='https://%s' % current_site.domain,
+                login_required=False,
+            )
 
         messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)
@@ -322,18 +322,19 @@ class UserCreationFederationView(UserPassesTestMixin, CreateView):
 
         if settings.EMAIL_HOST_USER:
             current_site = get_current_site(self.request)
-            data = {
-                'creator': self.request.user,
-                'user': user,
-                'user_type': user.user_type_names,
-                'url': 'https://%s' % current_site.domain,
-            }
-            subject = 'Omslagroute - je account is aangemaakt'
-            message = render_to_string('users/mail/to_new_user.txt', data)
-            from_email = settings.FROM_EMAIL
-            to_emails = [user.username]
-            # fail_silently: A boolean. When it’s False, send_mail() will raise an smtplib.SMTPException if an error occurs.
-            send_mail(subject, message, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                'Omslagroute - je account is aangemaakt',
+                'users/mail/to_new_user.txt',
+                {
+                    'creator': self.request.user,
+                    'user': user,
+                    'user_type': user.user_type_names,
+                },
+                [user.username],
+                link_text='Log in op de Omslagroute met de knop rechtsboven op deze pagina',
+                link_url='https://%s' % current_site.domain,
+                login_required=False,
+            )
 
         messages.add_message(self.request, messages.INFO, "Gebruiker %s is aangemaakt en heeft een e-mail ontvangen" % user.username)
         return super().form_valid(form)

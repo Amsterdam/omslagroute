@@ -1,9 +1,13 @@
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.core import mail
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from web.cases.models import Case, CaseStatus
 from web.organizations.models import Federation, Organization
 from web.organizations.statics import FEDERATION_TYPE_ZORGINSTELLING
 from web.profiles.models import Profile
+from .auth import OIDCAuthenticationBackend
 from .models import User
 from .statics import BEGELEIDER, BEHEERDER, PB_FEDERATIE_BEHEERDER
 from .utils import deactivate_user, get_cases_only_linked_to_user
@@ -157,3 +161,54 @@ class DeactivateUserTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertNotIn(self.case_shared, self.colleague.profile.cases.all())
         self.assertIn(self.case_shared, self.beheerder.profile.cases.all())
+
+
+@override_settings(EMAIL_HOST_USER='local')
+class UserMailTestCase(TestCase):
+    def setUp(self):
+        self.federation = Federation.objects.create(
+            name='Zorginstelling',
+            federation_id='zorginstelling',
+            organization=Organization.objects.create(
+                name='Zorginstelling',
+                federation_type=FEDERATION_TYPE_ZORGINSTELLING,
+            ),
+        )
+        self.beheerder = User.objects.create(
+            username='beheerder@example.com',
+            user_type=[str(BEHEERDER)],
+            federation=self.federation,
+        )
+        Profile.objects.get_or_create(user=self.beheerder)
+
+    def test_account_created_by_beheerder(self):
+        self.client.force_login(self.beheerder)
+
+        self.client.post(
+            reverse('create_user'),
+            {
+                'username': 'nieuw@example.com',
+                'federation': self.federation.id,
+                'user_type': [str(BEGELEIDER)],
+            },
+        )
+
+        message = mail.outbox[-1]
+        self.assertEqual(message.subject, 'Omslagroute - je account is aangemaakt')
+        self.assertEqual(message.to, ['nieuw@example.com'])
+        self.assertIn('Log in op de Omslagroute met de knop rechtsboven op deze pagina:', message.alternatives[0][0])
+        self.assertNotIn('Je moet ingelogd zijn', message.body)
+
+    @patch('web.users.auth.MozillaOIDCAuthenticationBackend.create_user')
+    def test_first_login_notifies_beheerders(self, create_user):
+        create_user.return_value = User.objects.create(username='nieuw@example.com')
+        backend = OIDCAuthenticationBackend.__new__(OIDCAuthenticationBackend)
+        backend.UserModel = User
+        backend.request = RequestFactory().get('/')
+
+        backend.create_user({'federation': 'zorginstelling'})
+
+        message = mail.outbox[-1]
+        self.assertEqual(message.subject, 'Omslagroute - gebruiker aangemaakt')
+        self.assertEqual(message.to, ['beheerder@example.com'])
+        self.assertIn('Geef deze gebruiker een rol:', message.alternatives[0][0])

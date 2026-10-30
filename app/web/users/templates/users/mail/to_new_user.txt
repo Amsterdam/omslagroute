@@ -1,10 +1,6 @@
 Beste gebruiker,
 
-Je bent door '{{ creator.username }}' met het e-mailadres(gebruikersnaam) '{{ user.username }}' toegevoegd aan de Omslagroute.
+{{ creator.username }} heeft je met het e-mailadres (gebruikersnaam) {{ user.username }} toegevoegd aan de Omslagroute.
 
 Organisatie: {{ user.federation.name }}
 Rol: {{ user_type }}
-
-Login op Omslagroute met de knop rechtsboven op onderstaande pagina.
-
-{{ url }}

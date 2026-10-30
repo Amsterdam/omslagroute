@@ -1,6 +1,6 @@
 Beste,
 
-Er is op de site {{ site }} nieuwe feedback ingevuld door een gebruiker.
+Er is nieuwe feedback binnengekomen via {{ site }}.
 
 Naam:
 {% if name %}{{ name }}{% else %}—{% endif %}

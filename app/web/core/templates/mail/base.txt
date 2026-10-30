@@ -1,0 +1,11 @@
+{{ body }}{% if link_url %}
+
+{{ link_text }}:
+{{ link_url }}{% if login_required %}
+
+Je moet ingelogd zijn om deze pagina te bekijken.{% endif %}{% endif %}
+
+Gemeente Amsterdam
+Omslagroute
+
+Dit is een automatisch bericht. Je kunt hier niet op reageren.

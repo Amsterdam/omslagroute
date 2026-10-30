@@ -4,8 +4,7 @@ from constance import config
 from django.http.response import HttpResponseRedirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from web.core.mail import send_template_mail
 
 
 def validate_email_wrapper(email):
@@ -45,11 +44,12 @@ class FeedbackFormView(FormView):
                     data.update({
                         'name': user.get_full_name()
                     })
-            subject = 'Omslagroute - feedback'
-            message = render_to_string('feedback/mail/feedback.txt', data)
-            from_email = settings.FROM_EMAIL
-            to_emails = addresses
-            send_mail(subject, message, from_email, to_emails, fail_silently=False)
+            send_template_mail(
+                'Omslagroute - feedback',
+                'feedback/mail/feedback.txt',
+                data,
+                addresses,
+            )
         else:
             return HttpResponseRedirect('./?error=1')
         return super().form_valid(form)

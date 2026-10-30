@@ -1,12 +1,6 @@
-Beste {{ invited.first_name }},
+Beste {{ invited.first_name|default:"collega" }},
 
-Je bent door de medewerker met het email adres '{{ user.username }}' toegevoegd aan het team van medewerkers voor een cliënt in de omslagroute.
+{{ user.username }} heeft je toegevoegd aan het team van medewerkers voor een cliënt in de Omslagroute.{% if message %}
 
-Als je bent ingelogd kun je deze cliënt met de onderstaande url beheren.
-
-{{ case_url}}{% if message %}
-
-De medewerker die je heeft uitgenodigd heeft het volgende bericht meegestuurd:
-
-{{ message|safe }}
-{% endif %}
+Bericht van {{ user.username }}:
+{{ message }}{% endif %}
