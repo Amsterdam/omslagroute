@@ -1054,6 +1054,8 @@ class SendCaseView(UserPassesTestMixin, UpdateView):
         return super().form_invalid(form)
 
 
+# Working together with employees of another organization is desired behaviour,
+# but users can only invite others to cases of their own organization.
 class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
     model = Case
     template_name = "cases/case_invite.html"
@@ -1101,6 +1103,10 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step=step)
         self.instance = self.model.objects.get(id=self.kwargs.get("pk"))
+        if not self.instance.profile_set.filter(
+            user__federation=self.request.user.federation
+        ).exists():
+            raise PermissionDenied
         kwargs.update({"queryset": self.get_user_options()})
         return kwargs
 
@@ -1165,6 +1171,8 @@ class CaseInviteUsers(UserPassesTestMixin, SessionWizardView):
         return HttpResponseRedirect(self.get_success_url())
 
 
+# Working together with employees of another organization is desired behaviour,
+# but users can only invite others to cases of their own organization.
 class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
     model = Case
     template_name = "cases/case_invite_cross_federation.html"
@@ -1188,6 +1196,10 @@ class CaseInviteUsersCrossFederation(UserPassesTestMixin, SessionWizardView):
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step=step)
         self.instance = self.model.objects.get(id=self.kwargs.get("pk"))
+        if not self.instance.profile_set.filter(
+            user__federation=self.request.user.federation
+        ).exists():
+            raise PermissionDenied
         kwargs.update({"queryset": []})
         return kwargs
 

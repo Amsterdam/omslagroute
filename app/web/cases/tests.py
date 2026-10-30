@@ -9,6 +9,11 @@ from django.utils import timezone
 
 from web.cases.forms import CaseAddressForm, CaseAddressUpdateForm
 from web.cases.models import Case, CaseStatus
+from web.cases.statics import (
+    CASE_STATUS_GOEDGEKEURD,
+    CASE_STATUS_INGEDIEND,
+    CASE_STATUS_WONINGCORPORATIE_GOEDGEKEURD,
+)
 from web.organizations.models import Federation, Organization
 from web.organizations.statics import (
     FEDERATION_TYPE_ADW,
@@ -17,7 +22,7 @@ from web.organizations.statics import (
 )
 from web.profiles.models import Profile
 from web.users.models import User
-from web.users.statics import BEGELEIDER, WONEN
+from web.users.statics import BEGELEIDER, WONEN, WONINGCORPORATIE_MEDEWERKER
 
 
 class AddressStadsdeelTestCase(TestCase):
@@ -355,6 +360,7 @@ class CaseMailFlowTestCase(TestCase):
 
     def test_status_change(self):
         self.client.force_login(self.wonen_user)
+        self.case.create_version('aanvraag-omklap')
         CaseStatus.objects.create(
             case=self.case, form='aanvraag-omklap', profile=self.user.profile, status=1
         )
@@ -418,3 +424,218 @@ class CaseMailFlowTestCase(TestCase):
         self.assert_mail('Omslagroute - je bent toegevoegd aan een team', 'Cliënt bekijken')
         self.assertEqual(mail.outbox[-1].to, ['uitgenodigd@example.com'])
         self.assertIn('Kijk je mee?', mail.outbox[-1].body)
+
+
+@override_settings(EMAIL_HOST_USER='local')
+class CaseInviteAccessTestCase(TestCase):
+    def setUp(self):
+        organization = Organization.objects.create(
+            name='Zorginstelling', federation_type=FEDERATION_TYPE_ZORGINSTELLING
+        )
+        federation = Federation.objects.create(
+            name='Zorginstelling', federation_id='zorginstelling', organization=organization
+        )
+        other_federation = Federation.objects.create(
+            name='Andere zorginstelling',
+            federation_id='andere-zorginstelling',
+            organization=Organization.objects.create(
+                name='Andere zorginstelling', federation_type=FEDERATION_TYPE_ZORGINSTELLING
+            ),
+        )
+        self.user = self.create_user('begeleider@example.com', federation)
+        self.colleague = self.create_user('collega@example.com', federation)
+        self.other_user = self.create_user('ander@example.com', other_federation)
+        self.own_case = Case.objects.create()
+        self.foreign_case = Case.objects.create()
+        self.user.profile.cases.add(self.own_case)
+        self.other_user.profile.cases.add(self.foreign_case)
+        self.client.force_login(self.user)
+
+    def create_user(self, username, federation):
+        user = User.objects.create(
+            username=username,
+            email=username,
+            user_type=[str(BEGELEIDER)],
+            federation=federation,
+        )
+        Profile.objects.get_or_create(user=user)
+        return user
+
+    def invite_colleague(self, case):
+        url = reverse('case_invite_users', kwargs={'pk': case.id})
+        self.client.post(
+            url, {'case_invite_users-current_step': '0', '0-user_list': [self.colleague.id]}
+        )
+        return self.client.post(
+            url, {'case_invite_users-current_step': '1', '1-message': ''}
+        )
+
+    def invite_other_organization(self, case):
+        url = reverse('case_invite_users_federation', kwargs={'pk': case.id})
+        self.client.post(
+            url,
+            {
+                'case_invite_users_cross_federation-current_step': '0',
+                '0-user_email_cross_federation': 'ander@example.com',
+            },
+        )
+        return self.client.post(
+            url, {'case_invite_users_cross_federation-current_step': '1', '1-message': ''}
+        )
+
+    def test_invite_on_own_case(self):
+        self.invite_colleague(self.own_case)
+
+        self.assertTrue(self.colleague.profile.cases.filter(id=self.own_case.id).exists())
+
+    def test_invite_other_organization_on_own_case(self):
+        self.invite_other_organization(self.own_case)
+
+        self.assertTrue(self.other_user.profile.cases.filter(id=self.own_case.id).exists())
+
+    def test_invite_on_case_of_colleague(self):
+        self.colleague.profile.cases.add(self.foreign_case)
+        third = self.create_user('derde@example.com', self.user.federation)
+        url = reverse('case_invite_users', kwargs={'pk': self.foreign_case.id})
+
+        self.client.post(
+            url, {'case_invite_users-current_step': '0', '0-user_list': [third.id]}
+        )
+        self.client.post(url, {'case_invite_users-current_step': '1', '1-message': ''})
+
+        self.assertTrue(third.profile.cases.filter(id=self.foreign_case.id).exists())
+
+    def test_invite_other_organization_on_case_of_colleague(self):
+        self.colleague.profile.cases.add(self.own_case)
+        self.user.profile.cases.remove(self.own_case)
+
+        self.invite_other_organization(self.own_case)
+
+        self.assertTrue(self.other_user.profile.cases.filter(id=self.own_case.id).exists())
+
+    def test_invite_on_foreign_case_is_denied(self):
+        response = self.invite_colleague(self.foreign_case)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(self.colleague.profile.cases.filter(id=self.foreign_case.id).exists())
+
+    def test_invite_other_organization_on_foreign_case_is_denied(self):
+        self.other_user.profile.cases.remove(self.foreign_case)
+
+        response = self.invite_other_organization(self.foreign_case)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(self.other_user.profile.cases.filter(id=self.foreign_case.id).exists())
+
+    def test_invite_pages_of_foreign_case_are_denied(self):
+        for name in ('case_invite_users', 'case_invite_users_federation'):
+            response = self.client.get(reverse(name, kwargs={'pk': self.foreign_case.id}))
+
+            self.assertEqual(response.status_code, 403)
+
+
+class CaseStatusApiTestCase(TestCase):
+    url = '/api/casestatus/'
+
+    def setUp(self):
+        self.wonen_federation = self.create_federation('wonen', FEDERATION_TYPE_ADW)
+        self.corporation = self.create_federation('corporatie', FEDERATION_TYPE_WONINGCORPORATIE)
+        other_corporation = self.create_federation(
+            'andere-corporatie', FEDERATION_TYPE_WONINGCORPORATIE
+        )
+        self.wonen_user = self.create_user('wonen@example.com', WONEN, self.wonen_federation)
+        self.corporation_user = self.create_user(
+            'corporatie@example.com', WONINGCORPORATIE_MEDEWERKER, self.corporation
+        )
+        self.begeleider = self.create_user('begeleider@example.com', BEGELEIDER, self.corporation)
+        self.case = Case.objects.create(woningcorporatie=self.corporation)
+        self.foreign_case = Case.objects.create(woningcorporatie=other_corporation)
+        for case in (self.case, self.foreign_case):
+            case.create_version('aanvraag-omklap')
+            case.create_version('evaluatie-wonen')
+
+    def create_federation(self, name, federation_type):
+        return Federation.objects.create(
+            name=name,
+            federation_id=name,
+            organization=Organization.objects.create(name=name, federation_type=federation_type),
+        )
+
+    def create_user(self, username, user_type, federation):
+        user = User.objects.create(
+            username=username, user_type=[str(user_type)], federation=federation
+        )
+        Profile.objects.get_or_create(user=user)
+        return user
+
+    def post(self, user, **data):
+        self.client.force_login(user)
+        return self.client.post(self.url, data, content_type='application/json')
+
+    def corporation_status(self, **data):
+        status_data = {
+            'case': self.case.id,
+            'form': 'evaluatie-wonen',
+            'status': CASE_STATUS_WONINGCORPORATIE_GOEDGEKEURD,
+        }
+        status_data.update(data)
+        return self.post(self.corporation_user, **status_data)
+
+    def test_status_is_saved_on_own_case(self):
+        response = self.post(
+            self.wonen_user, case=self.case.id, form='aanvraag-omklap', status=CASE_STATUS_GOEDGEKEURD
+        )
+
+        self.assertEqual(response.status_code, 201)
+        status = CaseStatus.objects.get(case=self.case)
+        self.assertEqual(status.profile, self.wonen_user.profile)
+        self.assertIsNotNone(status.case_version)
+
+    def test_status_on_foreign_case_is_denied(self):
+        response = self.corporation_status(case=self.foreign_case.id)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(CaseStatus.objects.exists())
+
+    def test_profile_from_request_is_ignored(self):
+        response = self.corporation_status(profile=self.begeleider.profile.id)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(CaseStatus.objects.get().profile, self.corporation_user.profile)
+
+    def test_case_version_from_request_is_ignored(self):
+        version = self.foreign_case.create_version('evaluatie-wonen')
+
+        self.corporation_status(status=CASE_STATUS_INGEDIEND, case_version=version.id)
+
+        self.assertIsNone(CaseStatus.objects.get().case_version)
+
+    def test_form_of_other_organization_type_is_denied(self):
+        response = self.corporation_status(form='aanvraag-omklap')
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(CaseStatus.objects.exists())
+
+    def test_status_of_other_organization_type_is_denied(self):
+        response = self.corporation_status(status=CASE_STATUS_GOEDGEKEURD)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(CaseStatus.objects.exists())
+
+    def test_history_is_readable(self):
+        self.corporation_status()
+
+        response = self.client.get(self.url, {'case': self.case.id, 'form': 'evaluatie-wonen'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['count'], 1)
+
+    def test_history_cannot_be_changed_or_deleted(self):
+        self.corporation_status()
+        url = '%s%s/' % (self.url, CaseStatus.objects.get().id)
+
+        for method in (self.client.put, self.client.patch, self.client.delete):
+            response = method(url, {}, content_type='application/json')
+
+            self.assertEqual(response.status_code, 405)
+        self.assertTrue(CaseStatus.objects.exists())
