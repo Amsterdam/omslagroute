@@ -1,14 +1,19 @@
 from rest_framework import viewsets, generics
 from .models import CaseStatus, Case
-from .statics import CASE_STATUS_INGEDIEND, CASE_STATUS_DICT
+from .statics import (
+    CASE_STATUS_CHOICES_BY_FEDEATION_TYPE,
+    CASE_STATUS_DICT,
+    CASE_STATUS_INGEDIEND,
+)
 from .serializers import CaseStatusSerializer, CaseDossierNrSerializer
 from django.contrib.auth.mixins import UserPassesTestMixin
 from web.users.statics import WONEN, WONINGCORPORATIE_MEDEWERKER
-from web.forms.statics import FORMS_BY_SLUG
+from web.forms.statics import FORMS_BY_SLUG, FORMS_SLUG_BY_FEDERATION_TYPE
 from web.users.auth import auth_test
 from web.users.utils import get_zorginstelling_medewerkers_email_list
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from web.core.mail import send_template_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -18,6 +23,8 @@ from django.conf import settings
 class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
     queryset = CaseStatus.objects.all()
     serializer_class = CaseStatusSerializer
+    # The status history can't be changed afterwards
+    http_method_names = ['get', 'post', 'head', 'options']
 
     def test_func(self):
         return auth_test(self.request.user, [WONEN, WONINGCORPORATIE_MEDEWERKER]) and hasattr(self.request.user, 'profile')
@@ -32,11 +39,22 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
         return queryset.filter(**kwargs).order_by('-created')
 
     def create(self, request, *args, **kwargs):
-        data = {'profile': request.user.profile.id}
+        data = {}
         data.update(request.data)
+        data.update({'profile': request.user.profile.id})
+        data.pop('case_version', None)
+
+        case = generics.get_object_or_404(Case.objects.by_user(request.user), id=data.get('case'))
+        federation_type = request.user.federation.organization.federation_type
+        if data.get('form') not in FORMS_SLUG_BY_FEDERATION_TYPE.get(federation_type, []):
+            raise PermissionDenied()
+        status_choices = CASE_STATUS_CHOICES_BY_FEDEATION_TYPE.get(federation_type, [])
+        if str(data.get('status')) not in [str(s) for s in status_choices]:
+            raise PermissionDenied()
+
         if data.get('status') != CASE_STATUS_INGEDIEND:
             data.update({
-                'case_version': Case.objects.get(id=data.get('case')).create_version(data.get('form')).id,
+                'case_version': case.create_version(data.get('form')).id,
             })
 
         serializer = self.get_serializer(data=data)
