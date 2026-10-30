@@ -1,5 +1,3 @@
-Beste {{ removed_user.first_name }},
+Beste {{ removed_user.first_name|default:"collega" }},
 
-Je bent door de medewerker met het e-mailadres '{{ user.username }}' verwijderd van het team voor een cliënt in de omslagroute.
-
-{{ case_url}}
+{{ user.username }} heeft je verwijderd uit het team van medewerkers voor een cliënt in de Omslagroute.

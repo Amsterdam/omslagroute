@@ -1,8 +1,4 @@
-Er is een verzoek om een cliënt te verwijderen uit de Omslagroute door {{ user.username }}{% if case.delete_request_message %}
+{{ user.username }} heeft gevraagd om een cliënt te verwijderen uit de Omslagroute.{% if case.delete_request_message %}
 
 Bericht van {{ user.username }}:
-{{ case.delete_request_message|safe }}{% endif %}
-
-Als je bent ingelogd op de Omslagroute kun je de cliëntgegevens inzien met onderstaande url.
-
-{{ case_url }}
+{{ case.delete_request_message }}{% endif %}

@@ -1,5 +1,1 @@
-Het adres van een cliënt op omslagroute.amsterdam.nl is gewijzigd door {{ user.username }}.
-
-Als je bent ingelogd op omslagroute.amsterdam.nl, kun je de cliëntgegevens inzien met onderstaande url.
-
-{{ case_url }}
+Het adres van een cliënt is gewijzigd door {{ user.username }}.

@@ -1,8 +1,4 @@
-Het verzoek om de cliënt te verwijderen is ongedaan gemaakt door {{ user.username }}{% if delete_request_revoke_message %}
+Het verzoek om een cliënt te verwijderen is ongedaan gemaakt door {{ user.username }}.{% if delete_request_revoke_message %}
 
 Bericht van {{ user.username }}:
-{{ delete_request_revoke_message|safe }}{% endif %}
-
-Als je bent ingelogd op de Omslagroute kun je de cliëntgegevens inzien met onderstaande url.
-
-{{ case_url }}
+{{ delete_request_revoke_message }}{% endif %}

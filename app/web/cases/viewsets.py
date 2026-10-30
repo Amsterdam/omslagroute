@@ -9,11 +9,10 @@ from web.users.auth import auth_test
 from web.users.utils import get_zorginstelling_medewerkers_email_list
 from rest_framework.response import Response
 from rest_framework import status
-from django.template.loader import render_to_string
+from web.core.mail import send_template_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.conf import settings
-from django.core.mail import send_mail
 
 
 class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
@@ -47,26 +46,28 @@ class CaseStatusUpdateViewSet(UserPassesTestMixin, viewsets.ModelViewSet):
         if serializer.instance.status != CASE_STATUS_INGEDIEND:
             current_site = get_current_site(request)
             form_config = FORMS_BY_SLUG.get(serializer.instance.form)
-            message = render_to_string('cases/mail/case_status_to_pb.txt', {
-                'case_status': serializer.instance,
-                'form_name': form_config.get('title'),
-                'case_form_url': 'https://%s%s' % (
-                    current_site.domain,
-                    reverse('update_case', kwargs={
-                        'pk': serializer.instance.case.id,
-                        'form_config_slug': serializer.instance.form,
-                    })
-                ),
-            })
             email_adresses = get_zorginstelling_medewerkers_email_list(serializer.instance.case)
             if settings.EMAIL_HOST_USER and email_adresses:
-                subject = 'Omslagroute - %s, status: %s' % (
-                    form_config.get('title'),
-                    CASE_STATUS_DICT.get(serializer.instance.status).get('current'),
+                send_template_mail(
+                    'Omslagroute - %s, status: %s' % (
+                        form_config.get('title'),
+                        CASE_STATUS_DICT.get(serializer.instance.status).get('current'),
+                    ),
+                    'cases/mail/case_status_to_pb.txt',
+                    {
+                        'case_status': serializer.instance,
+                        'form_name': form_config.get('title'),
+                    },
+                    email_adresses,
+                    button_text='Formulier bekijken',
+                    button_url='https://%s%s' % (
+                        current_site.domain,
+                        reverse('update_case', kwargs={
+                            'pk': serializer.instance.case.id,
+                            'form_config_slug': serializer.instance.form,
+                        })
+                    ),
                 )
-                from_email = settings.FROM_EMAIL
-                to_emails = email_adresses
-                send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

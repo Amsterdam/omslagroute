@@ -13,11 +13,11 @@ Ontvangers (`get_zorginstelling_medewerkers_email_list` in `app/web/users/utils.
 | Gebeurtenis | Uitgevoerd door | Onderwerp | Code |
 |---|---|---|---|
 | Aanvraag ter controle gestuurd | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} controleren | `ValidateCaseView` |
-| Aanvraag ingediend (alle formulieren) | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} | `SendCaseView` |
+| Aanvraag ingediend (alle formulieren) | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} ingediend | `SendCaseView` |
 | Status van een aanvraag gewijzigd (goedgekeurd, afgekeurd, in behandeling, …) | Wonen / Woningcorporatie medewerker | Omslagroute - {formulier}, status: {status} | `CaseStatusUpdateViewSet` |
-| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Cliënt adres wijziging | `CaseAddressUpdate` |
+| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Adres van cliënt gewijzigd | `CaseAddressUpdate` |
 | Verzoek om cliënt te verwijderen | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt | `CaseDeleteRequestView` |
-| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt terug gedraaid | `CaseDeleteRequestRevokeView` |
+| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt teruggedraaid | `CaseDeleteRequestRevokeView` |
 | Cliënt definitief verwijderd | Wonen | Omslagroute - Cliënt definitief verwijderd | `CaseDeleteView` |
 | Toegevoegd aan het team van een cliënt | Begeleider / PB & Organisatie beheerder | Omslagroute - je bent toegevoegd aan een team | `CaseInviteUsers`, `CaseInviteUsersCrossFederation` |
 | Verwijderd uit het team van een cliënt | Begeleider / PB & Organisatie beheerder | Omslagroute - je bent uit een team verwijderd | `CaseRemoveInvitedUsers` |
@@ -34,10 +34,10 @@ Ontvangers (`get_wonen_medewerkers_email_list` in `app/web/users/utils.py`):
 
 | Gebeurtenis | Uitgevoerd door | Onderwerp | Code |
 |---|---|---|---|
-| Aanvraag ingediend: *Aanvraag Urgentie onder voorwaarden* of *Aanvraag Voordracht omklap* | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} | `SendCaseView` |
-| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Cliënt adres wijziging | `CaseAddressUpdate` |
+| Aanvraag ingediend: *Aanvraag Urgentie onder voorwaarden* of *Aanvraag Voordracht omklap* | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} ingediend | `SendCaseView` |
+| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Adres van cliënt gewijzigd | `CaseAddressUpdate` |
 | Verzoek om cliënt te verwijderen | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt | `CaseDeleteRequestView` |
-| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt terug gedraaid | `CaseDeleteRequestRevokeView` |
+| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt teruggedraaid | `CaseDeleteRequestRevokeView` |
 
 ## Woningcorporatie
 
@@ -50,10 +50,10 @@ Ontvangers (`get_woningcorporatie_medewerkers_email_list` in `app/web/users/util
 
 | Gebeurtenis | Uitgevoerd door | Onderwerp | Code |
 |---|---|---|---|
-| Aanvraag ingediend: *Evaluatie wonen*, *Match met passende woning* of *Kennismaking woningcorporatie* | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} | `SendCaseView` |
-| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Cliënt adres wijziging | `CaseAddressUpdate` |
+| Aanvraag ingediend: *Evaluatie wonen*, *Match met passende woning* of *Kennismaking woningcorporatie* | Begeleider / PB & Organisatie beheerder | Omslagroute - {formulier} ingediend | `SendCaseView` |
+| Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Adres van cliënt gewijzigd | `CaseAddressUpdate` |
 | Verzoek om cliënt te verwijderen | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt | `CaseDeleteRequestView` |
-| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt terug gedraaid | `CaseDeleteRequestRevokeView` |
+| Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt teruggedraaid | `CaseDeleteRequestRevokeView` |
 | Cliënt definitief verwijderd | Wonen | Omslagroute - Cliënt definitief verwijderd | `CaseDeleteView` |
 
 Het stadsdeel van de cliënt wordt bij het opslaan van het adres server-side bepaald op basis van het gekozen adres (`AddressStadsdeelMixin` in `app/web/cases/forms.py`). Bij een adreswijziging wordt de mail verstuurd naar het stadsdeel van het nieuwe adres.
@@ -62,6 +62,8 @@ Het stadsdeel van de cliënt wordt bij het opslaan van het adres server-side bep
 
 - Bij een adreswijziging, een verzoek om te verwijderen en het terugdraaien daarvan krijgt de gebruiker die de actie uitvoert zelf geen e-mail.
 - De e-mails van de cliënt staan in de views in `app/web/cases/views.py` en `app/web/cases/viewsets.py`, de teksten in `app/web/cases/templates/cases/mail/`.
+- Alle e-mails gaan via `send_template_mail` in `app/web/core/mail.py`. Die maakt van één `.txt`-sjabloon een platte tekst- én een HTML-versie, met de opmaak uit `app/web/core/templates/mail/`. Alinea's in een sjabloon worden gescheiden door een lege regel; de knop en de link geef je mee als `button_text` en `button_url`.
+- De opmaak gebruikt geen afbeeldingen of externe bronnen, omdat firewalls en mailfilters die vaak blokkeren. De handtekening volgt de [huisstijl](https://www.amsterdam.nl/stijlweb/middelen/middelen/emailhandtekening/): 'Gemeente Amsterdam' vet en rood (rgb 236/0/0), zonder logo.
 
 ## Overige e-mails
 

@@ -9,7 +9,7 @@ from web.timeline.models import *
 from web.documents.models import *
 from web.organizations.models import *
 from django.urls import reverse_lazy
-from django.core.mail import send_mail
+from web.core.mail import send_template_mail
 from django.conf import settings
 from .utils import *
 from django.contrib.auth.decorators import user_passes_test
@@ -95,11 +95,7 @@ class SendMailView(UserPassesTestMixin, RedirectView):
     def get(self, request, *args, **kwargs):
         mailadres = request.GET.get('mailadres')
         if mailadres:
-            subject = 'Omslagroute - mail',
-            from_email = settings.FROM_EMAIL
-            to_emails = [mailadres]
-            message = 'Het versturen van een mail werkt!'
-            send_mail(subject, message, from_email, to_emails, fail_silently=False)
+            send_template_mail('Omslagroute - mail', 'mail/test.txt', {}, [mailadres])
 
         return super().get(request, *args, **kwargs)
 

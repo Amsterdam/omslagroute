@@ -13,8 +13,7 @@ from mozilla_django_oidc.utils import absolutify
 import logging
 from web.organizations.models import Federation
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from web.core.mail import send_template_mail
 from django.urls import reverse
 
 LOGGER = logging.getLogger(__name__)
@@ -106,17 +105,15 @@ class OIDCAuthenticationBackend(MozillaOIDCAuthenticationBackend):
 
         if settings.EMAIL_HOST_USER and beheerder_recipient_list:
             current_site = get_current_site(self.request)
-            data = {
-                "site": current_site.domain,
-                "url": reverse("update_user", kwargs={"pk": user.id}),
-            }
-            subject = "Omslagroute - gebruiker aangemaakt"
-            message = render_to_string(
-                "users/mail/gebruikers_beheerders_new_user.txt", data
+            send_template_mail(
+                "Omslagroute - gebruiker aangemaakt",
+                "users/mail/gebruikers_beheerders_new_user.txt",
+                {"site": current_site.domain},
+                beheerder_recipient_list,
+                button_text="Gebruiker beheren",
+                button_url="https://%s%s"
+                % (current_site.domain, reverse("update_user", kwargs={"pk": user.id})),
             )
-            from_email = settings.FROM_EMAIL
-            to_emails = beheerder_recipient_list
-            send_mail(subject, message, from_email, to_emails, fail_silently=False)
 
         return user
 
