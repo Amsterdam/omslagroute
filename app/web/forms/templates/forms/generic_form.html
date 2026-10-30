@@ -18,6 +18,22 @@
 </nav>
 {% endblock %}
 
+{% block messages %}
+    {% if form.errors %}
+        {% for message in messages %}{% endfor %}
+        <ul class="alert-container screen-only">
+            <li class="alert alert--error alert--persistent">
+                <svg class="alert__icon" width="20" height="20">
+                    <use href="#alert" xlink:href="#alert" width="20" height="20"></use>
+                </svg>
+                {% with aantal=form.errors|length %}<p class="alert__message">Niet opgeslagen: {{ aantal }} veld{{ aantal|pluralize:"en" }} {{ aantal|pluralize:"is,zijn" }} niet goed ingevuld.</p>{% endwith %}
+            </li>
+        </ul>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+{% endblock %}
+
 {% block main %}
 <section class="section section--client">
     {% if object.delete_request_date %}
@@ -47,7 +63,7 @@
 
 <section class="section section--form section--form-{{ title|slugify }}{% if request.GET.control %} section--form--control{% endif %} u-margin-bottom-sticky">
     {% if form.instance.id %}{% client_status form.instance form_config_slug as status  %}{% endif %}
-    <form method="post" enctype="multipart/form-data" novalidate>
+    <form method="post" enctype="multipart/form-data" novalidate data-decorator="session-keep-alive">
 
         <div class="grid__wrapper">
             <div class="grid__main">

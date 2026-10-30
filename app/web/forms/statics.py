@@ -420,7 +420,7 @@ FIELDS = (
         forms.CharField(
             label=_("Telefoonnummer"),
             widget=forms.TextInput(attrs={"placeholder": " "}),
-            required=True,
+            required=False,
             validators=[validate_telefoonnummer],
         ),
         {"step_required": True},
@@ -1301,7 +1301,7 @@ FIELDS = (
         forms.CharField(
             label=_("Telefoonnummer"),
             widget=forms.TextInput(attrs={"placeholder": " "}),
-            required=True,
+            required=False,
             validators=[validate_telefoonnummer],
         ),
         {"step_required": True},
@@ -1609,7 +1609,7 @@ FIELDS = (
         forms.CharField(
             label=_("Telefoonnummer"),
             widget=forms.TextInput(attrs={"placeholder": " "}),
-            required=True,
+            required=False,
             validators=[validate_telefoonnummer],
         ),
         {"step_required": True},
