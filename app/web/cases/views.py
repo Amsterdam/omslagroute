@@ -26,6 +26,7 @@ from web.forms.views import GenericUpdateFormView, GenericCreateFormView
 from web.forms.utils import get_sections_fields
 import logging
 from web.core.mail import send_template_mail
+from .services import delete_case_permanently, delete_date
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from web.organizations.models import Federation
@@ -33,7 +34,7 @@ from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from web.users.auth import user_passes_test
 from django.core.paginator import Paginator
 from web.timeline.models import Moment
@@ -366,6 +367,13 @@ class CaseDetailView(UserPassesTestMixin, DetailView):
     model = Case
     template_name_suffix = "_page"
 
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            # Links in earlier mails can point to a case that has been deleted
+            return render(request, "cases/case_not_found.html", status=404)
+
     def get_context_data(self, **kwargs):
         kwargs.update(
             {
@@ -505,29 +513,16 @@ class CaseDeleteView(UserPassesTestMixin, DeleteView):
 
     def post(self, request, *args, **kwargs):
         case = self.get_object()
-        recipient_list = list(
-            set(
-                get_zorginstelling_medewerkers_email_list(case)
-                + get_woningcorporatie_medewerkers_email_list(case)
-            )
-        )
-        response = super().delete(request, *args, **kwargs)
-
-        if settings.EMAIL_HOST_USER and recipient_list:
-            send_template_mail(
-                "Omslagroute - Cliënt definitief verwijderd",
-                "cases/mail/case_deleted.txt",
-                {},
-                recipient_list,
-            )
+        client_name = case.client_name
+        delete_case_permanently(case)
 
         messages.add_message(
             self.request,
             messages.INFO,
-            "De cliënt '%s' is verwijderd." % case.client_name,
+            "De cliënt '%s' is verwijderd." % client_name,
         )
 
-        return response
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
@@ -569,6 +564,7 @@ class CaseDeleteRequestView(UserPassesTestMixin, UpdateView):
                 {
                     "case": case,
                     "user": self.request.user,
+                    "delete_date": delete_date(case),
                 },
                 recipient_list,
                 link_text="Cliëntgegevens bekijken",

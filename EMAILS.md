@@ -18,13 +18,13 @@ Ontvangers (`get_zorginstelling_medewerkers_email_list` in `app/web/users/utils.
 | Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Adres van cliënt gewijzigd | `CaseAddressUpdate` |
 | Verzoek om cliënt te verwijderen | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt | `CaseDeleteRequestView` |
 | Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt teruggedraaid | `CaseDeleteRequestRevokeView` |
-| Cliënt definitief verwijderd | Wonen | Omslagroute - Cliënt definitief verwijderd | `CaseDeleteView` |
 | Toegevoegd aan het team van een cliënt | Begeleider / PB & Organisatie beheerder | Omslagroute - je bent toegevoegd aan een team | `CaseInviteUsers`, `CaseInviteUsersCrossFederation` |
 | Verwijderd uit het team van een cliënt | Begeleider / PB & Organisatie beheerder | Omslagroute - je bent uit een team verwijderd | `CaseRemoveInvitedUsers` |
 
 Bijzonderheden:
 - *Aanvraag ter controle gestuurd* gaat alleen naar het standaard e-mailadres van de eigen federatie (de controle afdeling), niet naar de gekoppelde begeleiders.
 - *Toegevoegd aan* en *verwijderd uit een team* gaan alleen naar de betreffende gebruiker zelf.
+- *Verzoek om cliënt te verwijderen* noemt de datum waarop de cliënt automatisch definitief wordt verwijderd (`CASE_DELETE_SECONDS`, standaard 30 dagen na het verzoek). Bij het definitief verwijderen zelf wordt geen mail meer verstuurd: de cliënt is dan niet meer te herkennen of te openen.
 
 ## Wonen (gemeente)
 
@@ -54,7 +54,6 @@ Ontvangers (`get_woningcorporatie_medewerkers_email_list` in `app/web/users/util
 | Adres van de cliënt gewijzigd | Begeleider / PB & Organisatie beheerder | Omslagroute - Adres van cliënt gewijzigd | `CaseAddressUpdate` |
 | Verzoek om cliënt te verwijderen | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt | `CaseDeleteRequestView` |
 | Verzoek om cliënt te verwijderen teruggedraaid | Begeleider / PB & Organisatie beheerder | Omslagroute - Verzoek verwijderen cliënt teruggedraaid | `CaseDeleteRequestRevokeView` |
-| Cliënt definitief verwijderd | Wonen | Omslagroute - Cliënt definitief verwijderd | `CaseDeleteView` |
 
 Het stadsdeel van de cliënt wordt bij het opslaan van het adres server-side bepaald op basis van het gekozen adres (`AddressStadsdeelMixin` in `app/web/cases/forms.py`). Bij een adreswijziging wordt de mail verstuurd naar het stadsdeel van het nieuwe adres.
 

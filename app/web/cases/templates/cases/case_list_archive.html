@@ -66,7 +66,7 @@
                             <iframe class="modal--uploads" id="iframeCaseDelete" data-src="{% url 'delete_case' object.id %}" src="about:blank" title="Cliënt defintief verwijderen"></iframe>
                         </div>
                         {% else %}
-                        {{ object.delete_request_seconds_left|duration }}
+                        Automatisch verwijderd over {{ object.delete_request_seconds_left|duration }}
                         {% endif %}
                     </td>
                 </tr>

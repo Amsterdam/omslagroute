@@ -1,4 +1,6 @@
-{{ user.username }} heeft gevraagd om een cliënt te verwijderen uit de Omslagroute.{% if case.delete_request_message %}
+{{ user.username }} heeft gevraagd om een cliënt te verwijderen uit de Omslagroute.{% if delete_date %}
+
+De cliënt wordt op {{ delete_date|date:"j F Y" }} automatisch definitief verwijderd. Tot die datum kan het verzoek ongedaan worden gemaakt.{% endif %}{% if case.delete_request_message %}
 
 Bericht van {{ user.username }}:
 {{ case.delete_request_message }}{% endif %}

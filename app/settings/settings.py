@@ -246,7 +246,7 @@ CONSTANCE_CONFIG = {
     CONSTANCE_HOMEPAGE_INTRO_KEY: ('', 'Homepage introduction html'),
     CONSTANCE_NEW_USER_INTRO_KEY: ('', 'Nieuwe gebruiker introduction html'),
     CONSTANCE_FEEDBACK_RECIPIENT_LIST_KEY: ('', 'Feedback ontvangers lijst(kommagescheiden)'),
-    CONSTANCE_CASE_DELETE_SECONDS_KEY: (60 * 60 * 24 * 30, 'Na het aantal seconden nadat de persoonlijk begeleider de cliënt het verzoek om de cliënt te verwijderen heeft ingediend, wordt de cliënt echt verwijderd. Standaard is dit 30 dagen (60*60*24*30)'),
+    CONSTANCE_CASE_DELETE_SECONDS_KEY: (60 * 60 * 24 * 30, 'Na het aantal seconden nadat de persoonlijk begeleider de cliënt het verzoek om de cliënt te verwijderen heeft ingediend, wordt de cliënt automatisch definitief verwijderd (dagelijkse taak: manage.py delete_expired_cases). Tot die taak gedraaid heeft kan Wonen de cliënt ook handmatig verwijderen. Standaard is dit 30 dagen (60*60*24*30)'),
 }
 
 OIDC_RP_CLIENT_ID = os.environ.get('IAM_CLIENT_ID')

@@ -18,7 +18,7 @@
             </div>
             {% else %}
             
-            <p>Verwijderen mogelijk over <strong>{{ object.delete_request_seconds_left|duration }}</strong></p>
+            <p>Wordt automatisch definitief verwijderd over <strong>{{ object.delete_request_seconds_left|duration }}</strong></p>
             {% endif %}
             {% else %}
             <p><a href="#" data-handler="modal" data-contentid="modalDeleteRequestRevoke">Verwijderen ongedaan maken</a> nog <strong>{{ object.delete_request_seconds_left|duration }}</strong>

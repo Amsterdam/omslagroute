@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %} - Cliënt niet gevonden{% endblock %}
+
+{% block breadcrumb %}
+    <nav class="breadcrumb screen-only" aria-label="Kruimelpad">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-step"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-step sr-only" aria-current="location">Cliënt niet gevonden</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    <section class="section section--404">
+        <h2 class="u-margin-none">Deze cliënt bestaat niet meer of je hebt geen toegang.</h2>
+        <p>Een cliënt wordt na een verzoek om te verwijderen automatisch definitief verwijderd. Ga verder via de <a href="/">homepage</a>.</p>
+    </section>
+{% endblock %}
