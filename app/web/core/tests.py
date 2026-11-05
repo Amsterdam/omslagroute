@@ -77,7 +77,6 @@ class SendTemplateMailTestCase(SimpleTestCase):
     def test_all_mail_templates_exist(self):
         for name in (
             'cases/mail/case_address_changed.txt',
-            'cases/mail/case_deleted.txt',
             'cases/mail/case_delete_request.txt',
             'cases/mail/case_delete_request_revoke.txt',
             'cases/mail/case_link.txt',

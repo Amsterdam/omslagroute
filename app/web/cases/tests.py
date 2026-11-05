@@ -1,11 +1,16 @@
 from datetime import timedelta
+from io import StringIO
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
+from constance.test import override_config
 from django.contrib.sessions.models import Session
 from django.core import mail
+from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import dateformat, timezone
 
 from web.cases.forms import CaseAddressForm, CaseAddressUpdateForm
 from web.cases.models import Case, CaseStatus
@@ -307,14 +312,26 @@ class CaseMailFlowTestCase(TestCase):
         else:
             self.assertNotIn('https://', message.body)
 
-    def test_case_deleted(self):
+    def test_case_deleted_sends_no_mail(self):
         self.client.force_login(self.wonen_user)
 
         self.client.post(reverse('delete_case', kwargs={'pk': self.case.id}))
 
-        self.assert_mail('Omslagroute - Cliënt definitief verwijderd')
-        self.assertIn('begeleider@example.com', mail.outbox[-1].to)
+        self.assertFalse(Case.objects.filter(pk=self.case.pk).exists())
+        self.assertEqual(len(mail.outbox), 0)
 
+    def test_deleted_case_link_shows_not_found_page(self):
+        case_id = self.case.id
+        self.case.delete()
+
+        response = self.client.get(reverse('case', kwargs={'pk': case_id}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(
+            response, 'Deze cliënt bestaat niet meer of je hebt geen toegang.', status_code=404
+        )
+
+    @override_config(CASE_DELETE_SECONDS=60 * 60 * 24 * 30)
     def test_delete_request(self):
         self.client.post(
             reverse('delete_request_case', kwargs={'pk': self.case.id}),
@@ -323,6 +340,18 @@ class CaseMailFlowTestCase(TestCase):
 
         self.assert_mail('Omslagroute - Verzoek verwijderen cliënt', 'Cliëntgegevens bekijken')
         self.assertIn('Reden', mail.outbox[-1].body)
+        self.case.refresh_from_db()
+        expected_date = dateformat.format(
+            timezone.localtime(
+                self.case.delete_request_date + timedelta(days=30),
+                ZoneInfo('Europe/Amsterdam'),
+            ),
+            'j F Y',
+        )
+        self.assertIn(
+            'De cliënt wordt op %s automatisch definitief verwijderd.' % expected_date,
+            mail.outbox[-1].body,
+        )
 
     def test_delete_request_revoke(self):
         Case.objects.filter(pk=self.case.pk).update(delete_request_date=timezone.now())
@@ -639,3 +668,90 @@ class CaseStatusApiTestCase(TestCase):
 
             self.assertEqual(response.status_code, 405)
         self.assertTrue(CaseStatus.objects.exists())
+
+
+@override_settings(EMAIL_HOST_USER='local')
+@override_config(CASE_DELETE_SECONDS=60 * 60 * 24 * 30)
+class DeleteExpiredCasesCommandTestCase(TestCase):
+    def setUp(self):
+        federation = Federation.objects.create(
+            name='Zorginstelling',
+            federation_id='zorginstelling',
+            organization=Organization.objects.create(
+                name='Zorginstelling', federation_type=FEDERATION_TYPE_ZORGINSTELLING
+            ),
+        )
+        self.user = User.objects.create(
+            username='begeleider@example.com',
+            user_type=[str(BEGELEIDER)],
+            federation=federation,
+        )
+        Profile.objects.get_or_create(user=self.user)
+        now = timezone.now()
+        self.expired = self.create_case(now - timedelta(days=31))
+        self.pending = self.create_case(now - timedelta(days=29))
+        self.active = self.create_case(None)
+
+    def create_case(self, delete_request_date):
+        case = Case.objects.create(
+            delete_request_date=delete_request_date,
+            delete_request_by=self.user.profile if delete_request_date else None,
+            delete_request_message='Cliënt is verhuisd' if delete_request_date else None,
+        )
+        self.user.profile.cases.add(case)
+        CaseStatus.objects.create(
+            case=case, form='aanvraag-omklap', profile=self.user.profile, status=1
+        )
+        return case
+
+    def run_command(self, *args):
+        out = StringIO()
+        call_command('delete_expired_cases', *args, stdout=out)
+        return out.getvalue()
+
+    def test_deletes_only_expired_cases(self):
+        output = self.run_command()
+
+        self.assertFalse(Case.objects.filter(pk=self.expired.pk).exists())
+        self.assertFalse(CaseStatus.objects.filter(case_id=self.expired.pk).exists())
+        self.assertTrue(Case.objects.filter(pk=self.pending.pk).exists())
+        self.assertTrue(Case.objects.filter(pk=self.active.pk).exists())
+        self.assertIn('1 cliënt(en) verwijderd, 0 mislukt', output)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_dry_run_deletes_nothing(self):
+        output = self.run_command('--dry-run')
+
+        self.assertEqual(Case.objects.count(), 3)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertIn('case %s' % self.expired.pk, output)
+        self.assertIn('1 cliënt(en) zouden worden verwijderd', output)
+
+    def test_failure_continues_and_exits_with_error(self):
+        second = self.create_case(timezone.now() - timedelta(days=40))
+        original_delete = Case.delete
+
+        def failing_delete(case):
+            if case.pk == second.pk:
+                raise RuntimeError('storage down')
+            return original_delete(case)
+
+        with patch.object(Case, 'delete', failing_delete):
+            with self.assertRaises(CommandError):
+                self.run_command()
+
+        self.assertFalse(Case.objects.filter(pk=self.expired.pk).exists())
+        self.assertTrue(Case.objects.filter(pk=second.pk).exists())
+
+    def test_manual_delete_button_still_works(self):
+        wonen_user = User.objects.create(
+            username='wonen@example.com', user_type=[str(WONEN)]
+        )
+        Profile.objects.get_or_create(user=wonen_user)
+        self.client.force_login(wonen_user)
+
+        response = self.client.post(reverse('delete_case', kwargs={'pk': self.expired.pk}))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Case.objects.filter(pk=self.expired.pk).exists())
+        self.assertEqual(len(mail.outbox), 0)
