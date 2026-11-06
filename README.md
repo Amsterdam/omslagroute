@@ -2,24 +2,29 @@
 
 # Prerequisites
 
-- [Docker](https://docs.docker.com/docker-for-mac/install/)
+- [Docker](https://docs.docker.com/get-docker/) with Docker Compose
 
 # Local Development
 
-Start the dev server for local development:
+All commands below are run through Docker Compose. Start the dev server for local development:
 ```bash
-docker-compose -f docker-compose.local.yml up
-```
-
-Create superuser:
-```bash
-python manage.py initadmin --settings settings.settings --username <EMAIL> --password <PASSWORD>
+docker compose -f docker-compose.local.yml up
 ```
 
 Go to http://localhost:8088/
 
 For the admin interface:
 http://localhost:8088/admin/
+
+## Superuser
+On startup, the container automatically creates a superuser with username `name@email.com` and password `insecure` (see the `command` in `docker-compose.local.yml`). On later starts, the log shows `Admin accounts can only be initialized if no Accounts exist`; this is expected, because the account already exists.
+
+To create another superuser:
+```bash
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py initadmin --username <USERNAME> --password <PASSWORD>
+```
+
+> Note: `initadmin` always sets the e-mail address to `<part before the @>@email.com`, regardless of the username given.
 
 ## E-mail (Mailpit)
 Locally, all outgoing e-mail is caught by [Mailpit](https://mailpit.axllent.org/), which is started together with the dev server. No e-mail is sent to real addresses.
@@ -30,50 +35,71 @@ The mail settings are configured through environment variables (`EMAIL_BACKEND`,
 
 For an overview of when and to whom e-mails are sent, see [EMAILS.md](EMAILS.md).
 
+To send a test e-mail, log in as a superuser and go to:
+http://localhost:8088/admin/sendmail?mailadres=test@example.com
+
+The e-mail then shows up in Mailpit.
+
 To print e-mails to the container logs instead, set:
 ```bash
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 ```
 
-## Importing fixtures dump
-The Django project needs some configuration in order to run locally. It's possible to add these manually, but the quickest way is importing using fixtures from the acceptance environment. You can download these automatically at: https://acc.omslagroute.amsterdam.nl/admin/dumpdata. You'll need to be logged in using an admin account first to access this url.
+## Fixtures
+The Django project needs some configuration in order to run locally. It's possible to add these manually, but there are two quicker options.
 
-Move the json into the `app` directory on the root of your project, and run the following command
-
+For a basic setup, import the fixtures that are included in the repository:
 ```bash
-docker-compose -f docker-compose.local.yml run --rm omslagroute python manage.py loaddata <name of fixture>
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py loaddata fixtures.json
+```
+
+For a more complete setup, import a dump from the acceptance environment. You can download it at: https://acc.omslagroute.amsterdam.nl/admin/dumpdata. You'll need to be logged in using an admin account first to access this url.
+
+Move the json into the `app` directory of this repository, and run:
+```bash
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py loaddata <name of fixture>
 ```
 Remove the json fixture after installing it.
 
+## Tests
+
+Run all tests:
+```bash
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py test web.core web.cases web.users web.organizations web.feedback
+```
+
+> Note: list the apps explicitly. `python manage.py test` and `python manage.py test web` fail with `Model class app.web.users.models.User doesn't declare an explicit app_label`, because `app/__init__.py` makes the tests get imported as `app.web...` instead of `web...`.
+
+Run only the e-mail tests (layout and templates of `send_template_mail`):
+```bash
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py test web.core
+```
+
+The e-mails sent per event are tested in the tests of the other apps.
+
 ## Build
 
-To rebuild (for example, when dependencies are added requirements.txt):
+To rebuild (for example, after dependencies are added in `pyproject.toml` or `package.json`):
 ```bash
-docker-compose -f docker-compose.local.yml build
+docker compose -f docker-compose.local.yml build
 ```
 
 Start watching static files changes scss:
 
 ```bash
-docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/sass --watch static_src/sass:./assets/bundles/
-
+docker compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/sass --watch static_src/sass:./assets/bundles/
 ```
 
 Start watching static files changes js, vue:
 
 ```bash
-docker-compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/webpack --config webpack.config.js --watch
+docker compose -f docker-compose.local.yml exec omslagroute ./node_modules/.bin/webpack --config webpack.config.js --watch
 ```
 
 Migrate database without restarting containers:
 
 ```bash
-docker-compose -f docker-compose.local.yml exec omslagroute python manage.py migrate
-```
-
-To add a basic setup for your local environment run the following command to import fixtures:
-```bash
-docker exec -it salmagundi_wonen_omslagroute python manage.py loaddata fixtures.json
+docker compose -f docker-compose.local.yml exec omslagroute python manage.py migrate
 ```
 
 # Dependency management & upgrading
